@@ -1,6 +1,14 @@
 [
   {
     "kind": "commit",
+    "repo": "ozzycodes2",
+    "title": "fix: require PROFILE_TOKEN and fill in the contact links",
+    "url": "https://github.com/ozzycodes2/ozzycodes2/commit/e53a05f584854e9372f9f5e7d9f0b2f0e6edf274",
+    "at": "2026-10-12T20:43:37Z",
+    "language": "Python"
+  },
+  {
+    "kind": "commit",
     "repo": "cc-powerline",
     "title": "chore: release 0.2.10",
     "url": "https://github.com/ozzycodes2/cc-powerline/commit/e222a7e435b00c887b2fa706628ff10f5b3f9b73",
