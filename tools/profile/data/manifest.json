@@ -5,36 +5,13 @@
     "width": "100%"
   },
   {
-    "file": "links.svg",
-    "desc": "Links: GitHub, LinkedIn, Email.",
-    "width": "100%"
-  },
-  {
-    "file": "links/github.svg",
-    "desc": "GitHub \u2014 https://github.com/ozzycodes2",
-    "width": "31.8182%",
-    "href": "https://github.com/ozzycodes2"
-  },
-  {
-    "file": "links/linkedin.svg",
-    "desc": "LinkedIn \u2014 https://www.linkedin.com/in/osniel-quintana/",
-    "width": "36.3636%",
-    "href": "https://www.linkedin.com/in/osniel-quintana/"
-  },
-  {
-    "file": "links/mail.svg",
-    "desc": "Email \u2014 mailto:osniel219@gmail.com",
-    "width": "31.8182%",
-    "href": "mailto:osniel219@gmail.com"
-  },
-  {
     "file": "stats.svg",
-    "desc": "GitHub stats updated 2026-10-12: 1,184 contributions in 2026, 1,451 all time, 1,130 of them in private repositories, 375 pull requests merged, longest streak 6 days, 5 followers. member since August 2016 \u00b7 5 of 11 repos public. Top languages by bytes: Python 33.4%, TypeScript 31.0%, Java 12.5%, Swift 10.0%, JavaScript 8.0%, C++ 5.1%.",
+    "desc": "GitHub stats updated 2026-10-12: 1,185 contributions in 2026, 1,452 all time, 1,130 of them in private repositories, 375 pull requests merged, longest streak 6 days, 5 followers. member since August 2016 \u00b7 5 of 11 repos public. Top languages by bytes: Python 33.4%, TypeScript 31.0%, Java 12.5%, Swift 10.0%, JavaScript 8.0%, C++ 5.1%.",
     "width": "100%"
   },
   {
     "file": "contribution-city.svg",
-    "desc": "Contribution city: an isometric night skyline with one building per day of the last year, each building's height set by that day's contribution count. 1,181 contributions across 65 active days between 16 April 2026 and 12 October 2026; busiest day 25 August 2026 with 66.",
+    "desc": "Contribution city: an isometric night skyline with one building per day of the last year, each building's height set by that day's contribution count. 1,182 contributions across 65 active days between 16 April 2026 and 12 October 2026; busiest day 25 August 2026 with 66.",
     "width": "100%"
   },
   {
@@ -70,11 +47,6 @@
     "desc": "facebook-message-parser, Python, updated 7 years ago. Tagged Python, HTML. Turns a Facebook data export into readable, searchable HTML conversation history.",
     "width": "50%",
     "href": "https://github.com/ozzycodes2/facebook-message-parser"
-  },
-  {
-    "file": "activity.svg",
-    "desc": "4 recent public events: commit in ozzycodes2, chore: refresh profile, 2 minutes ago; commit in cc-powerline, chore: release 0.2.10, 1 month ago; release in cc-powerline, v0.1.2, 1 month ago; commit in email-signatures, Updated, 3 months ago. 1,130 private contributions this year are counted in the stats above, not listed here.",
-    "width": "100%"
   },
   {
     "file": "footer.svg",

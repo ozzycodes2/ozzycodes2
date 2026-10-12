@@ -12,22 +12,6 @@ tagline = [
   "I build the developer tooling other engineers ship on.",
 ]
 
-# `icon` must match a key in icons.json.
-[[links]]
-icon = "github"
-label = "GitHub"
-url = "https://github.com/ozzycodes2"
-
-[[links]]
-icon = "linkedin"
-label = "LinkedIn"
-url = "https://www.linkedin.com/in/osniel-quintana/"
-
-[[links]]
-icon = "mail"
-label = "Email"
-url = "mailto:osniel219@gmail.com"
-
 [city]
 # Days of contribution history the skyline draws. Shorter windows mean fewer
 # weeks, so the buildings get bigger and the strip still fills the frame — the

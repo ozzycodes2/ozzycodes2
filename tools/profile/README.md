@@ -16,7 +16,7 @@ fetch.py ─────┘                 + manifest.json
 
 | Step | Reads | Writes |
 |---|---|---|
-| `fetch.py` | GitHub GraphQL API | `data/stats.json`, `calendar.json`, `activity.json`, `projects.json` |
+| `fetch.py` | GitHub GraphQL API | `data/stats.json`, `calendar.json`, `projects.json` |
 | `render.py` | `profile.toml`, `data/*.json` | `assets/**.svg`, `data/manifest.json` |
 | `readme.py` | `data/manifest.json` | the block between the markers in `README.md` |
 
@@ -43,15 +43,15 @@ monospace the viewer has.
 
 A single tall SVG could not be partly clickable — one image, one link. Slicing
 the frame into consecutive images lets the README wrap individual slices in
-their own `<a>`, which is how the project cards and link tiles work. Each slice
+their own `<a>`, which is how the project cards work. Each slice
 redraws the side rails and the background grid, and because every height is a
 multiple of 40px the grid lines up across the seams; only the first slice draws
 the top edge, only the last closes the frame.
 
 ## Adding or changing a panel
 
-Content that is prose lives in `profile.toml` — headline, links, the stack
-table, project blurbs. Editing it and pushing is enough; the workflow re-renders
+Content that is prose lives in `profile.toml` — headline, the stack table,
+project blurbs. Editing it and pushing is enough; the workflow re-renders
 on any change under `tools/profile/`.
 
 A new panel is a module in `panels/` exposing `render(cfg, data)`, registered in
@@ -81,8 +81,8 @@ The workflow's built-in `GITHUB_TOKEN` also authenticates, but sees public data
 only — totals drop to a small fraction with no error. The job checks for the
 PAT and fails rather than committing an undercount that looks plausible.
 
-Private repository *names* are never written to `data/` and never rendered. The
-activity panel lists public events only and states the private count separately.
+Private repository *names* are never written to `data/` and never rendered —
+only aggregate counts.
 
 One API detail worth recording, because it is easy to get wrong and the error
 is silent: when the token can see private repositories,

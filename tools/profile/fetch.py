@@ -4,7 +4,6 @@ Writes four files, each the input to one or more panels:
 
   stats.json     headline counters, language byte totals, streaks
   calendar.json  [[iso date, count], ...] for the last 365 days
-  activity.json  recent releases and pushes, public repos only
   projects.json  live stars/language for the repos profile.toml curates
 
 PROFILE_TOKEN is a classic PAT with `repo` + `read:user`; with it, private
@@ -91,29 +90,6 @@ query($login: String!, $from: DateTime!, $to: DateTime!) {
 }
 """
 
-ACTIVITY_Q = """
-query($login: String!) {
-  user(login: $login) {
-    repositories(first: 100, ownerAffiliations: OWNER, privacy: PUBLIC,
-                 orderBy: {field: PUSHED_AT, direction: DESC}) {
-      nodes {
-        name
-        description
-        pushedAt
-        primaryLanguage { name }
-        releases(last: 3) { nodes { tagName publishedAt url } }
-        defaultBranchRef {
-          target {
-            ... on Commit {
-              history(first: 1) { nodes { committedDate messageHeadline url } }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-"""
 
 REPO_Q = """
 query($owner: String!, $name: String!) {
@@ -221,42 +197,6 @@ def build_stats(today):
     return stats, calendar
 
 
-def build_activity(limit=6, per_repo=2, max_age_days=550):
-    """Recent public releases and commits, newest first.
-
-    Capped per repository so one busy project cannot fill the panel, and
-    cut off by age so a dormant repo's last commit from years ago does not
-    get presented as recent activity. Returning fewer than `limit` events
-    is expected; the panel sizes itself to what it gets.
-    """
-    cutoff = (datetime.datetime.now(datetime.timezone.utc)
-              - datetime.timedelta(days=max_age_days)).isoformat()
-    nodes = graphql(ACTIVITY_Q, login=USER)["user"]["repositories"]["nodes"]
-    events = []
-    for repo in nodes:
-        for release in repo["releases"]["nodes"]:
-            events.append({"kind": "release", "repo": repo["name"],
-                           "title": release["tagName"], "url": release["url"],
-                           "at": release["publishedAt"],
-                           "language": (repo["primaryLanguage"] or {}).get("name")})
-        target = repo["defaultBranchRef"] and repo["defaultBranchRef"]["target"]
-        for commit in (target or {}).get("history", {}).get("nodes", []):
-            events.append({"kind": "commit", "repo": repo["name"],
-                           "title": commit["messageHeadline"], "url": commit["url"],
-                           "at": commit["committedDate"],
-                           "language": (repo["primaryLanguage"] or {}).get("name")})
-    events.sort(key=lambda e: e["at"], reverse=True)
-
-    kept, seen = [], {}
-    for event in events:
-        if event["at"] < cutoff or seen.get(event["repo"], 0) >= per_repo:
-            continue
-        seen[event["repo"]] = seen.get(event["repo"], 0) + 1
-        kept.append(event)
-        if len(kept) == limit:
-            break
-    return kept
-
 
 def build_projects(config):
     out = []
@@ -308,7 +248,6 @@ def main():
     check_private_visible(stats)
     write("stats.json", stats)
     write("calendar.json", calendar)
-    write("activity.json", build_activity())
     write("projects.json", build_projects(config))
 
 

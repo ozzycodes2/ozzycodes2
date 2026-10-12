@@ -13,19 +13,16 @@ HERE = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent.parent))
 
 from tools.profile import console as c
-from tools.profile.panels import (activity, city, footer, header, links,
-                                  projects, stack, stats)
+from tools.profile.panels import city, footer, header, projects, stack, stats
 
 # Display order, and the order of the manifest. `top` and `bottom` are decided
 # from position here, so header stays first and footer last.
 PANELS = [
     ("header.svg", header),
-    ("links.svg", links),
     ("stats.svg", stats),
     ("contribution-city.svg", city),
     ("stack.svg", stack),
     ("projects.svg", projects),
-    ("activity.svg", activity),
     ("footer.svg", footer),
 ]
 

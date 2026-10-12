@@ -20,7 +20,7 @@ def render(cfg, data):
 
 - `cfg` — parsed `profile.toml` (hand-written content).
 - `data` — `{stem: parsed json}` for every file in `data/`: `stats`, `calendar`,
-  `activity`, `projects`. A panel must tolerate a missing key.
+  `projects`. A panel must tolerate a missing key.
 
 ### `console` exports
 
