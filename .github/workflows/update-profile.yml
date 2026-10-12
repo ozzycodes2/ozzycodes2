@@ -34,13 +34,21 @@ jobs:
       - name: Install dependencies
         run: pip install fonttools==4.62.1 brotli==1.2.0
 
+      # Required, not optional: the job token sees only public activity, so
+      # without the PAT the contribution and language totals silently collapse
+      # to a fraction of the real numbers and get committed as if correct.
+      # Failing here is recoverable; a published undercount is not obvious.
+      - name: Require a personal access token
+        run: |
+          if [ -z "${{ secrets.PROFILE_TOKEN }}" ]; then
+            echo "::error::PROFILE_TOKEN is not set. Create a classic PAT with" \
+                 "'repo' + 'read:user' and add it as a repository secret."
+            exit 1
+          fi
+
       - name: Fetch data
         env:
-          # Optional. A classic PAT with `repo` + `read:user` makes private
-          # repositories count toward contributions and language totals.
-          # Without it the job falls back to the public-only job token.
           PROFILE_TOKEN: ${{ secrets.PROFILE_TOKEN }}
-          GITHUB_TOKEN: ${{ github.token }}
         run: python tools/profile/fetch.py
 
       - name: Render SVGs

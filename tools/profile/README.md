@@ -73,10 +73,13 @@ shows an empty frame. Force reduced motion to see the final state.
 
 ## The token
 
-`fetch.py` works with the workflow's built-in `GITHUB_TOKEN`, which sees public
-data only. Setting a repository secret named `PROFILE_TOKEN` to a classic PAT
-with `repo` and `read:user` makes private repositories count toward
+The workflow requires a repository secret named `PROFILE_TOKEN`: a classic PAT
+with `repo` and `read:user`. It is what makes private repositories count toward
 contribution totals, streaks, and language byte counts.
+
+The workflow's built-in `GITHUB_TOKEN` also authenticates, but sees public data
+only — totals drop to a small fraction with no error. The job checks for the
+PAT and fails rather than committing an undercount that looks plausible.
 
 Private repository *names* are never written to `data/` and never rendered. The
 activity panel lists public events only and states the private count separately.
