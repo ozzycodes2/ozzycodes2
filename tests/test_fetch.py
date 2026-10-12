@@ -2,6 +2,7 @@
 import datetime
 import io
 import json
+import re
 import sys
 import urllib.error
 
@@ -228,24 +229,80 @@ PROFILE = {"user": {
 }}
 
 
-def test_build_stats_sums_languages_across_repos(monkeypatch):
-    monkeypatch.setattr(fetch, "graphql", lambda q, **k:
-                        PROFILE if "repositories" in q and "contributionsCollection" not in q
-                        else collection(10, 4, [("2026-10-12", 10)]))
+def contributed_page(nodes, *, orgs=2, next_cursor=None):
+    return {"user": {
+        "organizations": {"totalCount": orgs},
+        "repositoriesContributedTo": {
+            "totalCount": len(nodes),
+            "pageInfo": {"hasNextPage": bool(next_cursor), "endCursor": next_cursor},
+            "nodes": nodes,
+        },
+    }}
+
+
+def repo(size_by_language, *, private=True, org=True):
+    return {"isPrivate": private, "isInOrganization": org,
+            "languages": {"edges": [{"size": n, "node": {"name": k}}
+                                    for k, n in size_by_language.items()]}}
+
+
+CONTRIBUTED = contributed_page([
+    repo({"Python": 100}, private=False, org=False),
+    repo({"Python": 300, "Go": 50}),
+])
+
+
+def route(q, **k):
+    """Dispatch a fake response on which query the caller passed."""
+    if "repositoriesContributedTo" in q:
+        return CONTRIBUTED
+    if "contributionsCollection" in q:
+        return collection(10, 4, [("2026-10-12", 10)])
+    return PROFILE
+
+
+def test_build_stats_sums_languages_across_every_repo_worked_in(monkeypatch):
+    monkeypatch.setattr(fetch, "graphql", route)
     stats, _ = fetch.build_stats(datetime.date(2026, 10, 12))
     assert stats["languages"] == {"Python": 400, "Go": 50}
     assert list(stats["languages"]) == ["Python", "Go"], "sorted by size descending"
 
 
-def test_build_stats_counts_public_and_total_repos(monkeypatch):
-    monkeypatch.setattr(fetch, "graphql", lambda q, **k:
-                        PROFILE if "repositories" in q and "contributionsCollection" not in q
-                        else collection(10, 4, [("2026-10-12", 10)]))
+def test_build_stats_counts_owned_and_contributed_repos_separately(monkeypatch):
+    """`repos` is what the account owns; `repos_contributed` is what it worked in."""
+    monkeypatch.setattr(fetch, "graphql", route)
     stats, calendar = fetch.build_stats(datetime.date(2026, 10, 12))
     assert (stats["repos"], stats["repos_public"]) == (11, 1)
+    assert stats["repos_contributed"] == 2
+    assert stats["repos_contributed_private"] == 1
+    assert stats["repos_contributed_org"] == 1
+    assert stats["orgs"] == 2
     assert (stats["prs"], stats["prs_merged"]) == (423, 372)
     assert stats["private_year"] == 4
     assert calendar == [["2026-10-12", 10]]
+
+
+def test_contributed_repos_follows_every_page(monkeypatch):
+    """A 100-repo page cap would silently truncate the language totals."""
+    pages = iter([
+        contributed_page([repo({"Rust": 10})], next_cursor="cursor"),
+        contributed_page([repo({"Rust": 5, "Zig": 1})]),
+    ])
+    monkeypatch.setattr(fetch, "graphql", lambda q, **k: next(pages))
+    languages, counts = fetch.contributed_repos()
+    assert languages == {"Rust": 15, "Zig": 1}
+    assert counts["repos"] == 2
+
+
+def test_contributed_repos_never_asks_for_a_repository_or_owner_name():
+    """An employer's identity must not be reachable from data/.
+
+    Language names are the one `name` the query may select, so they are cut
+    out before looking for the rest.
+    """
+    query = re.sub(r"languages\(.*?\n\s*\}", "", fetch.CONTRIB_REPOS_Q, flags=re.S)
+    for field in ("name", "nameWithOwner", "owner", "url", "description"):
+        assert field not in query, field
 
 
 def test_write_emits_trailing_newline(tmp_path, monkeypatch):

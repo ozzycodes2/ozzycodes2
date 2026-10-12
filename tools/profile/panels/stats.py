@@ -3,6 +3,10 @@
 Stars and forks are deliberately absent: the account has none, and a row of
 zeroes says less than nothing. Most of the work here happens in private repos,
 so the private contribution count carries the honest signal.
+
+The language chart is whole-repository byte totals over every repository worked
+in, organization repositories included. It describes the codebases rather than
+the author's own output; `desc` says so, since the bars cannot.
 """
 import datetime
 
@@ -37,7 +41,7 @@ def _counters(s):
         ("PRIVATE THIS YEAR", n("private_year"), ""),
         ("PRS MERGED", n("prs_merged"), ""),
         ("LONGEST STREAK", n("streak_longest"), " days"),
-        ("FOLLOWERS", n("followers"), ""),
+        ("REPOS CONTRIBUTED", n("repos_contributed"), ""),
     ]
 
 
@@ -106,8 +110,13 @@ def render(_cfg, data):
                     + _cell(x, label_y, label, value, suffix) + "</g>")
 
     since = _member_since(s.get("created_at"))
-    split = f"{s.get('repos_public', 0):,} of {s.get('repos', 0):,} repos public"
-    meta = f"{since} · {split}" if since else split
+    orgs = s.get("orgs", 0)
+    parts = [p for p in (
+        since,
+        f"{s.get('repos_public', 0):,} of {s.get('repos', 0):,} repos public",
+        f"{orgs:,} organization{'' if orgs == 1 else 's'}" if orgs else "",
+    ) if p]
+    meta = " · ".join(parts)
     body.append(f'<g class="ln" style="animation-delay:0.60s">'
                 f'<text x="{COL_L}" y="234" class="faint" style="font-size:13px">{c.e(meta)}</text></g>')
 
@@ -133,8 +142,11 @@ def render(_cfg, data):
         f"{s.get('private_year', 0):,} of them in private repositories, "
         f"{s.get('prs_merged', 0):,} pull requests merged, "
         f"longest streak {s.get('streak_longest', 0):,} days, "
-        f"{s.get('followers', 0):,} followers. {meta}. "
-        f"Top languages by bytes: {chart}."
+        f"{s.get('repos_contributed', 0):,} repositories contributed to. {meta}. "
+        # States the basis: these are whole-repository byte totals across every
+        # repository worked in, not a measure of what this author wrote.
+        f"Top languages by total bytes across all "
+        f"{s.get('repos_contributed', 0):,} repositories: {chart}."
     )
     return c.slice_svg(
         c.to_grid(last_y + 28), "\n".join(body),

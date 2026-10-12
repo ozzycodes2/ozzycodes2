@@ -11,6 +11,8 @@ STATS = {
     "followers": 5, "prs": 423, "prs_merged": 372, "repos": 11, "repos_public": 5,
     "stars": 0, "forks": 0, "contributions_year": 1174, "contributions_all": 1441,
     "private_year": 1122, "streak_longest": 6,
+    "repos_contributed": 29, "repos_contributed_private": 26,
+    "repos_contributed_org": 23, "orgs": 2,
     "languages": {"TypeScript": 508003, "Python": 417967, "Java": 204747,
                   "Swift": 163026, "JavaScript": 130812, "C++": 83684,
                   "CSS": 80999, "Shell": 39980},
@@ -57,7 +59,7 @@ def test_nothing_is_drawn_outside_the_content_column(markup):
 def test_every_requested_counter_is_drawn_with_thousands_separators(shown):
     for label, value in (("CONTRIBUTIONS 2026", "1,174"), ("ALL TIME", "1,441"),
                          ("PRIVATE THIS YEAR", "1,122"), ("PRS MERGED", "372"),
-                         ("LONGEST STREAK", "6"), ("FOLLOWERS", "5")):
+                         ("LONGEST STREAK", "6"), ("REPOS CONTRIBUTED", "29")):
         assert label in shown and value in shown
 
 
@@ -154,8 +156,9 @@ def test_desc_spells_out_every_number_it_draws(markup):
     for fragment in ("updated 2026-10-12", "1,174 contributions in 2026",
                      "1,441 all time", "1,122 of them in private",
                      "372 pull requests merged", "longest streak 6 days",
-                     "5 followers", "member since August 2016",
-                     "5 of 11 repos public", "TypeScript 33.7%", "C++ 5.5%"):
+                     "29 repositories contributed to",
+                     "member since August 2016", "5 of 11 repos public",
+                     "2 organizations", "TypeScript 33.7%", "C++ 5.5%"):
         assert fragment in desc, fragment
 
 

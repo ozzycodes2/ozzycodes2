@@ -6,10 +6,13 @@ Writes four files, each the input to one or more panels:
   calendar.json  [[iso date, count], ...] for the last 365 days
   projects.json  live stars/language for the repos profile.toml curates
 
-PROFILE_TOKEN is a classic PAT with `repo` + `read:user`; with it, private
-repositories contribute to counters and language totals. Without it the job
-falls back to GITHUB_TOKEN and sees public data only. Private repository
-*names* are never written to any of these files.
+PROFILE_TOKEN is a classic PAT with `repo` + `read:user`, SSO-authorized for
+every organization whose work should count. Without that access the counters
+silently drop to public-only; REQUIRE_PRIVATE makes that an error instead.
+
+No repository, organization or owner *name* is ever requested for anything
+beyond the repos profile.toml curates by hand. Organization work reaches the
+profile only as counts and as language byte totals.
 """
 import datetime
 import json
@@ -66,6 +69,41 @@ query($login: String!) {
         isPrivate
         stargazerCount
         forkCount
+        languages(first: 12, orderBy: {field: SIZE, direction: DESC}) {
+          edges { size node { name } }
+        }
+      }
+    }
+  }
+}
+"""
+
+# Repositories actually worked in, across every affiliation, so organization
+# work counts toward the language totals and the repo tally. Deliberately asks
+# for no `name` and no `owner`: the query cannot leak an employer's identity
+# into data/ or into an error message even if one is later dumped verbatim.
+# `includeUserRepositories` folds personal repos into the same list, which is
+# what lets byte totals be summed without needing names to deduplicate.
+#
+# These are whole-tree byte counts, so the chart describes the codebases its
+# author works in, not lines they wrote. The honest alternative — commits
+# bucketed by language — is not available: GitHub reports private work only as
+# an undifferentiated `restrictedContributionsCount`, with no per-repository
+# breakdown, so a commit-based chart would silently omit 1,130 of this year's
+# 1,185 contributions and misreport the mix.
+CONTRIB_REPOS_Q = """
+query($login: String!, $after: String) {
+  user(login: $login) {
+    organizations(first: 1) { totalCount }
+    repositoriesContributedTo(
+      first: 100, after: $after, includeUserRepositories: true,
+      contributionTypes: [COMMIT, PULL_REQUEST, REPOSITORY]
+    ) {
+      totalCount
+      pageInfo { hasNextPage endCursor }
+      nodes {
+        isPrivate
+        isInOrganization
         languages(first: 12, orderBy: {field: SIZE, direction: DESC}) {
           edges { size node { name } }
         }
@@ -159,14 +197,35 @@ def streaks(calendar, today):
     return current, longest
 
 
+def contributed_repos():
+    """Every repository worked in, owned or not, aggregated without any names.
+
+    Returns `(language bytes, counts)`. The counts are plain integers — how
+    many repositories, how many private, how many under an organization, how
+    many organizations — which is as much as the profile says about work that
+    is not the author's to name.
+    """
+    languages, counts, after = {}, {"repos": 0, "private": 0, "org": 0, "orgs": 0}, None
+    while True:
+        result = graphql(CONTRIB_REPOS_Q, login=USER, after=after)["user"]
+        counts["orgs"] = result["organizations"]["totalCount"]
+        page = result["repositoriesContributedTo"]
+        for repo in page["nodes"]:
+            counts["repos"] += 1
+            counts["private"] += bool(repo["isPrivate"])
+            counts["org"] += bool(repo["isInOrganization"])
+            for edge in repo["languages"]["edges"]:
+                name = edge["node"]["name"]
+                languages[name] = languages.get(name, 0) + edge["size"]
+        if not page["pageInfo"]["hasNextPage"]:
+            return languages, counts
+        after = page["pageInfo"]["endCursor"]
+
+
 def build_stats(today):
     user = graphql(PROFILE_Q, login=USER)["user"]
     repos = user["repositories"]["nodes"]
-
-    languages = {}
-    for repo in repos:
-        for edge in repo["languages"]["edges"]:
-            languages[edge["node"]["name"]] = languages.get(edge["node"]["name"], 0) + edge["size"]
+    languages, contributed = contributed_repos()
 
     created = datetime.datetime.fromisoformat(user["createdAt"].replace("Z", "+00:00"))
     per_year, private, calendars = contributions_by_year(created.year, today)
@@ -183,6 +242,10 @@ def build_stats(today):
         "issues": user["issues"]["totalCount"],
         "repos": user["repositories"]["totalCount"],
         "repos_public": sum(1 for r in repos if not r["isPrivate"]),
+        "repos_contributed": contributed["repos"],
+        "repos_contributed_private": contributed["private"],
+        "repos_contributed_org": contributed["org"],
+        "orgs": contributed["orgs"],
         "stars": sum(r["stargazerCount"] for r in repos),
         "forks": sum(r["forkCount"] for r in repos),
         "contributions_year": per_year.get(today.year, 0),
