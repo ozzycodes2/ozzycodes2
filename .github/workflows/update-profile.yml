@@ -1,0 +1,62 @@
+name: Update profile
+
+on:
+  schedule:
+    - cron: "41 11 * * *"           # daily, a few minutes off the hour so the
+                                    # scheduler is not contending with everyone
+  workflow_dispatch:                # "Run workflow" button on the Actions tab
+  push:
+    branches: [main]
+    paths:                          # re-render immediately when the generator
+      - "tools/profile/**"          # or the hand-written content changes
+      - ".github/workflows/update-profile.yml"
+
+permissions:
+  contents: write                   # the job commits the refreshed output
+
+concurrency:
+  group: update-profile             # never let two runs race on a push
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      # Pinned: fontTools decides how the embedded font subsets are built, so
+      # an unpinned upgrade would rewrite every SVG and produce a noise commit.
+      - name: Install dependencies
+        run: pip install fonttools==4.62.1 brotli==1.2.0
+
+      - name: Fetch data
+        env:
+          # Optional. A classic PAT with `repo` + `read:user` makes private
+          # repositories count toward contributions and language totals.
+          # Without it the job falls back to the public-only job token.
+          PROFILE_TOKEN: ${{ secrets.PROFILE_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python tools/profile/fetch.py
+
+      - name: Render SVGs
+        run: python tools/profile/render.py
+
+      - name: Update README
+        run: python tools/profile/readme.py
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tools/profile/data assets README.md
+          if git diff --cached --quiet; then
+            echo "Nothing changed."
+          else
+            git commit -m "chore: refresh profile"
+            git push
+          fi

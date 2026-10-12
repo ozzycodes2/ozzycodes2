@@ -1,0 +1,70 @@
+# Hand-edited content for the profile README. Nothing here is fetched.
+# Edit, push, and the Actions workflow re-renders the SVGs from it.
+
+[identity]
+name = "Osniel Quintana"
+handle = "ozzycodes2"
+role = "platform engineer"
+# One line per rendered line. Keep each under ~72 characters or it will clip.
+tagline = [
+  "Backend by trade, platform by habit. Java and Python at the core,",
+  "Kubernetes and Terraform in production, agents in the toolchain.",
+  "I build the developer tooling other engineers ship on.",
+]
+
+# `icon` must match a key in icons.json.
+[[links]]
+icon = "github"
+label = "GitHub"
+url = "https://github.com/ozzycodes2"
+
+[[links]]
+icon = "linkedin"
+label = "LinkedIn"
+url = "https://www.linkedin.com/in/REPLACE-ME/"
+
+[[links]]
+icon = "mail"
+label = "Email"
+url = "mailto:REPLACE-ME@example.com"
+
+[city]
+# Days of contribution history the skyline draws. Shorter windows mean fewer
+# weeks, so the buildings get bigger and the strip still fills the frame — the
+# panel height does not change. 180 covers 1,171 of the last year's 1,174
+# contributions; raise to 365 to show the full calendar with the quiet months.
+window_days = 180
+
+[stack]
+Languages = ["Java", "Python", "TypeScript", "Swift", "Shell"]
+Platform = ["Kubernetes", "Terraform", "Helm", "ArgoCD", "Docker"]
+Cloud = ["AWS", "EKS", "Grafana", "Prometheus"]
+Tooling = ["Claude Code", "MCP", "Git", "Just", "Neovim"]
+
+# Curated, in display order. `repo` is owner/name; the language and last-push
+# date come from the API at render time, so only the prose lives here. Set
+# `language` to override what GitHub reports.
+[[projects]]
+repo = "ozzycodes2/cc-powerline"
+name = "cc-powerline"
+blurb = "A Claude Code status line for Powerline users: segments for model, context burn, git state and cost, rendered in the glyphs your prompt already uses."
+tags = ["TypeScript", "CLI"]
+
+[[projects]]
+repo = "ozzycodes2/visualizer"
+name = "visualizer"
+blurb = "Step-through visualisation of pathfinding algorithms — A*, Dijkstra, BFS, DFS — on a grid you draw walls into."
+tags = ["JavaScript", "Algorithms"]
+
+[[projects]]
+repo = "ozzycodes2/email-signatures"
+name = "email-signatures"
+blurb = "Hand-written HTML email signatures that survive Outlook, Gmail and the dark-mode inversion every client applies differently."
+tags = ["HTML", "Email"]
+
+[[projects]]
+repo = "ozzycodes2/facebook-message-parser"
+name = "facebook-message-parser"
+blurb = "Turns a Facebook data export into readable, searchable HTML conversation history."
+tags = ["Python", "HTML"]
+language = "Python"   # GitHub reports CSS: the bundled stylesheet outweighs the script

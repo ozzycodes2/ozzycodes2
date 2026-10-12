@@ -1,0 +1,84 @@
+[
+  {
+    "file": "header.svg",
+    "desc": "Osniel Quintana \u2014 platform engineer. Backend by trade, platform by habit. Java and Python at the core, Kubernetes and Terraform in production, agents in the toolchain. I build the developer tooling other engineers ship on.",
+    "width": "100%"
+  },
+  {
+    "file": "links.svg",
+    "desc": "Links: GitHub, LinkedIn, Email.",
+    "width": "100%"
+  },
+  {
+    "file": "links/github.svg",
+    "desc": "GitHub \u2014 https://github.com/ozzycodes2",
+    "width": "31.8182%",
+    "href": "https://github.com/ozzycodes2"
+  },
+  {
+    "file": "links/linkedin.svg",
+    "desc": "LinkedIn \u2014 https://www.linkedin.com/in/REPLACE-ME/",
+    "width": "36.3636%",
+    "href": "https://www.linkedin.com/in/REPLACE-ME/"
+  },
+  {
+    "file": "links/mail.svg",
+    "desc": "Email \u2014 mailto:REPLACE-ME@example.com",
+    "width": "31.8182%",
+    "href": "mailto:REPLACE-ME@example.com"
+  },
+  {
+    "file": "stats.svg",
+    "desc": "GitHub stats updated 2026-10-12: 1,177 contributions in 2026, 1,444 all time, 1,125 of them in private repositories, 373 pull requests merged, longest streak 6 days, 5 followers. member since August 2016 \u00b7 5 of 11 repos public. Top languages by bytes: TypeScript 33.7%, Python 27.7%, Java 13.6%, Swift 10.8%, JavaScript 8.7%, C++ 5.5%.",
+    "width": "100%"
+  },
+  {
+    "file": "contribution-city.svg",
+    "desc": "Contribution city: an isometric night skyline with one building per day of the last year, each building's height set by that day's contribution count. 1,174 contributions across 65 active days between 16 April 2026 and 12 October 2026; busiest day 25 August 2026 with 66.",
+    "width": "100%"
+  },
+  {
+    "file": "stack.svg",
+    "desc": "Stack \u2014 Languages: Java, Python, TypeScript, Swift, Shell; Platform: Kubernetes, Terraform, Helm, ArgoCD, Docker; Cloud: AWS, EKS, Grafana, Prometheus; Tooling: Claude Code, MCP, Git, Just, Neovim.",
+    "width": "100%"
+  },
+  {
+    "file": "projects.svg",
+    "desc": "Section heading: projects, 4 public repositories.",
+    "width": "100%"
+  },
+  {
+    "file": "projects-1.svg",
+    "desc": "cc-powerline, TypeScript, updated 1 month ago. Tagged TypeScript, CLI. A Claude Code status line for Powerline users: segments for model, context burn, git state and cost, rendered in the glyphs your prompt already uses.",
+    "width": "50%",
+    "href": "https://github.com/ozzycodes2/cc-powerline"
+  },
+  {
+    "file": "projects-2.svg",
+    "desc": "visualizer, JavaScript, updated 5 years ago. Tagged JavaScript, Algorithms. Step-through visualisation of pathfinding algorithms \u2014 A*, Dijkstra, BFS, DFS \u2014 on a grid you draw walls into.",
+    "width": "50%",
+    "href": "https://github.com/ozzycodes2/visualizer"
+  },
+  {
+    "file": "projects-3.svg",
+    "desc": "email-signatures, HTML, updated 3 months ago. Tagged HTML, Email. Hand-written HTML email signatures that survive Outlook, Gmail and the dark-mode inversion every client applies differently.",
+    "width": "50%",
+    "href": "https://github.com/ozzycodes2/email-signatures"
+  },
+  {
+    "file": "projects-4.svg",
+    "desc": "facebook-message-parser, Python, updated 7 years ago. Tagged Python, HTML. Turns a Facebook data export into readable, searchable HTML conversation history.",
+    "width": "50%",
+    "href": "https://github.com/ozzycodes2/facebook-message-parser"
+  },
+  {
+    "file": "activity.svg",
+    "desc": "3 recent public events: commit in cc-powerline, chore: release 0.2.10, 1 month ago; release in cc-powerline, v0.1.2, 1 month ago; commit in email-signatures, Updated, 3 months ago. 1,125 private contributions this year are counted in the stats above, not listed here.",
+    "width": "100%"
+  },
+  {
+    "file": "footer.svg",
+    "desc": "Closing prompt: exit. This README is rendered from profile.toml and the GitHub API by a scheduled job; last run 2026-10-12.",
+    "width": "100%"
+  }
+]

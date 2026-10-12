@@ -1,16 +1,19 @@
-### Hi there 👋
+<!-- profile:start -->
+<p align="center">
+<img src="./assets/header.svg" width="100%" align="top" alt="Osniel Quintana — platform engineer. Backend by trade, platform by habit. Java and Python at the core, Kubernetes and Terraform in production, agents in the toolchain. I build the developer tooling other engineers ship on.">
+<img src="./assets/links.svg" width="100%" align="top" alt="Links: GitHub, LinkedIn, Email.">
+<a href="https://github.com/ozzycodes2"><img src="./assets/links/github.svg" width="31.8182%" align="top" alt="GitHub — https://github.com/ozzycodes2"></a><a href="https://www.linkedin.com/in/REPLACE-ME/"><img src="./assets/links/linkedin.svg" width="36.3636%" align="top" alt="LinkedIn — https://www.linkedin.com/in/REPLACE-ME/"></a><a href="mailto:REPLACE-ME@example.com"><img src="./assets/links/mail.svg" width="31.8182%" align="top" alt="Email — mailto:REPLACE-ME@example.com"></a>
+<img src="./assets/stats.svg" width="100%" align="top" alt="GitHub stats updated 2026-10-12: 1,177 contributions in 2026, 1,444 all time, 1,125 of them in private repositories, 373 pull requests merged, longest streak 6 days, 5 followers. member since August 2016 · 5 of 11 repos public. Top languages by bytes: TypeScript 33.7%, Python 27.7%, Java 13.6%, Swift 10.8%, JavaScript 8.7%, C++ 5.5%.">
+<img src="./assets/contribution-city.svg" width="100%" align="top" alt="Contribution city: an isometric night skyline with one building per day of the last year, each building&#x27;s height set by that day&#x27;s contribution count. 1,174 contributions across 65 active days between 16 April 2026 and 12 October 2026; busiest day 25 August 2026 with 66.">
+<img src="./assets/stack.svg" width="100%" align="top" alt="Stack — Languages: Java, Python, TypeScript, Swift, Shell; Platform: Kubernetes, Terraform, Helm, ArgoCD, Docker; Cloud: AWS, EKS, Grafana, Prometheus; Tooling: Claude Code, MCP, Git, Just, Neovim.">
+<img src="./assets/projects.svg" width="100%" align="top" alt="Section heading: projects, 4 public repositories.">
+<a href="https://github.com/ozzycodes2/cc-powerline"><img src="./assets/projects-1.svg" width="50%" align="top" alt="cc-powerline, TypeScript, updated 1 month ago. Tagged TypeScript, CLI. A Claude Code status line for Powerline users: segments for model, context burn, git state and cost, rendered in the glyphs your prompt already uses."></a><a href="https://github.com/ozzycodes2/visualizer"><img src="./assets/projects-2.svg" width="50%" align="top" alt="visualizer, JavaScript, updated 5 years ago. Tagged JavaScript, Algorithms. Step-through visualisation of pathfinding algorithms — A*, Dijkstra, BFS, DFS — on a grid you draw walls into."></a>
+<a href="https://github.com/ozzycodes2/email-signatures"><img src="./assets/projects-3.svg" width="50%" align="top" alt="email-signatures, HTML, updated 3 months ago. Tagged HTML, Email. Hand-written HTML email signatures that survive Outlook, Gmail and the dark-mode inversion every client applies differently."></a><a href="https://github.com/ozzycodes2/facebook-message-parser"><img src="./assets/projects-4.svg" width="50%" align="top" alt="facebook-message-parser, Python, updated 7 years ago. Tagged Python, HTML. Turns a Facebook data export into readable, searchable HTML conversation history."></a>
+<img src="./assets/activity.svg" width="100%" align="top" alt="3 recent public events: commit in cc-powerline, chore: release 0.2.10, 1 month ago; release in cc-powerline, v0.1.2, 1 month ago; commit in email-signatures, Updated, 3 months ago. 1,125 private contributions this year are counted in the stats above, not listed here.">
+<img src="./assets/footer.svg" width="100%" align="top" alt="Closing prompt: exit. This README is rendered from profile.toml and the GitHub API by a scheduled job; last run 2026-10-12.">
+</p>
+<!-- profile:end -->
 
-<!--
-**ozzycodes2/ozzycodes2** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
-
-Here are some ideas to get you started:
-
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+<sub>This README builds itself. A daily GitHub Action re-fetches the numbers and
+re-renders every panel above from <a href="tools/profile/">tools/profile</a> —
+see <a href="tools/profile/README.md">how it works</a>.</sub>
