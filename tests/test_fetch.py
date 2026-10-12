@@ -328,5 +328,34 @@ def test_private_guard_passes_when_private_work_is_visible(monkeypatch):
 def test_private_guard_aborts_on_an_underprivileged_token(monkeypatch):
     """Authenticating is not the same as being able to see the private work."""
     monkeypatch.setenv("REQUIRE_PRIVATE", "1")
+    monkeypatch.setattr(fetch, "token_scopes", lambda: "repo")
     with pytest.raises(SystemExit, match="SSO"):
+        fetch.check_private_visible({"private_all": 0})
+
+
+def test_token_scopes_reads_the_rest_header(monkeypatch):
+    monkeypatch.setenv("GITHUB_TOKEN", "t")
+
+    class Resp(FakeResponse):
+        headers = {"x-oauth-scopes": "repo, read:user"}
+
+    monkeypatch.setattr(fetch.urllib.request, "urlopen", lambda *a, **k: Resp({}))
+    assert fetch.token_scopes() == "repo, read:user"
+
+
+def test_token_scopes_is_quiet_when_the_request_fails(monkeypatch):
+    """It only ever decorates an error message; it must not raise its own."""
+    monkeypatch.setenv("GITHUB_TOKEN", "t")
+
+    def boom(*_a, **_k):
+        raise urllib.error.URLError("no route")
+
+    monkeypatch.setattr(fetch.urllib.request, "urlopen", boom)
+    assert fetch.token_scopes() == ""
+
+
+def test_private_guard_reports_the_scopes_it_found(monkeypatch):
+    monkeypatch.setenv("REQUIRE_PRIVATE", "1")
+    monkeypatch.setattr(fetch, "token_scopes", lambda: "read:user")
+    with pytest.raises(SystemExit, match="token scopes: read:user"):
         fetch.check_private_visible({"private_all": 0})

@@ -282,6 +282,25 @@ def write(name, payload):
     print(f"wrote data/{name}")
 
 
+def token_scopes():
+    """The token's scopes, as GitHub reports them, or "" if it will not say.
+
+    Only the REST API returns `x-oauth-scopes`, and only for a classic PAT —
+    a fine-grained token or an Actions job token reports nothing. Used in
+    diagnostics, so any failure to ask is not worth raising over.
+    """
+    req = urllib.request.Request(
+        "https://api.github.com/user",
+        headers={"Authorization": f"bearer {token()}",
+                 "User-Agent": f"{USER}-profile-readme"},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            return resp.headers.get("x-oauth-scopes", "")
+    except (urllib.error.URLError, OSError):
+        return ""
+
+
 def check_private_visible(stats):
     """Abort when a token that should see private work reports none of it.
 
@@ -298,8 +317,11 @@ def check_private_visible(stats):
         return
     sys.exit(
         "error: the token reports 0 private contributions, so the counters "
-        "would undercount. A classic PAT needs the `repo` scope, and needs "
-        "'Configure SSO' authorization for each SAML organization."
+        "would undercount.\n"
+        f"  token scopes: {token_scopes() or '(none reported — not a classic PAT?)'}\n"
+        "  `repo` is required, and a classic PAT also needs 'Configure SSO' "
+        "authorization for each SAML organization — that is granted per "
+        "organization and is separate from the scope list."
     )
 
 
