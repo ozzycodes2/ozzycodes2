@@ -279,11 +279,33 @@ def write(name, payload):
     print(f"wrote data/{name}")
 
 
+def check_private_visible(stats):
+    """Abort when a token that should see private work reports none of it.
+
+    A classic PAT that lacks `repo`, or that has not been SSO-authorized for an
+    organization, is not rejected — it authenticates and returns a smaller
+    answer. The counters then drop by an order of magnitude with no error, and
+    the scheduled job commits the undercount as if it were correct. Set
+    REQUIRE_PRIVATE on a profile that is known to have private contributions
+    and the run fails instead.
+    """
+    if not os.environ.get("REQUIRE_PRIVATE"):
+        return
+    if stats["private_all"]:
+        return
+    sys.exit(
+        "error: the token reports 0 private contributions, so the counters "
+        "would undercount. A classic PAT needs the `repo` scope, and needs "
+        "'Configure SSO' authorization for each SAML organization."
+    )
+
+
 def main():
     today = datetime.date.today()
     config = tomllib.loads((HERE / "profile.toml").read_text())
 
     stats, calendar = build_stats(today)
+    check_private_visible(stats)
     write("stats.json", stats)
     write("calendar.json", calendar)
     write("activity.json", build_activity())

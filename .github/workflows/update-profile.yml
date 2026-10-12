@@ -49,6 +49,7 @@ jobs:
       - name: Fetch data
         env:
           PROFILE_TOKEN: ${{ secrets.PROFILE_TOKEN }}
+          REQUIRE_PRIVATE: "1"
         run: python tools/profile/fetch.py
 
       - name: Render SVGs
@@ -64,7 +65,11 @@ jobs:
           git add tools/profile/data assets README.md
           if git diff --cached --quiet; then
             echo "Nothing changed."
-          else
-            git commit -m "chore: refresh profile"
-            git push
+            exit 0
           fi
+          git commit -m "chore: refresh profile"
+          # A queued run checked out its SHA before the run ahead of it pushed,
+          # so concurrency serializes the jobs but not their views of main.
+          # Rebase: this commit is generated output, never a merge candidate.
+          git pull --rebase --autostash origin main
+          git push

@@ -320,3 +320,22 @@ def test_write_emits_trailing_newline(tmp_path, monkeypatch):
     text = (tmp_path / "x.json").read_text()
     assert text.endswith("\n")
     assert json.loads(text) == {"a": 1}
+
+
+# --- private-visibility guard ----------------------------------------------
+
+def test_private_guard_is_off_by_default(monkeypatch):
+    monkeypatch.delenv("REQUIRE_PRIVATE", raising=False)
+    fetch.check_private_visible({"private_all": 0})
+
+
+def test_private_guard_passes_when_private_work_is_visible(monkeypatch):
+    monkeypatch.setenv("REQUIRE_PRIVATE", "1")
+    fetch.check_private_visible({"private_all": 1302})
+
+
+def test_private_guard_aborts_on_an_underprivileged_token(monkeypatch):
+    """Authenticating is not the same as being able to see the private work."""
+    monkeypatch.setenv("REQUIRE_PRIVATE", "1")
+    with pytest.raises(SystemExit, match="SSO"):
+        fetch.check_private_visible({"private_all": 0})
