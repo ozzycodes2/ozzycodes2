@@ -15,9 +15,13 @@ tagline = [
 [city]
 # Days of contribution history the skyline draws. Shorter windows mean fewer
 # weeks, so the buildings get bigger and the strip still fills the frame — the
-# panel height does not change. 180 covers 1,171 of the last year's 1,174
-# contributions; raise to 365 to show the full calendar with the quiet months.
-window_days = 180
+# panel height does not change.
+#
+# 90 covers 254 of the last year's 259 public contributions and leaves roughly
+# a third of the plane built on. Longer windows do not add contributions, only
+# empty ground: 180 days is the same 256 at half the density, and 365 the same
+# 259 at a quarter. Revisit this if the publishable activity changes shape.
+window_days = 90
 
 [stack]
 Languages = ["Java", "Python", "TypeScript", "Swift", "Shell"]
