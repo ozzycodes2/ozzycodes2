@@ -1,7 +1,7 @@
 [
   {
     "file": "header.svg",
-    "desc": "Osniel Quintana \u2014 platform engineer. Backend by trade, platform by habit. Java and Python at the core, Kubernetes and Terraform in production, agents in the toolchain. I build the developer tooling other engineers ship on.",
+    "desc": "Osniel Quintana \u2014 platform engineer. Backend by trade, platform by habit. Java, Rust, Python and TypeScript at the core, Kubernetes, Terraform and Argo in production, agents in the toolchain. I build the developer tooling other engineers ship on.",
     "width": "100%"
   },
   {
@@ -16,7 +16,7 @@
   },
   {
     "file": "stack.svg",
-    "desc": "Stack \u2014 Languages: Java, Python, TypeScript, Swift, Shell; Platform: Kubernetes, Terraform, Helm, ArgoCD, Docker; Cloud: AWS, EKS, Grafana, Prometheus; Tooling: Claude Code, MCP, Git, Just, Neovim.",
+    "desc": "Stack \u2014 Languages: Java, Rust, Python, TypeScript, Swift, Shell; Platform: Kubernetes, Terraform, Helm, ArgoCD, Docker; Cloud: AWS, EKS, Grafana, Prometheus; Tooling: Claude Code, MCP, Git, Just, Neovim.",
     "width": "100%"
   },
   {

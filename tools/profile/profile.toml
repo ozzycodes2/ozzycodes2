@@ -7,8 +7,9 @@ handle = "ozzycodes2"
 role = "platform engineer"
 # One line per rendered line. Keep each under ~72 characters or it will clip.
 tagline = [
-  "Backend by trade, platform by habit. Java and Python at the core,",
-  "Kubernetes and Terraform in production, agents in the toolchain.",
+  "Backend by trade, platform by habit.",
+  "Java, Rust, Python and TypeScript at the core,",
+  "Kubernetes, Terraform and Argo in production, agents in the toolchain.",
   "I build the developer tooling other engineers ship on.",
 ]
 
@@ -24,7 +25,7 @@ tagline = [
 window_days = 120
 
 [stack]
-Languages = ["Java", "Python", "TypeScript", "Swift", "Shell"]
+Languages = ["Java", "Rust", "Python", "TypeScript", "Swift", "Shell"]
 Platform = ["Kubernetes", "Terraform", "Helm", "ArgoCD", "Docker"]
 Cloud = ["AWS", "EKS", "Grafana", "Prometheus"]
 Tooling = ["Claude Code", "MCP", "Git", "Just", "Neovim"]
