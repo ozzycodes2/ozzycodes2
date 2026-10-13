@@ -100,24 +100,113 @@ def test_building_draws_three_faces():
     assert grid.building(100, 100, 30, 3).count("<path") == 3
 
 
+def test_building_faces_are_outlined():
+    """Unstroked neighbours of equal height merge into one unreadable slab."""
+    grid = city.Grid(26, 800, 400)
+    assert grid.building(100, 100, 30, 3).count(f'stroke="{city.MORTAR}"') == 3
+
+
 def test_ground_tile_is_a_closed_diamond():
     grid = city.Grid(26, 800, 400)
     assert grid.ground_tile(100, 100).count("Z") == 1
 
 
+# --- windows ---------------------------------------------------------------
+
+PANE_RE = re.compile(r'd="M([\d.]+) ([\d.]+)L([\d.]+) ([\d.]+)L([\d.]+) ([\d.]+)L([\d.]+) ([\d.]+)Z"')
+
+
+def panes(markup):
+    """Each window as eight floats: the four corners, clockwise from top-left."""
+    return [tuple(float(v) for v in m) for m in PANE_RE.findall(markup)]
+
+
 def test_windows_skip_single_storey_buildings():
     grid = city.Grid(26, 800, 400)
-    assert grid.windows(100, 100, 5, 4) == ""
+    assert grid.windows(100, 100, 5, 4, 0, 0) == ""
 
 
 def test_windows_appear_on_tall_buildings():
     grid = city.Grid(26, 800, 400)
-    assert "<rect" in grid.windows(100, 200, 58, 4)
+    assert panes(grid.windows(100, 200, 58, 4, 0, 0))
 
 
 def test_windows_skip_tiny_tiles():
     """At a 365-day window the tiles are too small to carry legible glass."""
-    assert city.Grid(400, 800, 400).windows(100, 200, 58, 4) == ""
+    assert city.Grid(400, 800, 400).windows(100, 200, 58, 4, 0, 0) == ""
+
+
+def test_window_tops_follow_the_gradient_of_the_wall_they_sit_on():
+    """Both walls are sheared ±1/2; an upright rect would cross its own wall."""
+    grid = city.Grid(26, 800, 400)
+    # Coordinates are emitted at one decimal, so the gradient only survives to
+    # about that.
+    slopes = set()
+    for ax, ay, bx, by, *_ in panes(grid.windows(400, 300, 58, 4, 0, 0)):
+        slopes.add(round((by - ay) / (bx - ax), 1))
+    assert slopes == {0.5, -0.5}
+
+
+def test_window_sides_stay_vertical():
+    """A sheared top edge, but the pane itself hangs plumb."""
+    grid = city.Grid(26, 800, 400)
+    for ax, ay, bx, by, cx, cy, dx, dy in panes(grid.windows(400, 300, 58, 4, 0, 0)):
+        assert (cx, dx) == (bx, ax)
+        assert round(cy - by, 1) == round(dy - ay, 1) == city.WIN_H
+
+
+def depths(grid, xc, base, height):
+    """(is_west, drop below the roofline) for each pane of one building.
+
+    The roofline is read at the pane's own x rather than taken as a single y,
+    which is the whole point of the measurement: both walls slope.
+    """
+    hw, hh = grid.tile_w / 2, grid.tile_h / 2
+    top, out = base - height, []
+    for ax, ay, bx, by, *_ in panes(grid.windows(xc, base, height, 4, 0, 0)):
+        west = by > ay
+        edge = top + (ax - xc + hw) / 2 if west else top + hh - (ax - xc) / 2
+        out.append((west, round(ay - edge, 1)))
+    return out
+
+
+def test_window_rows_line_up_across_the_corner():
+    """Storeys measured from each wall's own top edge, not from a shared y."""
+    ds = depths(city.Grid(26, 800, 400), 400, 300, 58)
+    west = {d for is_west, d in ds if is_west}
+    assert west
+    assert west == {d for is_west, d in ds if not is_west}
+
+
+def test_no_window_overhangs_its_wall():
+    height = 58
+    for _, d in depths(city.Grid(26, 800, 400), 400, 300, height):
+        assert 0 <= d and d + city.WIN_H <= height
+
+
+def test_windows_are_identical_for_the_same_cell():
+    grid = city.Grid(26, 800, 400)
+    a = grid.windows(400, 300, 58, 4, 3, 2)
+    assert a == grid.windows(400, 300, 58, 4, 3, 2)
+
+
+def test_flicker_is_assigned_per_cell_not_per_sequence():
+    """A hash of the coordinates, so one new day does not rewire the skyline."""
+    grid = city.Grid(26, 800, 400)
+    classes = re.findall(r'class="(fl\d)"', grid.windows(400, 300, 58, 4, 3, 2))
+    assert classes
+    assert classes == re.findall(r'class="(fl\d)"',
+                                 grid.windows(999, 42, 58, 4, 3, 2))
+
+
+def test_every_flicker_variant_is_defined():
+    for i in range(city.FLICKERS):
+        assert f".fl{i}{{animation:flick" in city.CITY_CSS
+
+
+def test_jitter_is_order_independent():
+    assert city._jitter(1, 2, 3) == city._jitter(1, 2, 3)
+    assert city._jitter(1, 2, 3) != city._jitter(3, 2, 1)
 
 
 # --- layout ----------------------------------------------------------------
@@ -186,6 +275,19 @@ def test_render_is_deterministic():
     assert city.render({}, data) == city.render({}, data)
 
 
+def test_render_interleaves_windows_with_the_blocks_they_belong_to():
+    """Batched into layers, every window drew over every wall.
+
+    Far buildings' lights then showed through the blocks standing in front of
+    them, as squares floating in open air.
+    """
+    svg = city.render({"city": {"window_days": 30}}, {"calendar": calendar([9] * 30)})
+    walls = [m.start() for m in re.finditer(re.escape(f'stroke="{city.MORTAR}"'), svg)]
+    lights = [m.start() for m in re.finditer(r'fill-opacity="0\.78"', svg)]
+    assert walls and lights
+    assert lights[0] < walls[-1], "windows all emitted after the last wall"
+
+
 def test_render_draws_one_ground_tile_per_day():
     days = 30
     svg = city.render({"city": {"window_days": days}}, {"calendar": calendar([1] * days)})
@@ -200,3 +302,10 @@ def test_render_escapes_nothing_unbalanced():
 def test_render_window_falls_back_to_a_year():
     svg = city.render({}, {"calendar": calendar([1] * 365)})
     assert "--last 365d" in svg
+
+
+def test_render_ships_the_flicker_keyframes_and_the_motion_opt_out():
+    svg = city.render({"city": {"window_days": 30}}, {"calendar": calendar([9] * 30)})
+    assert "@keyframes flick" in svg
+    assert re.search(r'class="fl\d"', svg)
+    assert "prefers-reduced-motion" in svg
