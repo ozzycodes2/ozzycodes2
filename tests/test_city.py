@@ -100,10 +100,38 @@ def test_building_draws_three_faces():
     assert grid.building(100, 100, 30, 3).count("<path") == 3
 
 
-def test_building_faces_are_outlined():
-    """Unstroked neighbours of equal height merge into one unreadable slab."""
+def test_building_faces_are_not_outlined():
+    """At this tile size an outline reads as a black gap, not as an edge."""
     grid = city.Grid(26, 800, 400)
-    assert grid.building(100, 100, 30, 3).count(f'stroke="{city.MORTAR}"') == 3
+    assert "stroke" not in grid.building(100, 100, 30, 3)
+
+
+def test_only_the_roof_carries_the_bucket():
+    """Shading the walls too broke the mass into districts."""
+    grid = city.Grid(26, 800, 400)
+    for lvl in range(len(city.ROOFS)):
+        markup = grid.building(100, 100, 30, lvl)
+        assert f'fill="{city.ROOFS[lvl]}"' in markup
+        assert f'fill="{city.WALL_L}"' in markup
+        assert f'fill="{city.WALL_R}"' in markup
+
+
+def test_height_rises_with_the_count_off_a_visible_floor():
+    grid = city.Grid(26, 800, 400)
+    assert grid.height_for(1, 60) >= city.MIN_STOREYS
+    assert grid.height_for(60, 60) == pytest.approx(grid.max_h)
+    assert grid.height_for(10, 60) < grid.height_for(30, 60)
+
+
+def test_towers_stand_clear_of_their_own_footprint():
+    """Below about twice the tile width a building reads as a lid, not a tower.
+
+    This is what bounds `window_days` from below: the headroom is capped, so
+    past roughly 26 weeks the tiles get wide enough to outgrow it.
+    """
+    for weeks in (26, 40, 53):
+        grid = city.Grid(weeks, 800, 400)
+        assert grid.max_h >= 2 * grid.tile_w
 
 
 def test_ground_tile_is_a_closed_diamond():
@@ -113,95 +141,144 @@ def test_ground_tile_is_a_closed_diamond():
 
 # --- windows ---------------------------------------------------------------
 
-PANE_RE = re.compile(r'd="M([\d.]+) ([\d.]+)L([\d.]+) ([\d.]+)L([\d.]+) ([\d.]+)L([\d.]+) ([\d.]+)Z"')
+GLASS = re.compile(r'<path d="([^"]+)" fill="([^"]+)"')
+PANE = re.compile(r"M([\d.-]+) ([\d.-]+)L([\d.-]+) ([\d.-]+)"
+                  r"L([\d.-]+) ([\d.-]+)L([\d.-]+) ([\d.-]+)Z")
 
 
 def panes(markup):
-    """Each window as eight floats: the four corners, clockwise from top-left."""
-    return [tuple(float(v) for v in m) for m in PANE_RE.findall(markup)]
+    """Every window as eight floats, from the batched paths they ship in.
+
+    Steady panes are concatenated into one path per state, so the segments have
+    to be split back out of the `d` attribute.
+    """
+    out = []
+    for d, fill in GLASS.findall(markup):
+        if fill not in (city.WIN_ON, city.WIN_ON_SIDE, city.WIN_OFF):
+            continue
+        out += [tuple(float(v) for v in m) for m in PANE.findall(d)]
+    return out
+
+
+def lit_markup(grid, **kw):
+    """One building's windows, with enough storeys for every state to appear."""
+    return grid.windows(400, 300, grid.max_h, kw.get("col", 0), kw.get("row", 0))
 
 
 def test_windows_skip_single_storey_buildings():
     grid = city.Grid(26, 800, 400)
-    assert grid.windows(100, 100, 5, 4, 0, 0) == ""
+    assert grid.windows(100, 100, 5, 0, 0) == ""
 
 
 def test_windows_appear_on_tall_buildings():
-    grid = city.Grid(26, 800, 400)
-    assert panes(grid.windows(100, 200, 58, 4, 0, 0))
+    assert panes(lit_markup(city.Grid(26, 800, 400)))
 
 
 def test_windows_skip_tiny_tiles():
-    """At a 365-day window the tiles are too small to carry legible glass."""
-    assert city.Grid(400, 800, 400).windows(100, 200, 58, 4, 0, 0) == ""
+    """Past a year the tiles are too small to carry legible glass."""
+    assert city.Grid(400, 800, 400).windows(100, 200, 58, 0, 0) == ""
 
 
-def test_window_tops_follow_the_gradient_of_the_wall_they_sit_on():
-    """Both walls are sheared ±1/2; an upright rect would cross its own wall."""
+def test_windows_are_glass_not_a_tint_of_the_roof():
+    """The lit interior is the same on every building, whatever its bucket."""
     grid = city.Grid(26, 800, 400)
+    fills = {fill for _, fill in GLASS.findall(lit_markup(grid))}
+    assert fills & {city.WIN_ON, city.WIN_ON_SIDE}
+    assert not fills & set(city.ROOFS)
+
+
+def test_both_walls_are_glazed_and_the_east_one_is_dimmer():
+    grid = city.Grid(26, 800, 400)
+    fills = {fill for _, fill in GLASS.findall(lit_markup(grid))}
+    assert {city.WIN_ON, city.WIN_ON_SIDE} <= fills
+
+
+def test_window_bases_follow_the_gradient_of_the_wall_they_sit_on():
+    """Both walls are sheared ±1/2; an upright rect would cross its own wall."""
     # Coordinates are emitted at one decimal, so the gradient only survives to
     # about that.
-    slopes = set()
-    for ax, ay, bx, by, *_ in panes(grid.windows(400, 300, 58, 4, 0, 0)):
-        slopes.add(round((by - ay) / (bx - ax), 1))
+    slopes = {round((by - ay) / (bx - ax), 1)
+              for ax, ay, bx, by, *_ in panes(lit_markup(city.Grid(26, 800, 400)))}
     assert slopes == {0.5, -0.5}
 
 
 def test_window_sides_stay_vertical():
-    """A sheared top edge, but the pane itself hangs plumb."""
+    """A sheared base, but the pane itself stands plumb."""
     grid = city.Grid(26, 800, 400)
-    for ax, ay, bx, by, cx, cy, dx, dy in panes(grid.windows(400, 300, 58, 4, 0, 0)):
+    tall = grid.tile_w * city.WIN_H
+    for ax, ay, bx, by, cx, cy, dx, dy in panes(lit_markup(grid)):
         assert (cx, dx) == (bx, ax)
-        assert round(cy - by, 1) == round(dy - ay, 1) == city.WIN_H
+        # Coordinates ship at one decimal, so the two sides can disagree by a
+        # rounding step without the pane being out of true.
+        assert by - cy == pytest.approx(tall, abs=0.15)
+        assert ay - dy == pytest.approx(tall, abs=0.15)
 
 
-def depths(grid, xc, base, height):
-    """(is_west, drop below the roofline) for each pane of one building.
+def rises(grid):
+    """(is_west, height above the base edge) for each pane of one building.
 
-    The roofline is read at the pane's own x rather than taken as a single y,
+    The base edge is read at the pane's own x rather than taken as a single y,
     which is the whole point of the measurement: both walls slope.
     """
-    hw, hh = grid.tile_w / 2, grid.tile_h / 2
-    top, out = base - height, []
-    for ax, ay, bx, by, *_ in panes(grid.windows(xc, base, height, 4, 0, 0)):
+    xc, base, hw, hh = 400, 300, grid.tile_w / 2, grid.tile_h / 2
+    out = []
+    for ax, ay, bx, by, *_ in panes(lit_markup(grid)):
         west = by > ay
-        edge = top + (ax - xc + hw) / 2 if west else top + hh - (ax - xc) / 2
-        out.append((west, round(ay - edge, 1)))
+        edge = base + (ax - xc + hw) / 2 if west else base + hh - (ax - xc) / 2
+        out.append((west, round(edge - ay, 1)))
     return out
 
 
 def test_window_rows_line_up_across_the_corner():
-    """Storeys measured from each wall's own top edge, not from a shared y."""
-    ds = depths(city.Grid(26, 800, 400), 400, 300, 58)
-    west = {d for is_west, d in ds if is_west}
-    assert west
-    assert west == {d for is_west, d in ds if not is_west}
+    """Both walls stack off one ladder of storeys, each from its own base edge.
+
+    Compared against the ladder rather than wall against wall: a storey whose
+    panes all came up dark on one side contributes no row to measure there.
+    """
+    grid = city.Grid(26, 800, 400)
+    pitch = grid.tile_w * city.WIN_PITCH
+    rs = rises(grid)
+    for _, r in rs:
+        assert (r - 4) % pitch == pytest.approx(0, abs=0.15) or \
+               (r - 4) % pitch == pytest.approx(pitch, abs=0.15)
+    for want in (True, False):
+        assert len({r for is_west, r in rs if is_west is want}) > 1
 
 
 def test_no_window_overhangs_its_wall():
-    height = 58
-    for _, d in depths(city.Grid(26, 800, 400), 400, 300, height):
-        assert 0 <= d and d + city.WIN_H <= height
+    grid = city.Grid(26, 800, 400)
+    tall = grid.tile_w * city.WIN_H
+    for _, r in rises(grid):
+        assert 0 <= r and r + tall <= grid.max_h
 
 
 def test_windows_are_identical_for_the_same_cell():
     grid = city.Grid(26, 800, 400)
-    a = grid.windows(400, 300, 58, 4, 3, 2)
-    assert a == grid.windows(400, 300, 58, 4, 3, 2)
+    assert lit_markup(grid, col=3, row=2) == lit_markup(grid, col=3, row=2)
 
 
-def test_flicker_is_assigned_per_cell_not_per_sequence():
-    """A hash of the coordinates, so one new day does not rewire the skyline."""
+def test_window_state_is_hashed_per_cell_not_drawn_from_a_sequence():
+    """So one new day does not relight every building and rewrite the panel."""
     grid = city.Grid(26, 800, 400)
-    classes = re.findall(r'class="(fl\d)"', grid.windows(400, 300, 58, 4, 3, 2))
-    assert classes
-    assert classes == re.findall(r'class="(fl\d)"',
-                                 grid.windows(999, 42, 58, 4, 3, 2))
+    assert lit_markup(grid, col=3, row=2) != lit_markup(grid, col=4, row=2)
 
 
-def test_every_flicker_variant_is_defined():
-    for i in range(city.FLICKERS):
+def test_some_windows_are_dark_and_some_are_failing():
+    """A fully lit tower at 3am is a texture, not a building."""
+    grid = city.Grid(26, 800, 400)
+    seen = set()
+    for col in range(12):
+        markup = grid.windows(400, 300, grid.max_h, col, 0)
+        seen |= {fill for _, fill in GLASS.findall(markup)}
+        seen |= set(re.findall(r'class="(fl\d)"', markup))
+    assert city.WIN_OFF in seen
+    assert any(cls.startswith("fl") for cls in seen)
+
+
+def test_every_animation_variant_is_defined():
+    for i in range(city.VARIANTS):
         assert f".fl{i}{{animation:flick" in city.CITY_CSS
+        assert f".tw{i}{{animation:twinkle" in city.CITY_CSS
 
 
 def test_jitter_is_order_independent():
@@ -282,16 +359,20 @@ def test_render_interleaves_windows_with_the_blocks_they_belong_to():
     them, as squares floating in open air.
     """
     svg = city.render({"city": {"window_days": 30}}, {"calendar": calendar([9] * 30)})
-    walls = [m.start() for m in re.finditer(re.escape(f'stroke="{city.MORTAR}"'), svg)]
-    lights = [m.start() for m in re.finditer(r'fill-opacity="0\.78"', svg)]
+    walls = [m.start() for m in re.finditer(re.escape(f'fill="{city.WALL_L}"'), svg)]
+    lights = [m.start() for m in re.finditer(re.escape(f'fill="{city.WIN_ON}"'), svg)]
     assert walls and lights
     assert lights[0] < walls[-1], "windows all emitted after the last wall"
 
 
-def test_render_draws_one_ground_tile_per_day():
-    days = 30
-    svg = city.render({"city": {"window_days": days}}, {"calendar": calendar([1] * days)})
-    assert svg.count(f'fill="{city.GROUND_FILL}"') == days
+def test_render_paves_the_whole_grid_not_just_the_days_with_data():
+    """A window rarely starts on a Monday, so the end columns are partial.
+
+    Tiling only the days present notched two corners out of the plane.
+    """
+    svg = city.render({"city": {"window_days": 30}}, {"calendar": calendar([1] * 30)})
+    _, weeks = city.layout(calendar([1] * 30), 30)
+    assert svg.count(f'fill="{city.GROUND_FILL}"') == weeks * city.ROWS + 1  # + legend swatch
 
 
 def test_render_escapes_nothing_unbalanced():

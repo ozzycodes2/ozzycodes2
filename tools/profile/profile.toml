@@ -18,11 +18,14 @@ tagline = [
 # weeks, so the buildings get bigger and the strip still fills the frame — the
 # panel height does not change.
 #
-# 120 covers 1,300 of the last year's 1,303 contributions with 55% of the days
-# built on. Longer windows buy almost no contributions and a lot of empty
-# ground: 180 days is the same 1,300 at 36% density, 365 the same 1,303 at 18%.
-# Revisit this if the shape of the activity changes.
-window_days = 120
+# 180, which is where two constraints cross. Tiles have to be small for a
+# building to stand taller than its own footprint and read as a tower at all —
+# at 120 days they are 65px across and the plane looks like paving slabs with
+# lids. But this profile's activity is concentrated in the last four months, so
+# a full year is two thirds bare ground. 180 days puts 48px across a tile for a
+# tower 2.7 times its width, keeps 1,301 of the year's 1,303 contributions, and
+# leaves only the far third of the plane undeveloped.
+window_days = 180
 
 [stack]
 Languages = ["Java", "Rust", "Python", "TypeScript", "Swift", "Shell"]
