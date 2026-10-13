@@ -175,3 +175,25 @@ def test_an_entirely_empty_stats_payload_still_counts_from_zero():
     markup = stats.render({}, {"stats": {"updated": "2026-01-01"}})
     assert "CONTRIBUTIONS" in c.visible(markup)
     assert "0" in c.visible(markup)
+
+
+# --- degrading to public-only data -----------------------------------------
+
+def test_private_counter_yields_to_followers_when_there_is_no_private_work():
+    """A counter reading 0 would assert no private work exists, not that the
+    token could not see it."""
+    public_only = dict(STATS, private_year=0, followers=5)
+    shown = c.visible(stats.render({}, {"stats": public_only}))
+    assert "PRIVATE THIS YEAR" not in shown
+    assert "FOLLOWERS" in shown
+
+
+def test_desc_omits_the_private_clause_when_the_count_is_zero():
+    desc = desc_of(stats.render({}, {"stats": dict(STATS, private_year=0)}))
+    assert "private repositories" not in desc
+    assert "1,441 all time, 372 pull requests merged" in desc
+
+
+def test_private_counter_returns_when_private_work_is_visible():
+    shown = c.visible(stats.render({}, {"stats": STATS}))
+    assert "PRIVATE THIS YEAR" in shown and "FOLLOWERS" not in shown

@@ -33,12 +33,20 @@ DEFS = (f'<linearGradient id="lang" gradientUnits="userSpaceOnUse" '
 
 
 def _counters(s):
-    """(label, value, suffix) per cell, in reading order across the grid."""
+    """(label, value, suffix) per cell, in reading order across the grid.
+
+    The private count yields its cell to the follower count when it is zero,
+    which happens whenever the fetching token cannot see private work. A
+    counter reading 0 asserts that none exists, which would be a stronger and
+    falser claim than leaving it out.
+    """
     n = lambda key: f"{s.get(key, 0):,}"
+    third = (("PRIVATE THIS YEAR", n("private_year"), "") if s.get("private_year")
+             else ("FOLLOWERS", n("followers"), ""))
     return [
         (f"CONTRIBUTIONS {s.get('year', '')}".strip(), n("contributions_year"), ""),
         ("ALL TIME", n("contributions_all"), ""),
-        ("PRIVATE THIS YEAR", n("private_year"), ""),
+        third,
         ("PRS MERGED", n("prs_merged"), ""),
         ("LONGEST STREAK", n("streak_longest"), " days"),
         ("REPOS CONTRIBUTED", n("repos_contributed"), ""),
@@ -139,7 +147,8 @@ def render(_cfg, data):
         f"GitHub stats updated {s.get('updated', 'unknown')}: "
         f"{s.get('contributions_year', 0):,} contributions in {s.get('year', '')}, "
         f"{s.get('contributions_all', 0):,} all time, "
-        f"{s.get('private_year', 0):,} of them in private repositories, "
+        + (f"{s['private_year']:,} of them in private repositories, "
+           if s.get("private_year") else "") +
         f"{s.get('prs_merged', 0):,} pull requests merged, "
         f"longest streak {s.get('streak_longest', 0):,} days, "
         f"{s.get('repos_contributed', 0):,} repositories contributed to. {meta}. "

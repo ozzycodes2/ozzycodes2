@@ -71,18 +71,30 @@ GITHUB_TOKEN=$(gh auth token) .venv/bin/python tools/profile/fetch.py
 SVGs directly — but note the fade-in animations mean a screenshot taken at t=0
 shows an empty frame. Force reduced motion to see the final state.
 
-## The token
+## The token, and what this profile does not show
 
-The workflow requires a repository secret named `PROFILE_TOKEN`: a classic PAT
-with `repo` and `read:user`. It is what makes private repositories count toward
-contribution totals, streaks, and language byte counts.
+**The published numbers are public activity only.** The organization holding
+most of the work does not admit personal access tokens, and GitHub reports
+private contributions as a single `restrictedContributionsCount` with no
+per-organization breakdown — so there is no partial credit to collect. A token
+that can see some private work but not that organization's would still
+undercount by an order of magnitude. Rather than publish a figure that looks
+precise and is not, the profile reports what anyone can verify.
 
-The workflow's built-in `GITHUB_TOKEN` also authenticates, but sees public data
-only — totals drop to a small fraction with no error. The job checks for the
-PAT and fails rather than committing an undercount that looks plausible.
+`PROFILE_TOKEN` is therefore optional. Set it to a classic PAT with `repo` and
+`read:user` and private repositories it *can* reach count toward the totals;
+leave it unset and the job falls back to the built-in `GITHUB_TOKEN`.
 
-Private repository *names* are never written to `data/` and never rendered —
-only aggregate counts.
+Private repository, organization and owner *names* are never requested, never
+written to `data/`, and never rendered. Organization work reaches the profile
+only as counts and language byte totals, and a test pins the absence of those
+fields from the query.
+
+`REQUIRE_PRIVATE=1` makes `fetch.py` abort when the token reports no private
+contributions at all, printing the token's scopes. It exists for the case where
+the organization policy changes and a silent regression to public-only would
+otherwise go unnoticed. It is deliberately unset in the workflow, because today
+that condition is the expected state rather than a fault.
 
 One API detail worth recording, because it is easy to get wrong and the error
 is silent: when the token can see private repositories,
