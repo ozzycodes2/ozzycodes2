@@ -5,6 +5,15 @@ on:
     - cron: "41 11 * * *"           # daily, a few minutes off the hour so the
                                     # scheduler is not contending with everyone
   workflow_dispatch:                # "Run workflow" button on the Actions tab
+    inputs:
+      require_private:
+        description: >-
+          Fail if the token reports no private contributions, and print the
+          scopes it has. Use after changing PROFILE_TOKEN to check whether it
+          can actually reach private work, rather than inferring it from the
+          committed numbers.
+        type: boolean
+        default: false
   push:
     branches: [main]
     paths:                          # re-render immediately when the generator
@@ -44,6 +53,7 @@ jobs:
         env:
           PROFILE_TOKEN: ${{ secrets.PROFILE_TOKEN }}
           GITHUB_TOKEN: ${{ github.token }}
+          REQUIRE_PRIVATE: ${{ inputs.require_private && '1' || '' }}
         run: python tools/profile/fetch.py
 
       - name: Render SVGs
