@@ -17,11 +17,11 @@ tagline = [
 # weeks, so the buildings get bigger and the strip still fills the frame — the
 # panel height does not change.
 #
-# 90 covers 254 of the last year's 259 public contributions and leaves roughly
-# a third of the plane built on. Longer windows do not add contributions, only
-# empty ground: 180 days is the same 256 at half the density, and 365 the same
-# 259 at a quarter. Revisit this if the publishable activity changes shape.
-window_days = 90
+# 120 covers 1,300 of the last year's 1,303 contributions with 55% of the days
+# built on. Longer windows buy almost no contributions and a lot of empty
+# ground: 180 days is the same 1,300 at 36% density, 365 the same 1,303 at 18%.
+# Revisit this if the shape of the activity changes.
+window_days = 120
 
 [stack]
 Languages = ["Java", "Python", "TypeScript", "Swift", "Shell"]

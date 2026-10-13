@@ -115,6 +115,13 @@ def test_trailing_year_deduplicates_overlapping_calendars():
     assert fetch.trailing_year(cal, today) == [["2026-01-05", 3]]
 
 
+def test_trailing_year_drops_the_rest_of_the_calendar_year():
+    """The profile page returns whole years, so December arrives pre-padded."""
+    today = datetime.date(2026, 3, 1)
+    cal = {2026: [("2026-03-01", 4), ("2026-03-02", 0), ("2026-12-31", 0)]}
+    assert fetch.trailing_year(cal, today) == [["2026-03-01", 4]]
+
+
 # --- streaks ---------------------------------------------------------------
 
 def days(pairs):
@@ -151,39 +158,192 @@ def test_streak_on_empty_calendar():
     assert fetch.streaks([], datetime.date(2026, 10, 12)) == (0, 0)
 
 
+# --- the public contribution calendar --------------------------------------
+
+def calendar_page(days, *, headline=None):
+    """The profile page's contribution grid, trimmed to the parts that matter.
+
+    Counts live only in the tooltip prose; the <td> itself carries a 0-4
+    intensity level. `headline` overrides the total, to drive the checksum.
+    """
+    total = sum(n for _, n in days) if headline is None else headline
+    out = [f'<h2 class="f4">\n      {total:,}\n      contributions\n        in 2026\n</h2>']
+    for i, (date, count) in enumerate(days):
+        cell = f"contribution-day-component-0-{i}"
+        prose = (f"{count} contribution{'' if count == 1 else 's'}" if count
+                 else "No contributions")
+        out.append(f'<td tabindex="0" data-date="{date}" id="{cell}" data-level="0"></td>'
+                   f'<tool-tip for="{cell}" class="sr-only">{prose} on a day.</tool-tip>')
+    return "".join(out)
+
+
+class FakePage(FakeResponse):
+    def __init__(self, text):
+        self._payload = text.encode()
+
+
+def test_calendar_year_reads_the_count_out_of_each_tooltip(monkeypatch):
+    page = calendar_page([("2026-01-01", 12), ("2026-01-02", 0), ("2026-01-03", 1)])
+    monkeypatch.setattr(fetch.urllib.request, "urlopen",
+                        lambda *a, **k: FakePage(page))
+    assert fetch.calendar_year(2026) == [
+        ("2026-01-01", 12), ("2026-01-02", 0), ("2026-01-03", 1)]
+
+
+def test_calendar_year_sends_no_credential(monkeypatch):
+    """The private-inclusive total is served to a viewer *without* access.
+
+    Attaching the author's own token is what collapses these numbers to the
+    public subset, so sending one is a defect and not merely redundant.
+    """
+    monkeypatch.setenv("PROFILE_TOKEN", "secret")
+    seen = {}
+
+    def fake_urlopen(req, timeout=None):
+        seen["url"] = req.full_url
+        seen["headers"] = {k.lower() for k in req.headers}
+        return FakePage(calendar_page([("2026-01-01", 1)]))
+
+    monkeypatch.setattr(fetch.urllib.request, "urlopen", fake_urlopen)
+    fetch.calendar_year(2026)
+    assert "authorization" not in seen["headers"]
+    assert "from=2026-01-01&to=2026-12-31" in seen["url"]
+
+
+def test_calendar_year_aborts_when_the_total_will_not_reconcile(monkeypatch):
+    """The headline is rendered separately, so it catches a drifted parse."""
+    page = calendar_page([("2026-01-01", 5)], headline=900)
+    monkeypatch.setattr(fetch.urllib.request, "urlopen",
+                        lambda *a, **k: FakePage(page))
+    with pytest.raises(SystemExit, match="parsed 5 .* page says 900"):
+        fetch.calendar_year(2026)
+
+
+def test_calendar_year_aborts_when_the_grid_is_gone(monkeypatch):
+    monkeypatch.setattr(fetch.urllib.request, "urlopen",
+                        lambda *a, **k: FakePage("<html>redesigned</html>"))
+    with pytest.raises(SystemExit, match="no contribution days"):
+        fetch.calendar_year(2026)
+
+
+def test_calendar_year_counts_a_day_with_no_tooltip_as_empty(monkeypatch):
+    page = ('<td data-date="2026-01-01" id="contribution-day-component-0-0" '
+            'data-level="0"></td>')
+    monkeypatch.setattr(fetch.urllib.request, "urlopen",
+                        lambda *a, **k: FakePage(page))
+    assert fetch.calendar_year(2026) == [("2026-01-01", 0)]
+
+
+def test_calendar_year_exits_when_the_page_is_unreachable(monkeypatch):
+    def boom(*_a, **_k):
+        raise urllib.error.URLError("no route")
+
+    monkeypatch.setattr(fetch.urllib.request, "urlopen", boom)
+    with pytest.raises(SystemExit, match="could not reach the profile calendar"):
+        fetch.calendar_year(2026)
+
+
+def test_calendar_year_exits_on_http_error(monkeypatch):
+    def boom(*_a, **_k):
+        raise urllib.error.HTTPError("u", 404, "Not Found", {}, io.BytesIO(b""))
+
+    monkeypatch.setattr(fetch.urllib.request, "urlopen", boom)
+    with pytest.raises(SystemExit, match="returned 404"):
+        fetch.calendar_year(2026)
+
+
 # --- contributions by year -------------------------------------------------
 
-def collection(total, restricted, dates):
+def collection(restricted):
     return {"user": {"contributionsCollection": {
-        "totalCommitContributions": total,
         "restrictedContributionsCount": restricted,
-        "contributionCalendar": {
-            "totalContributions": total,
-            "weeks": [{"contributionDays": [{"date": d, "contributionCount": n}
-                                            for d, n in dates]}],
-        },
     }}}
 
 
-def test_private_contributions_are_not_added_to_the_calendar_total(monkeypatch):
-    """The calendar total already includes private work; adding it double-counts."""
-    monkeypatch.setattr(fetch, "graphql",
-                        lambda *a, **k: collection(1174, 1122, [("2026-01-01", 5)]))
+def test_year_totals_come_from_the_page_and_the_private_share_from_the_api(monkeypatch):
+    """The two sources disagree on the total; the page wins, being what visitors see."""
+    monkeypatch.setenv("GITHUB_TOKEN", "scopeless")
+    monkeypatch.setattr(fetch, "calendar_year", lambda _y: [("2026-01-01", 1303)])
+    monkeypatch.setattr(fetch, "graphql", lambda *a, **k: collection(1168))
     per_year, private, _ = fetch.contributions_by_year(2026, datetime.date(2026, 10, 12))
-    assert per_year[2026] == 1174
-    assert private[2026] == 1122
+    assert per_year[2026] == 1303
+    assert private[2026] == 1168
+
+
+def test_private_share_is_asked_without_the_read_user_token(monkeypatch):
+    """PROFILE_TOKEN carries read:user, which zeroes the field being read."""
+    monkeypatch.setenv("PROFILE_TOKEN", "has-read-user")
+    monkeypatch.setenv("GITHUB_TOKEN", "scopeless")
+    monkeypatch.setattr(fetch, "calendar_year", lambda _y: [("2026-01-01", 9)])
+    used = []
+
+    def spy(_q, _token=None, **_k):
+        used.append(_token)
+        return collection(4)
+
+    monkeypatch.setattr(fetch, "graphql", spy)
+    fetch.contributions_by_year(2026, datetime.date(2026, 10, 12))
+    assert used == ["scopeless"]
+
+
+def test_private_share_cannot_exceed_the_total(monkeypatch):
+    """The two sources count different windows, so the parts can overshoot."""
+    monkeypatch.setenv("GITHUB_TOKEN", "scopeless")
+    monkeypatch.setattr(fetch, "calendar_year", lambda _y: [("2026-01-01", 10)])
+    monkeypatch.setattr(fetch, "graphql", lambda *a, **k: collection(12))
+    _, private, _ = fetch.contributions_by_year(2026, datetime.date(2026, 10, 12))
+    assert private[2026] == 10
+
+
+def test_private_share_is_zero_when_only_a_read_user_token_exists(monkeypatch):
+    """Better absent than wrong: the panel drops the counter rather than lie."""
+    monkeypatch.setenv("PROFILE_TOKEN", "has-read-user")
+    for name in ("GITHUB_TOKEN", "GH_TOKEN"):
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setattr(fetch, "calendar_year", lambda _y: [("2026-01-01", 1303)])
+
+    def forbidden(*_a, **_k):
+        raise AssertionError("asked the API with a read:user token")
+
+    monkeypatch.setattr(fetch, "graphql", forbidden)
+    per_year, private, _ = fetch.contributions_by_year(2026, datetime.date(2026, 10, 12))
+    assert (per_year[2026], private[2026]) == (1303, 0)
 
 
 def test_contributions_by_year_walks_every_year(monkeypatch):
+    monkeypatch.setenv("GITHUB_TOKEN", "scopeless")
     seen = []
-
-    def fake(_q, **kw):
-        seen.append(kw["from"][:4])
-        return collection(1, 0, [("2024-01-01", 1)])
-
-    monkeypatch.setattr(fetch, "graphql", fake)
+    monkeypatch.setattr(fetch, "calendar_year",
+                        lambda year: seen.append(year) or [(f"{year}-01-01", 1)])
+    monkeypatch.setattr(fetch, "graphql", lambda *a, **k: collection(1))
     fetch.contributions_by_year(2024, datetime.date(2026, 1, 1))
-    assert seen == ["2024", "2025", "2026"]
+    assert seen == [2024, 2025, 2026]
+
+
+def test_outsider_token_refuses_the_read_user_credential(monkeypatch):
+    monkeypatch.setenv("PROFILE_TOKEN", "has-read-user")
+    monkeypatch.setenv("GITHUB_TOKEN", "scopeless")
+    assert fetch.outsider_token() == "scopeless"
+
+
+def test_outsider_token_is_none_when_only_profile_token_is_set(monkeypatch):
+    monkeypatch.setenv("PROFILE_TOKEN", "has-read-user")
+    for name in ("GITHUB_TOKEN", "GH_TOKEN"):
+        monkeypatch.delenv(name, raising=False)
+    assert fetch.outsider_token() is None
+
+
+def test_graphql_honours_an_explicit_token(monkeypatch):
+    monkeypatch.setenv("PROFILE_TOKEN", "wrong")
+    captured = {}
+
+    def fake_urlopen(req, timeout=None):
+        captured["auth"] = req.headers["Authorization"]
+        return FakeResponse({"data": {"ok": 1}})
+
+    monkeypatch.setattr(fetch.urllib.request, "urlopen", fake_urlopen)
+    fetch.graphql("query{x}", _token="right")
+    assert captured["auth"] == "bearer right"
 
 
 # --- projects --------------------------------------------------------------
@@ -257,20 +417,27 @@ def route(q, **k):
     if "repositoriesContributedTo" in q:
         return CONTRIBUTED
     if "contributionsCollection" in q:
-        return collection(10, 4, [("2026-10-12", 10)])
+        return collection(6)
     return PROFILE
 
 
-def test_build_stats_sums_languages_across_every_repo_worked_in(monkeypatch):
+@pytest.fixture
+def stubbed(monkeypatch):
+    """`build_stats`' two sources: the GraphQL router and the profile page."""
+    monkeypatch.setenv("GITHUB_TOKEN", "scopeless")
     monkeypatch.setattr(fetch, "graphql", route)
+    monkeypatch.setattr(fetch, "calendar_year",
+                        lambda year: [(f"{year}-10-12", 10)] if year == 2026 else [])
+
+
+def test_build_stats_sums_languages_across_every_repo_worked_in(stubbed):
     stats, _ = fetch.build_stats(datetime.date(2026, 10, 12))
     assert stats["languages"] == {"Python": 400, "Go": 50}
     assert list(stats["languages"]) == ["Python", "Go"], "sorted by size descending"
 
 
-def test_build_stats_counts_owned_and_contributed_repos_separately(monkeypatch):
+def test_build_stats_counts_owned_and_contributed_repos_separately(stubbed):
     """`repos` is what the account owns; `repos_contributed` is what it worked in."""
-    monkeypatch.setattr(fetch, "graphql", route)
     stats, calendar = fetch.build_stats(datetime.date(2026, 10, 12))
     assert (stats["repos"], stats["repos_public"]) == (11, 1)
     assert stats["repos_contributed"] == 2
@@ -278,7 +445,7 @@ def test_build_stats_counts_owned_and_contributed_repos_separately(monkeypatch):
     assert stats["repos_contributed_org"] == 1
     assert stats["orgs"] == 2
     assert (stats["prs"], stats["prs_merged"]) == (423, 372)
-    assert stats["private_year"] == 4
+    assert stats["private_year"] == 6
     assert calendar == [["2026-10-12", 10]]
 
 
@@ -311,51 +478,3 @@ def test_write_emits_trailing_newline(tmp_path, monkeypatch):
     text = (tmp_path / "x.json").read_text()
     assert text.endswith("\n")
     assert json.loads(text) == {"a": 1}
-
-
-# --- private-visibility guard ----------------------------------------------
-
-def test_private_guard_is_off_by_default(monkeypatch):
-    monkeypatch.delenv("REQUIRE_PRIVATE", raising=False)
-    fetch.check_private_visible({"private_all": 0})
-
-
-def test_private_guard_passes_when_private_work_is_visible(monkeypatch):
-    monkeypatch.setenv("REQUIRE_PRIVATE", "1")
-    fetch.check_private_visible({"private_all": 1302})
-
-
-def test_private_guard_aborts_on_an_underprivileged_token(monkeypatch):
-    """Authenticating is not the same as being able to see the private work."""
-    monkeypatch.setenv("REQUIRE_PRIVATE", "1")
-    monkeypatch.setattr(fetch, "token_scopes", lambda: "repo")
-    with pytest.raises(SystemExit, match="SSO"):
-        fetch.check_private_visible({"private_all": 0})
-
-
-def test_token_scopes_reads_the_rest_header(monkeypatch):
-    monkeypatch.setenv("GITHUB_TOKEN", "t")
-
-    class Resp(FakeResponse):
-        headers = {"x-oauth-scopes": "repo, read:user"}
-
-    monkeypatch.setattr(fetch.urllib.request, "urlopen", lambda *a, **k: Resp({}))
-    assert fetch.token_scopes() == "repo, read:user"
-
-
-def test_token_scopes_is_quiet_when_the_request_fails(monkeypatch):
-    """It only ever decorates an error message; it must not raise its own."""
-    monkeypatch.setenv("GITHUB_TOKEN", "t")
-
-    def boom(*_a, **_k):
-        raise urllib.error.URLError("no route")
-
-    monkeypatch.setattr(fetch.urllib.request, "urlopen", boom)
-    assert fetch.token_scopes() == ""
-
-
-def test_private_guard_reports_the_scopes_it_found(monkeypatch):
-    monkeypatch.setenv("REQUIRE_PRIVATE", "1")
-    monkeypatch.setattr(fetch, "token_scopes", lambda: "read:user")
-    with pytest.raises(SystemExit, match="token scopes: read:user"):
-        fetch.check_private_visible({"private_all": 0})

@@ -5,15 +5,6 @@ on:
     - cron: "41 11 * * *"           # daily, a few minutes off the hour so the
                                     # scheduler is not contending with everyone
   workflow_dispatch:                # "Run workflow" button on the Actions tab
-    inputs:
-      require_private:
-        description: >-
-          Fail if the token reports no private contributions, and print the
-          scopes it has. Use after changing PROFILE_TOKEN to check whether it
-          can actually reach private work, rather than inferring it from the
-          committed numbers.
-        type: boolean
-        default: false
   push:
     branches: [main]
     paths:                          # re-render immediately when the generator
@@ -32,9 +23,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v5
+      # Pinned by commit, not tag. A tag is a movable pointer, and retargeting
+      # one at a malicious commit is how tj-actions/changed-files reached
+      # ~23,000 repositories in March 2025 — the payload dumped every secret
+      # the job could name into the log, which on a public repository is world
+      # readable. Consumers pinned by SHA were unaffected. Comments record the
+      # tag each SHA was taken from, since the SHA alone is unreadable.
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09   # v5
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.12"
 
@@ -43,17 +40,16 @@ jobs:
       - name: Install dependencies
         run: pip install fonttools==4.62.1 brotli==1.2.0
 
-      # This job reports public activity only, and that is a settled choice
-      # rather than an oversight: the organization holding most of the work
-      # does not admit personal access tokens, and GitHub gives no per-org
-      # breakdown of private contributions, so there is no partial credit to
-      # be had. REQUIRE_PRIVATE stays unset for the same reason — see the
-      # token section of tools/profile/README.md before turning it on.
+      # Both tokens are needed, for opposite reasons. github.token carries no
+      # scopes, which is the only way to read how much of the year was private
+      # — `read:user` zeroes that field. PROFILE_TOKEN carries `read:user` and
+      # `repo`, which is what folds private repositories into the repo tally
+      # and the language totals. Neither affects the contribution totals: those
+      # come from the public profile page with no credential.
       - name: Fetch data
         env:
           PROFILE_TOKEN: ${{ secrets.PROFILE_TOKEN }}
           GITHUB_TOKEN: ${{ github.token }}
-          REQUIRE_PRIVATE: ${{ inputs.require_private && '1' || '' }}
         run: python tools/profile/fetch.py
 
       - name: Render SVGs

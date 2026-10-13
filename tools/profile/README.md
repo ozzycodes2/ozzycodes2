@@ -16,7 +16,7 @@ fetch.py ─────┘                 + manifest.json
 
 | Step | Reads | Writes |
 |---|---|---|
-| `fetch.py` | GitHub GraphQL API | `data/stats.json`, `calendar.json`, `projects.json` |
+| `fetch.py` | the public profile page, GitHub GraphQL API | `data/stats.json`, `calendar.json`, `projects.json` |
 | `render.py` | `profile.toml`, `data/*.json` | `assets/**.svg`, `data/manifest.json` |
 | `readme.py` | `data/manifest.json` | the block between the markers in `README.md` |
 
@@ -71,36 +71,56 @@ GITHUB_TOKEN=$(gh auth token) .venv/bin/python tools/profile/fetch.py
 SVGs directly — but note the fade-in animations mean a screenshot taken at t=0
 shows an empty frame. Force reduced motion to see the final state.
 
-## The token, and what this profile does not show
+## Why the contribution counts come from a web page
 
-**The published numbers are public activity only.** The organization holding
-most of the work does not admit personal access tokens, and GitHub reports
-private contributions as a single `restrictedContributionsCount` with no
-per-organization breakdown — so there is no partial credit to collect. A token
-that can see some private work but not that organization's would still
-undercount by an order of magnitude. Rather than publish a figure that looks
-precise and is not, the profile reports what anyone can verify.
+Counting private work through the API does not work, and the reason is a
+property of the API rather than of any token. GitHub's schema defines
+`restrictedContributionsCount` as "a count of contributions made by the user
+that **the viewer cannot access**", and the profile setting that exposes
+private work says the same thing from the other side: it shows daily counts to
+"people **without access** to those private repositories". Authenticating as
+yourself makes you a viewer *with* access, so the anonymized disclosure stops
+applying and the numbers fall back to whatever your credential can still reach.
+Where an organization forbids personal access tokens, that is the public
+subset. Measured on this profile for 2026: **259 through the API, 1,303 on the
+profile page.**
 
-`PROFILE_TOKEN` is therefore optional. Set it to a classic PAT with `repo` and
-`read:user` and private repositories it *can* reach count toward the totals;
-leave it unset and the job falls back to the built-in `GITHUB_TOKEN`.
+So the counts and the daily calendar are read from
+`github.com/users/<login>/contributions` with no credential attached — the same
+fragment the profile page renders its graph from, and the same source
+`sallar/github-contributions-chart`, `Platane/snk` and
+`grubersjoe/github-contributions-api` use. Nothing is published that the
+profile page does not already show to anyone, and there is no secret to rotate,
+leak, or lose access with.
+
+The cost is that the fragment is undocumented and unversioned. `calendar_year`
+therefore checksums itself: the page's headline total is rendered by a
+different code path than the grid, so a parse that drifts fails the run instead
+of quietly committing a year of zeroes.
+
+**The private count needs the opposite of a privileged token.** How much of
+the year was private is reported by `restrictedContributionsCount`, and the one
+scope that governs it is `read:user`: with it, `contributionsCollection`
+switches from the anonymized aggregate to per-repository itemization, and the
+field correctly drops to zero — nothing is restricted from a viewer who can
+reach it. So `fetch.py` asks for that field with `outsider_token()`, which
+skips `PROFILE_TOKEN` and takes `GITHUB_TOKEN` instead. Actions' own job token
+has no scopes at all and is perfect for it; so is `gh auth token`, whose
+scopes do not include `read:user`. With no such credential available the count
+is reported as zero and the panel drops the counter rather than guess.
+
+`PROFILE_TOKEN` is optional and never touches the contribution counts. It is
+read only for repository and pull request metadata: set it to a classic PAT
+with `repo` and `read:user` and the repo tally and language byte totals include
+private repositories it can reach; leave it unset and the job falls back to
+`GITHUB_TOKEN` and reports public repositories only. Because the language chart
+is built from whatever that credential can see, it shifts when the credential
+does — a local run through `gh` reaches more repositories than the PAT in CI.
 
 Private repository, organization and owner *names* are never requested, never
 written to `data/`, and never rendered. Organization work reaches the profile
 only as counts and language byte totals, and a test pins the absence of those
 fields from the query.
-
-`REQUIRE_PRIVATE=1` makes `fetch.py` abort when the token reports no private
-contributions at all, printing the token's scopes. It exists for the case where
-the organization policy changes and a silent regression to public-only would
-otherwise go unnoticed. It is deliberately unset in the workflow, because today
-that condition is the expected state rather than a fault.
-
-One API detail worth recording, because it is easy to get wrong and the error
-is silent: when the token can see private repositories,
-`contributionCalendar.totalContributions` **already includes** them.
-`restrictedContributionsCount` is the private subset of that total, not an
-addition to it. Summing the two double-counts every private contribution.
 
 ## Determinism
 

@@ -1,14 +1,17 @@
-"""Refreshes data/*.json from the GitHub API.
+"""Refreshes data/*.json from two GitHub sources.
 
-Writes four files, each the input to one or more panels:
+Writes three files, each the input to one or more panels:
 
   stats.json     headline counters, language byte totals, streaks
   calendar.json  [[iso date, count], ...] for the last 365 days
   projects.json  live stars/language for the repos profile.toml curates
 
-PROFILE_TOKEN is a classic PAT with `repo` + `read:user`, SSO-authorized for
-every organization whose work should count. Without that access the counters
-silently drop to public-only; REQUIRE_PRIVATE makes that an error instead.
+Three sources, and which credential each gets is load-bearing rather than
+incidental. Contribution totals and the daily calendar come from the public
+profile page with none at all (`calendar_year`). The private share of those
+totals comes from the GraphQL API asked with a token that must lack `read:user`
+(`outsider_token`). Everything else — repositories, languages, pull requests —
+comes from the same API asked with the most privileged token there is.
 
 No repository, organization or owner *name* is ever requested for anything
 beyond the repos profile.toml curates by hand. Organization work reaches the
@@ -18,6 +21,7 @@ import datetime
 import json
 import os
 import pathlib
+import re
 import sys
 import tomllib
 import urllib.error
@@ -36,11 +40,30 @@ def token():
     sys.exit("error: set PROFILE_TOKEN (or GITHUB_TOKEN) to a token with read:user")
 
 
-def graphql(query, **variables):
+def outsider_token():
+    """A credential that must *lack* `read:user`, or None if there is none.
+
+    Not least privilege — a different answer. `read:user` switches
+    `contributionsCollection` out of the anonymized aggregate and into
+    per-repository itemization, which drives
+    `restrictedContributionsCount` to zero: there is nothing the viewer cannot
+    access, so nothing is restricted. Without the scope the same field reports
+    how much of the year was private, which is the only way GitHub states that
+    number at all. PROFILE_TOKEN is skipped on purpose, since it carries
+    `read:user` for the repository queries; Actions' `GITHUB_TOKEN` has no
+    scopes and is ideal.
+    """
+    for name in ("GITHUB_TOKEN", "GH_TOKEN"):
+        if os.environ.get(name):
+            return os.environ[name]
+    return None
+
+
+def graphql(query, _token=None, **variables):
     body = json.dumps({"query": query, "variables": variables}).encode()
     req = urllib.request.Request(
         API, data=body,
-        headers={"Authorization": f"bearer {token()}",
+        headers={"Authorization": f"bearer {_token or token()}",
                  "Content-Type": "application/json",
                  "User-Agent": f"{USER}-profile-readme"},
     )
@@ -87,10 +110,10 @@ query($login: String!) {
 #
 # These are whole-tree byte counts, so the chart describes the codebases its
 # author works in, not lines they wrote. The honest alternative — commits
-# bucketed by language — is not available: GitHub reports private work only as
-# an undifferentiated `restrictedContributionsCount`, with no per-repository
-# breakdown, so a commit-based chart would silently omit 1,130 of this year's
-# 1,185 contributions and misreport the mix.
+# bucketed by language — is not available at all: GitHub itemizes contributions
+# per repository only for repositories the credential can read, so a
+# commit-based chart would silently omit roughly 1,000 of this year's 1,300
+# contributions and misreport the mix.
 CONTRIB_REPOS_Q = """
 query($login: String!, $after: String) {
   user(login: $login) {
@@ -113,16 +136,14 @@ query($login: String!, $after: String) {
 }
 """
 
+# Asked only for the private count, and only ever with `outsider_token()`.
+# Documented as "a count of contributions made by the user that the viewer
+# cannot access" — so it answers truthfully only for a viewer who cannot.
 YEAR_Q = """
 query($login: String!, $from: DateTime!, $to: DateTime!) {
   user(login: $login) {
     contributionsCollection(from: $from, to: $to) {
-      totalCommitContributions
       restrictedContributionsCount
-      contributionCalendar {
-        totalContributions
-        weeks { contributionDays { date contributionCount } }
-      }
     }
   }
 }
@@ -141,6 +162,68 @@ query($owner: String!, $name: String!) {
 """
 
 
+# The fragment the profile page loads its contribution graph from. `from`
+# selects the calendar year; the response is always Jan 1 to Dec 31 of it.
+CALENDAR_URL = ("https://github.com/users/{login}/contributions"
+                "?from={year}-01-01&to={year}-12-31")
+
+# One <td> per day, then a sibling <tool-tip> keyed to it by id. The count only
+# exists in the tooltip prose — the cell itself carries a 0-4 intensity level.
+DAY_RE = re.compile(r'data-date="(\d{4}-\d{2}-\d{2})" '
+                    r'id="(contribution-day-component-[\d-]+)"')
+TIP_RE = re.compile(r'for="(contribution-day-component-[\d-]+)"[^>]*>'
+                    r'([^<]*)</tool-tip>')
+COUNT_RE = re.compile(r"(\d+) contribution")
+TOTAL_RE = re.compile(r">\s*([\d,]+)\s*contributions?\s*in", re.S)
+
+
+def calendar_year(year):
+    """One calendar year of daily contribution counts, as visitors see them.
+
+    Sent unauthenticated, and that is the point rather than an economy.
+    GitHub's "Include private contributions on my profile" setting governs what
+    a *viewer without access* sees, and the schema says so outright:
+    `restrictedContributionsCount` is "a count of contributions made by the
+    user that the viewer cannot access". Querying the API as yourself makes you
+    a viewer with access, so the anonymized disclosure does not apply and the
+    numbers collapse to whatever your credential can still reach — which, when
+    an organization forbids personal access tokens, is the public subset. For
+    2026 that is 259 against the profile page's 1,303. Attaching no credential
+    is therefore not a workaround but the only accurate reading.
+
+    The fragment is undocumented and unversioned, which is the price. The
+    headline total is rendered from a different code path than the grid, so it
+    is used as a checksum: markup drift fails here instead of quietly
+    publishing a year of zeroes.
+    """
+    url = CALENDAR_URL.format(login=USER, year=year)
+    req = urllib.request.Request(url, headers={"User-Agent": f"{USER}-profile-readme"})
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            page = resp.read().decode()
+    except urllib.error.HTTPError as exc:
+        sys.exit(f"error: profile calendar for {year} returned {exc.code}")
+    except (urllib.error.URLError, OSError) as exc:
+        sys.exit(f"error: could not reach the profile calendar for {year}: {exc}")
+
+    tips = dict(TIP_RE.findall(page))
+    days = []
+    for date, cell in DAY_RE.findall(page):
+        found = COUNT_RE.match(tips.get(cell, ""))
+        days.append((date, int(found.group(1)) if found else 0))
+    if not days:
+        sys.exit(f"error: no contribution days found for {year} — {url} changed shape")
+
+    headline = TOTAL_RE.search(page)
+    if headline:
+        expected = int(headline.group(1).replace(",", ""))
+        total = sum(n for _, n in days)
+        if total != expected:
+            sys.exit(f"error: parsed {total} contributions for {year} but the page "
+                     f"says {expected} — {url} changed shape")
+    return sorted(days)
+
+
 def year_range(year, today):
     start = datetime.datetime(year, 1, 1, tzinfo=datetime.timezone.utc)
     end = min(datetime.datetime(year, 12, 31, 23, 59, 59, tzinfo=datetime.timezone.utc),
@@ -149,31 +232,46 @@ def year_range(year, today):
 
 
 def contributions_by_year(created_year, today):
-    """Per-year totals and private counts, plus the raw calendar per year.
+    """Per-year totals and the private share of them, from two sources.
 
-    When the token can see private repositories, contributionCalendar totals
-    already include them; restrictedContributionsCount is the private subset,
-    not an addition to it.
+    Neither source carries both halves. The profile page states the total but
+    not its composition; the API states how much was private but disagrees with
+    the page about the total — 1,227 against 1,303 for 2026 over the identical
+    window, because asking as the account holder changes which contributions
+    are counted at all. The page is taken as authoritative on the grounds that
+    it is the number every visitor to the profile sees.
+
+    The private figure therefore comes from a window the API measured and the
+    page did not, and is capped at the page's total so the counters can never
+    claim more private work than there was work.
     """
-    per_year, private, calendars = {}, {}, {}
+    outsider, per_year, private, calendars = outsider_token(), {}, {}, {}
     for year in range(created_year, today.year + 1):
+        days = calendar_year(year)
+        calendars[year] = days
+        per_year[year] = sum(n for _, n in days)
+        private[year] = 0
+        if not outsider:
+            continue
         start, end = year_range(year, today)
         # `from` is a Python keyword, so the GraphQL variable goes in by name.
-        result = graphql(YEAR_Q, login=USER, **{"from": start, "to": end})
-        coll = result["user"]["contributionsCollection"]
-        per_year[year] = coll["contributionCalendar"]["totalContributions"]
-        private[year] = coll["restrictedContributionsCount"]
-        calendars[year] = [(d["date"], d["contributionCount"])
-                           for week in coll["contributionCalendar"]["weeks"]
-                           for d in week["contributionDays"]]
+        coll = graphql(YEAR_Q, _token=outsider, login=USER,
+                       **{"from": start, "to": end})["user"]["contributionsCollection"]
+        private[year] = min(coll["restrictedContributionsCount"], per_year[year])
     return per_year, private, calendars
 
 
 def trailing_year(calendars, today):
-    """The last 365 days of contributions, stitched across the year boundary."""
+    """The last 365 days of contributions, stitched across the year boundary.
+
+    Upper-bounded as well as lower: the profile page returns whole calendar
+    years, so the current one arrives with every remaining day of December
+    attached at zero.
+    """
     cutoff = today - datetime.timedelta(days=364)
     days = sorted({d: n for cal in calendars.values() for d, n in cal}.items())
-    return [[d, n] for d, n in days if datetime.date.fromisoformat(d) >= cutoff]
+    return [[d, n] for d, n in days
+            if cutoff <= datetime.date.fromisoformat(d) <= today]
 
 
 def streaks(calendar, today):
@@ -282,55 +380,11 @@ def write(name, payload):
     print(f"wrote data/{name}")
 
 
-def token_scopes():
-    """The token's scopes, as GitHub reports them, or "" if it will not say.
-
-    Only the REST API returns `x-oauth-scopes`, and only for a classic PAT —
-    a fine-grained token or an Actions job token reports nothing. Used in
-    diagnostics, so any failure to ask is not worth raising over.
-    """
-    req = urllib.request.Request(
-        "https://api.github.com/user",
-        headers={"Authorization": f"bearer {token()}",
-                 "User-Agent": f"{USER}-profile-readme"},
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            return resp.headers.get("x-oauth-scopes", "")
-    except (urllib.error.URLError, OSError):
-        return ""
-
-
-def check_private_visible(stats):
-    """Abort when a token that should see private work reports none of it.
-
-    A classic PAT that lacks `repo`, or that has not been SSO-authorized for an
-    organization, is not rejected — it authenticates and returns a smaller
-    answer. The counters then drop by an order of magnitude with no error, and
-    the scheduled job commits the undercount as if it were correct. Set
-    REQUIRE_PRIVATE on a profile that is known to have private contributions
-    and the run fails instead.
-    """
-    if not os.environ.get("REQUIRE_PRIVATE"):
-        return
-    if stats["private_all"]:
-        return
-    sys.exit(
-        "error: the token reports 0 private contributions, so the counters "
-        "would undercount.\n"
-        f"  token scopes: {token_scopes() or '(none reported — not a classic PAT?)'}\n"
-        "  `repo` is required, and a classic PAT also needs 'Configure SSO' "
-        "authorization for each SAML organization — that is granted per "
-        "organization and is separate from the scope list."
-    )
-
-
 def main():
     today = datetime.date.today()
     config = tomllib.loads((HERE / "profile.toml").read_text())
 
     stats, calendar = build_stats(today)
-    check_private_visible(stats)
     write("stats.json", stats)
     write("calendar.json", calendar)
     write("projects.json", build_projects(config))
