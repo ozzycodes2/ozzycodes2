@@ -44,7 +44,7 @@ def bars(markup):
 
 def test_height_is_on_the_grid_and_the_frame_stays_open(markup):
     assert int(re.search(r'height="(\d+)"', markup).group(1)) % c.ROW == 0
-    edges = re.search(r'<path d="([^"]*)" fill="none" stroke="[^"]+" stroke-width="1.2"',
+    edges = re.search(rf'<path d="([^"]*)" fill="none" stroke="[^"]+" stroke-width="{c.EDGE_W}"',
                       markup).group(1)
     assert "H" not in edges            # neither top=True nor bottom=True
 

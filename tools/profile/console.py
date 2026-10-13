@@ -45,6 +45,14 @@ TEXT_X = 52      # left edge of body text
 FRAME_L = MARGIN
 FRAME_R = W - MARGIN
 
+# Even, so the stroke lands on whole user units either side of its centre line.
+# The rails are the one thing that has to agree across slices: each file is
+# rasterised on its own, and a rail whose edges fall mid-pixel can be rounded
+# one way in one slice and the other way in the next, which reads as the frame
+# stepping sideways at every seam. Integer edges plus `crispEdges` make every
+# slice snap the rail to the same device column at any scale.
+EDGE_W = 2
+
 e = html.escape
 
 
@@ -218,8 +226,8 @@ def slice_svg(height, body, *, title, desc, text="", top=False, bottom=False,
 <rect x="{x0}" y="{y0}" width="{x1 - x0}" height="{y1 - y0}" fill="{BG}"/>
 <rect x="{x0}" y="{y0}" width="{x1 - x0}" height="{y1 - y0}" fill="url(#grid)"/>
 {body}
-<path d="{edges}" fill="none" stroke="{ACCENT}" stroke-width="1.2"/>
-<g fill="none" stroke="{ACCENT}" stroke-width="2">{corners}</g>
+<path d="{edges}" fill="none" stroke="{ACCENT}" stroke-width="{EDGE_W}" shape-rendering="crispEdges"/>
+<g fill="none" stroke="{ACCENT}" stroke-width="2" shape-rendering="crispEdges">{corners}</g>
 </svg>
 '''
 

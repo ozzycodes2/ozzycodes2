@@ -36,7 +36,7 @@ def height_of(markup):
 
 def test_height_is_on_the_grid_and_the_frame_stays_open(markup):
     assert height_of(markup) % c.ROW == 0
-    edges = re.search(r'<path d="([^"]*)" fill="none" stroke="[^"]+" stroke-width="1.2"',
+    edges = re.search(rf'<path d="([^"]*)" fill="none" stroke="[^"]+" stroke-width="{c.EDGE_W}"',
                       markup).group(1)
     assert "H" not in edges
 

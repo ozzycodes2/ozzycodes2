@@ -78,7 +78,7 @@ def glow_path(markup):
 
 
 def edge_path(markup):
-    return re.search(r'<path d="([^"]*)" fill="none" stroke="[^"]*" stroke-width="1.2"',
+    return re.search(rf'<path d="([^"]*)" fill="none" stroke="[^"]*" stroke-width="{c.EDGE_W}"',
                      markup).group(1)
 
 
@@ -90,6 +90,19 @@ def test_height_must_sit_on_the_grid():
 def test_unknown_rails_value_is_rejected():
     with pytest.raises(ValueError, match="rails"):
         bare(rails="middle")
+
+
+def test_the_rails_snap_to_whole_pixels_in_every_slice():
+    """Each slice is a separate file rasterised on its own.
+
+    A rail whose stroke edges fall mid-unit can round one way in one slice and
+    the other way in the next, which shows up as the frame stepping sideways at
+    the seam. Even width on an integer centre line, plus the rendering hint.
+    """
+    assert c.EDGE_W % 2 == 0
+    assert c.MARGIN % 1 == 0
+    for markup in (bare(), bare(width=440, rails="left")):
+        assert 'shape-rendering="crispEdges"' in markup
 
 
 def test_default_slice_is_unchanged_by_the_new_parameters():
@@ -147,4 +160,4 @@ def test_a_half_slice_brackets_only_its_own_corner(edge):
 
 
 def test_a_middle_slice_draws_no_corner_brackets():
-    assert 'stroke-width="2"></g>' in bare(width=440, rails="left")
+    assert "><path" not in bare(width=440, rails="left").split("<g fill=")[-1]

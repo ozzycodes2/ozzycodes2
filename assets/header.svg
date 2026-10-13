@@ -41,6 +41,6 @@ text{font-family:'JBM',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font
 <g class="ln" style="animation-delay:1.16s">
 <text x="52" y="338" style="font-size:14px"><tspan class="ok">❯</tspan><tspan class="wh cursor" dx="10">█</tspan></text>
 </g>
-<path d="M16 16V400M864 16V400M16 16H864" fill="none" stroke="#00d9ff" stroke-width="1.2"/>
-<g fill="none" stroke="#00d9ff" stroke-width="2"><path d="M9 34V9H34"/><path d="M846 9H871V34"/></g>
+<path d="M16 16V400M864 16V400M16 16H864" fill="none" stroke="#00d9ff" stroke-width="2" shape-rendering="crispEdges"/>
+<g fill="none" stroke="#00d9ff" stroke-width="2" shape-rendering="crispEdges"><path d="M9 34V9H34"/><path d="M846 9H871V34"/></g>
 </svg>
