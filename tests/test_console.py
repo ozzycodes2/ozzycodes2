@@ -135,17 +135,29 @@ def arcs(d):
 
 
 def test_outline_rounds_the_one_corner_where_two_drawn_edges_meet():
-    d = c._outline(0, 100, 0, 50, 10, top=True, bottom=False, left=True, right=False)
-    assert arcs(d) == [(10, 10, -10)]                # the top-left turn only
-    assert d.startswith("M0 50V10")                  # rail stops short of the corner
-    assert d.endswith("H100")                        # and runs flush to the far edge
+    rails, caps = c._outline(0, 100, 0, 50, 10, top=True, bottom=False,
+                             left=True, right=False)
+    assert arcs(caps) == [(10, 10, -10)]             # the top-left turn only
+    assert rails == "M0 50V10"                       # rail stops short of the corner
+    assert caps.endswith("H100")                     # cap runs flush to the far edge
+
+
+def test_outline_separates_the_rails_from_the_caps():
+    """They are two paths so each can be rasterised the way it needs: the rails
+    snapped to a device column, the arcs antialiased."""
+    rails, caps = c._outline(0, 100, 0, 50, 10, top=True, bottom=True,
+                             left=True, right=True)
+    assert arcs(rails) == []                         # no curve in a rail
+    assert "V" not in caps and "H" in caps           # no straight run in a cap
 
 
 def test_outline_rounds_nothing_where_only_one_edge_is_drawn():
-    assert arcs(c._outline(0, 100, 0, 50, 10, top=True, bottom=False,
-                           left=False, right=False)) == []
-    assert arcs(c._outline(0, 100, 0, 50, 10, top=False, bottom=False,
-                           left=True, right=True)) == []
+    rails, caps = c._outline(0, 100, 0, 50, 10, top=True, bottom=False,
+                             left=False, right=False)
+    assert rails == "" and arcs(caps) == []
+    rails, caps = c._outline(0, 100, 0, 50, 10, top=False, bottom=False,
+                             left=True, right=True)
+    assert caps == "" and arcs(rails) == []
 
 
 def test_outline_leaves_every_uncapped_end_open():
@@ -153,18 +165,28 @@ def test_outline_leaves_every_uncapped_end_open():
     for kw in (dict(top=True, bottom=False, left=True, right=True),
                dict(top=False, bottom=True, left=True, right=True),
                dict(top=False, bottom=False, left=True, right=True)):
-        d = c._outline(0, 100, 0, 50, 10, **kw)
+        d = "".join(c._outline(0, 100, 0, 50, 10, **kw))
         assert "Z" not in d, d
 
 
 def test_outline_closes_all_four_corners_when_both_ends_are_capped():
-    d = c._outline(0, 100, 0, 50, 10, top=True, bottom=True, left=True, right=True)
-    assert arcs(d) == [(10, 10, -10), (10, 10, 10), (10, -10, 10), (10, -10, -10)]
+    _, caps = c._outline(0, 100, 0, 50, 10, top=True, bottom=True,
+                         left=True, right=True)
+    assert arcs(caps) == [(10, 10, -10), (10, 10, 10), (10, -10, 10), (10, -10, -10)]
+
+
+def test_outline_meets_its_own_caps_where_the_rails_stop():
+    """A gap or an overlap here shows as a notch at the corner."""
+    rails, caps = c._outline(0, 100, 0, 50, 10, top=True, bottom=True,
+                             left=True, right=True)
+    assert rails == "M0 40V10M100 10V40"             # both stop one radius short
+    assert caps.startswith("M0 10a")                 # and the arc starts there
+    assert "M100 40a" in caps
 
 
 def test_outline_draws_nothing_at_all_for_a_piece_with_no_edges():
     assert c._outline(0, 100, 0, 50, 10, top=False, bottom=False,
-                      left=False, right=False) == ""
+                      left=False, right=False) == ("", "")
 
 
 def test_fill_is_a_closed_shape_rounded_only_where_asked():
@@ -184,10 +206,21 @@ def fill_path(markup):
     return re.search(r'<path d="([^"]*)" fill="#', markup).group(1)
 
 
-def edge_path(markup):
-    return re.search(
-        rf'<path d="([^"]*)" fill="none" stroke="[^"]*" stroke-width="{c.EDGE_W}"',
-        markup).group(1)
+def edge_paths(markup):
+    """Every stroked frame path, as `d` -> whether it is told to snap."""
+    return {d: bool(snap) for d, snap in re.findall(
+        rf'<path d="([^"]*)" fill="none" stroke="[^"]*" '
+        rf'stroke-width="{c.RAIL_W}"( shape-rendering="crispEdges")?/>', markup)}
+
+
+def rails_path(markup):
+    """The snapped path: the straight verticals. Empty when none are drawn."""
+    return next((d for d, snap in edge_paths(markup).items() if snap), "")
+
+
+def caps_path(markup):
+    """The antialiased path: a horizontal edge and its corner arcs."""
+    return next((d for d, snap in edge_paths(markup).items() if not snap), "")
 
 
 def span(d):
@@ -211,13 +244,16 @@ def test_the_rails_snap_to_whole_pixels_in_every_slice():
 
     A rail whose stroke edges fall mid-unit can round one way in one slice and
     the other way in the next, which shows up as the frame stepping sideways at
-    the seam. A 1px stroke on an integer coordinate, plus the rendering hint.
+    the seam. Integer coordinates, the rendering hint, and twice the weight of
+    an interior stroke, since a 1px rail survives neither the resample nor the
+    difference in height between one slice and the next.
     """
-    assert c.EDGE_W == 1
+    assert c.RAIL_W == 2 and c.RAIL_W > c.EDGE_W
     assert c.MARGIN % 1 == 0
-    for markup in (bare(), bare(width=440, rails="left")):
-        assert 'shape-rendering="crispEdges"' in markup
-        coords = [float(n) for n in re.findall(r"[MHV](-?[\d.]+)", edge_path(markup))]
+    for markup in (bare(), bare(width=440, rails="left"), bare(top=True)):
+        d = rails_path(markup)
+        assert d, markup
+        coords = [float(n) for n in re.findall(r"[MHV](-?[\d.]+)", d)]
         assert all(n.is_integer() for n in coords), coords
 
 
@@ -226,35 +262,35 @@ def test_default_slice_is_unchanged_by_the_new_parameters():
     markup = bare()
     assert f'width="{c.W}" height="80"' in markup
     assert span(fill_path(markup)) == (c.FRAME_L, c.FRAME_R)
-    assert edge_path(markup) == f"M{c.FRAME_L} 80V0M{c.FRAME_R} 0V80"
+    assert rails_path(markup) == f"M{c.FRAME_L} 80V0M{c.FRAME_R} 0V80"
 
 
 def test_a_middle_slice_draws_two_straight_rails_and_rounds_nothing():
     """Everything between the header and the footer continues the rails only."""
     markup = bare()
-    d = edge_path(markup)
+    d = rails_path(markup)
     assert arcs(d) == []
     assert "Z" not in d
     assert d.count("M") == 2 and "H" not in d       # two verticals, no cap
-    assert 'shape-rendering="crispEdges"' in markup
+    assert caps_path(markup) == ""                  # and no cap path at all
 
 
 def test_left_half_keeps_its_outer_rail_and_runs_flush_to_the_seam():
     markup = bare(width=440, rails="left")
     assert 'width="440"' in markup
     assert span(fill_path(markup)) == (c.MARGIN, 440)
-    assert edge_path(markup) == f"M{c.MARGIN} 80V0"
+    assert rails_path(markup) == f"M{c.MARGIN} 80V0"
 
 
 def test_right_half_mirrors_the_left():
     markup = bare(width=440, rails="right")
     assert span(fill_path(markup)) == (0, 440 - c.MARGIN)
-    assert edge_path(markup) == f"M{440 - c.MARGIN} 0V80"
+    assert rails_path(markup) == f"M{440 - c.MARGIN} 0V80"
 
 
 def test_a_middle_piece_of_a_split_row_draws_no_rail_at_all():
     markup = bare(width=440, rails="none")
-    assert edge_path(markup) == ""
+    assert edge_paths(markup) == {}                 # no stroked frame path emitted
     assert span(fill_path(markup)) == (0, 440)
 
 
@@ -281,30 +317,30 @@ def test_a_half_slice_rounds_only_the_corner_on_the_rail_it_draws(edge, left_arc
                                                                  right_arc):
     left = bare(width=440, rails="left", **{edge: True})
     right = bare(width=440, rails="right", **{edge: True})
-    assert arcs(edge_path(left)) == [left_arc]
-    assert arcs(edge_path(right)) == [right_arc]
+    assert arcs(caps_path(left)) == [left_arc]
+    assert arcs(caps_path(right)) == [right_arc]
     # The other end of the cap runs flush to the seam, where the neighbour's
     # own cap picks it up.
-    assert span(edge_path(left))[1] == 440
-    assert span(edge_path(right))[0] == 0
+    assert span(caps_path(left))[1] == 440
+    assert span(caps_path(right))[0] == 0
 
 
 @pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
 def test_both_themes_produce_a_complete_frame(theme):
     """A one-slice console: capped at both ends, all four corners rounded."""
     markup = c.slice_svg(theme, 120, "", title="t", desc="d", top=True, bottom=True)
-    outline, fill = edge_path(markup), fill_path(markup)
-    assert len(arcs(outline)) == 4
-    assert {r for r, _, _ in arcs(outline)} == {c.R_CARD}
+    caps, rails, fill = caps_path(markup), rails_path(markup), fill_path(markup)
+    assert len(arcs(caps)) == 4
+    assert {r for r, _, _ in arcs(caps)} == {c.R_CARD}
     assert fill.endswith("Z")
     assert f'fill="{theme.canvas}"' in markup
     assert f'stroke="{theme.hairline}"' in markup
-    assert f"M{c.FRAME_L} " in outline and f"H{c.FRAME_R - c.R_CARD}" in outline
+    assert f"M{c.FRAME_L} " in rails and f"H{c.FRAME_R - c.R_CARD}" in caps
 
 
 @pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
 def test_a_slice_names_only_its_own_themes_colours(theme):
-    markup = c.slice_svg(theme, 80, c.title_bar(theme, 40) + c.heading(theme, 70, "x"),
+    markup = c.slice_svg(theme, 80, c.title_bar(theme) + c.heading(theme, 70, "x"),
                          title="t", desc="d", top=True)
     for other in c.THEMES:
         if other.name != theme.name:
@@ -314,7 +350,9 @@ def test_a_slice_names_only_its_own_themes_colours(theme):
 
 def test_a_rounded_corner_is_not_told_to_snap_to_a_device_column():
     """Only a rail is straight enough; a snapped arc steps where it meets one."""
-    assert 'shape-rendering="auto"' in bare(top=True)
+    markup = bare(top=True)
+    assert edge_paths(markup) == {rails_path(markup): True, caps_path(markup): False}
+    assert arcs(caps_path(markup))
 
 
 def test_css_and_defs_are_passed_through():
@@ -387,9 +425,10 @@ def test_the_text_argument_adds_glyphs_the_body_does_not_contain():
 
 @pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
 def test_the_title_bar_draws_three_hairline_rings(theme):
-    markup = c.title_bar(theme, 60)
+    markup = c.title_bar(theme)
+    mid = c.MARGIN + c.TITLE_H // 2
     rings = re.findall(
-        rf'<circle cx="(\d+)" cy="60" r="5" fill="none" stroke="{theme.hairline}"',
+        rf'<circle cx="(\d+)" cy="{mid}" r="5" fill="none" stroke="{theme.hairline}"',
         markup)
     assert [int(x) for x in rings] == [c.FRAME_L + 28, c.FRAME_L + 48, c.FRAME_L + 68]
     assert f'fill="{theme.surface}"' in markup
@@ -397,10 +436,28 @@ def test_the_title_bar_draws_three_hairline_rings(theme):
 
 
 def test_the_title_bar_sits_on_the_frames_rounded_cap():
-    markup = c.title_bar(c.LIGHT, c.MARGIN + 24)
-    assert arcs(fill_path(markup)) == [(c.R_CARD, c.R_CARD, c.R_CARD),
-                                       (c.R_CARD, c.R_CARD, -c.R_CARD)]
-    assert f'<line x1="{c.FRAME_L}"' in markup and f'x2="{c.FRAME_R}"' in markup
+    """Not merely rounded to the same radius — on the same arc.
+
+    Floated below the cap it leaves a strip of canvas above itself and the two
+    sets of corners read as two misaligned windows.
+    """
+    band = fill_path(c.title_bar(c.LIGHT))
+    assert arcs(band) == [(c.R_CARD, c.R_CARD, c.R_CARD),
+                          (c.R_CARD, c.R_CARD, -c.R_CARD)]
+    frame = caps_path(c.slice_svg(c.LIGHT, 120, "", title="t", desc="d", top=True))
+    assert band.startswith(f"M{c.FRAME_L + c.R_CARD} {c.MARGIN}")
+    assert frame.startswith(f"M{c.FRAME_L} {c.MARGIN + c.R_CARD}")
+    # Both turn between the same two points: (FRAME_L, MARGIN + R) and
+    # (FRAME_L + R, MARGIN), so the band's arc lies under the frame's.
+    assert band.endswith(f"V{c.MARGIN + c.R_CARD}"
+                         f"a{c.R_CARD} {c.R_CARD} 0 0 1 {c.R_CARD} {-c.R_CARD}Z")
+
+
+def test_the_title_bar_rules_off_at_a_fixed_depth():
+    markup = c.title_bar(c.LIGHT)
+    rule = c.MARGIN + c.TITLE_H
+    assert f'<line x1="{c.FRAME_L}" y1="{rule}" x2="{c.FRAME_R}" y2="{rule}"' in markup
+    assert f'V{rule}H{c.FRAME_L}' in fill_path(markup)
 
 
 @pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)

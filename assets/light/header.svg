@@ -19,10 +19,10 @@ text{font-family:Inter, 'Helvetica Neue', Helvetica, Arial, system-ui, sans-seri
 
 </defs>
 <path d="M34 16H846a18 18 0 0 1 18 18V400H16V34a18 18 0 0 1 18 -18Z" fill="#f8f8f8"/>
-<path d="M34 32H846a18 18 0 0 1 18 18V76H16V50a18 18 0 0 1 18 -18Z" fill="#ffffff"/>
-<circle cx="44" cy="56" r="5" fill="none" stroke="#d9d9d9" stroke-width="1"/><circle cx="64" cy="56" r="5" fill="none" stroke="#d9d9d9" stroke-width="1"/><circle cx="84" cy="56" r="5" fill="none" stroke="#d9d9d9" stroke-width="1"/>
-<text x="440" y="60" text-anchor="middle" class="caption dim">ozzycodes2</text>
-<line x1="16" y1="76" x2="864" y2="76" stroke="#d9d9d9" stroke-width="1" shape-rendering="crispEdges"/>
+<path d="M34 16H846a18 18 0 0 1 18 18V60H16V34a18 18 0 0 1 18 -18Z" fill="#ffffff"/>
+<circle cx="44" cy="38" r="5" fill="none" stroke="#d9d9d9" stroke-width="1"/><circle cx="64" cy="38" r="5" fill="none" stroke="#d9d9d9" stroke-width="1"/><circle cx="84" cy="38" r="5" fill="none" stroke="#d9d9d9" stroke-width="1"/>
+<text x="440" y="42" text-anchor="middle" class="caption dim">ozzycodes2</text>
+<line x1="16" y1="60" x2="864" y2="60" stroke="#d9d9d9" stroke-width="1" shape-rendering="crispEdges"/>
 <g class="ln" style="animation-delay:0.27s"><text x="52" y="96" class="mono dim"><tspan>❯</tspan><tspan dx="8">whoami</tspan></text></g>
 <g class="ln" style="animation-delay:0.40s">
 <text x="52" y="164" class="display ink">Osniel Quintana</text>
@@ -37,5 +37,6 @@ text{font-family:Inter, 'Helvetica Neue', Helvetica, Arial, system-ui, sans-seri
 <g class="ln" style="animation-delay:1.16s">
 <text x="52" y="348" class="mono dim"><tspan>❯</tspan><tspan class="ink cursor" dx="10">▌</tspan></text>
 </g>
-<path d="M16 400V34a18 18 0 0 1 18 -18H846a18 18 0 0 1 18 18V400" fill="none" stroke="#d9d9d9" stroke-width="1" shape-rendering="auto"/>
+<path d="M16 400V34M864 34V400" fill="none" stroke="#d9d9d9" stroke-width="2" shape-rendering="crispEdges"/>
+<path d="M16 34a18 18 0 0 1 18 -18H846a18 18 0 0 1 18 18" fill="none" stroke="#d9d9d9" stroke-width="2"/>
 </svg>

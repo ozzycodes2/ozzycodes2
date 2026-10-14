@@ -8,7 +8,7 @@ def render(cfg, _data, theme):
     role, tagline = ident["role"], ident["tagline"]
 
     y = 96
-    body = [c.title_bar(theme, 56)]
+    body = [c.title_bar(theme)]
 
     prompt = (f'<text x="{c.TEXT_X}" y="{{y}}" class="mono dim">'
               f'<tspan>❯</tspan><tspan dx="8">whoami</tspan></text>')

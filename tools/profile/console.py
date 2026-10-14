@@ -106,12 +106,21 @@ FRAME_L = MARGIN
 FRAME_R = W - MARGIN
 CONTENT_R = FRAME_R - 36
 
-# The rails are the one thing that has to agree across slices: each file is
-# rasterised on its own, and a rail whose edges fall mid-pixel can be rounded
-# one way in one slice and the other way in the next, which reads as the frame
-# stepping sideways at every seam. A 1px stroke on an integer coordinate plus
-# `crispEdges` makes every slice snap the rail to the same device column.
 EDGE_W = 1
+
+# The rails are the one stroke that has to agree across slices, and they are
+# twice the weight of everything else because of it. Each slice is rasterised at
+# its intrinsic 880px and then resampled to whatever width the page gives it;
+# `crispEdges` snaps the rail inside the raster, but the resample afterwards
+# redistributes it, and by how much depends on the slice's own height. Measured
+# at an 877px column: a 1px rail lands on one device column in a 280px slice and
+# spreads across two in an 80px one, so the frame visibly steps at that seam.
+# A 2px rail still covers one whole device column at any sub-pixel offset, and
+# renders identically in every slice. Interior strokes stay at EDGE_W: they live
+# wholly inside one file and never cross a seam.
+RAIL_W = 2
+
+TITLE_H = 44     # chrome band, measured down from the frame's top edge
 
 e = html.escape
 
@@ -228,32 +237,39 @@ def base_css(theme):
 
 
 def _outline(x0, x1, y0, y1, r, *, top, bottom, left, right):
-    """The frame's own edge, as one path, rounding only where two edges meet.
+    """The frame's own edge, as `(rails, caps)` — straight verticals, then the
+    capped horizontals with their corner arcs.
 
-    A middle slice rounds nothing and draws two bare rails; a capped slice
-    rounds the corners where its horizontal edge meets a rail it also draws.
-    The path is left open at every uncapped end, so the stroke stops there and
-    the next slice continues it.
+    Two paths rather than one so each can be rasterised the way it needs. The
+    rails must snap to a device column or the frame wanders between slices; an
+    arc told to snap grows a visible step where it meets the rail. As one path
+    they had to share a `shape-rendering`, which is why the capped slices
+    antialiased their rails and the middle ones did not.
+
+    A middle slice rounds nothing and returns two bare rails and no cap. Every
+    uncapped end is left open, so the stroke stops there and the next slice
+    continues it.
     """
     tl, tr, br, bl = top and left, top and right, bottom and right, bottom and left
-    parts = []
+
+    rails = []
     if left:
-        parts.append(f"M{x0} {y1 - (r if bl else 0)}V{y0 + (r if tl else 0)}")
-        if tl:
-            parts.append(f"a{r} {r} 0 0 1 {r} {-r}")
-    if top:
-        parts.append(("H" if tl else f"M{x0} {y0}H") + f"{x1 - (r if tr else 0)}")
-        if tr:
-            parts.append(f"a{r} {r} 0 0 1 {r} {r}")
+        rails.append(f"M{x0} {y1 - (r if bl else 0)}V{y0 + (r if tl else 0)}")
     if right:
-        parts.append(("V" if tr else f"M{x1} {y0}V") + f"{y1 - (r if br else 0)}")
-        if br:
-            parts.append(f"a{r} {r} 0 0 1 {-r} {r}")
+        rails.append(f"M{x1} {y0 + (r if tr else 0)}V{y1 - (r if br else 0)}")
+
+    caps = []
+    if top:
+        caps.append(f"M{x0} {y0 + r}a{r} {r} 0 0 1 {r} {-r}H" if tl else f"M{x0} {y0}H")
+        caps.append(f"{x1 - (r if tr else 0)}")
+        if tr:
+            caps.append(f"a{r} {r} 0 0 1 {r} {r}")
     if bottom:
-        parts.append(("H" if br else f"M{x1} {y1}H") + f"{x0 + (r if bl else 0)}")
+        caps.append(f"M{x1} {y1 - r}a{r} {r} 0 0 1 {-r} {r}H" if br else f"M{x1} {y1}H")
+        caps.append(f"{x0 + (r if bl else 0)}")
         if bl:
-            parts.append(f"a{r} {r} 0 0 1 {-r} {-r}")
-    return "".join(parts)
+            caps.append(f"a{r} {r} 0 0 1 {-r} {-r}")
+    return "".join(rails), "".join(caps)
 
 
 def _fill(x0, x1, y0, y1, r, *, tl, tr, br, bl):
@@ -300,13 +316,16 @@ def slice_svg(theme, height, body, *, title, desc, text="", top=False,
 
     corners = dict(tl=top and draw_l, tr=top and draw_r,
                    br=bottom and draw_r, bl=bottom and draw_l)
-    outline = _outline(x0, x1, y0, y1, R_CARD,
-                       top=top, bottom=bottom, left=draw_l, right=draw_r)
+    rails_d, caps_d = _outline(x0, x1, y0, y1, R_CARD,
+                               top=top, bottom=bottom, left=draw_l, right=draw_r)
     fill = _fill(x0, x1, y0, y1, R_CARD, **corners)
 
-    # Only a rail is straight enough to snap to a device column; an arc that
-    # is told to snap grows a visible step where it meets the rail.
-    rendering = "auto" if any(corners.values()) else "crispEdges"
+    edge = "\n".join(
+        f'<path d="{d}" fill="none" stroke="{theme.hairline}" '
+        f'stroke-width="{RAIL_W}"{snap}/>'
+        for d, snap in ((rails_d, ' shape-rendering="crispEdges"'), (caps_d, ""))
+        if d
+    )
 
     return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-labelledby="t d">
 <title id="t">{e(title)}</title>
@@ -322,27 +341,33 @@ def slice_svg(theme, height, body, *, title, desc, text="", top=False,
 </defs>
 <path d="{fill}" fill="{theme.canvas}"/>
 {body}
-<path d="{outline}" fill="none" stroke="{theme.hairline}" stroke-width="{EDGE_W}" shape-rendering="{rendering}"/>
+{edge}
 </svg>
 '''
 
 
-def title_bar(theme, y):
+def title_bar(theme):
     """Window chrome and title. Only the top slice draws one.
+
+    Takes no y: the band caps the frame, so it has to share the frame's top
+    edge and corner radius exactly. Positioned any lower it leaves a strip of
+    canvas above itself inside the cap, and its arcs no longer sit on the
+    frame's — the window then reads as two misaligned rectangles.
 
     Three hairline rings rather than traffic lights: the colour vocabulary has
     one accent and it is spent on live state, so the chrome is drawn in the
     same edge colour as the frame it belongs to.
     """
+    mid, rule = MARGIN + TITLE_H // 2, MARGIN + TITLE_H
     rings = "".join(
-        f'<circle cx="{FRAME_L + 28 + i * 20}" cy="{y}" r="5" fill="none" '
+        f'<circle cx="{FRAME_L + 28 + i * 20}" cy="{mid}" r="5" fill="none" '
         f'stroke="{theme.hairline}" stroke-width="{EDGE_W}"/>'
         for i in range(3)
     )
-    return f'''<path d="{_fill(FRAME_L, FRAME_R, y - 24, y + 20, R_CARD, tl=True, tr=True, br=False, bl=False)}" fill="{theme.surface}"/>
+    return f'''<path d="{_fill(FRAME_L, FRAME_R, MARGIN, rule, R_CARD, tl=True, tr=True, br=False, bl=False)}" fill="{theme.surface}"/>
 {rings}
-<text x="{W // 2}" y="{y + 4}" text-anchor="middle" class="caption dim">ozzycodes2</text>
-<line x1="{FRAME_L}" y1="{y + 20}" x2="{FRAME_R}" y2="{y + 20}" stroke="{theme.hairline}" stroke-width="{EDGE_W}" shape-rendering="crispEdges"/>'''
+<text x="{W // 2}" y="{mid + 4}" text-anchor="middle" class="caption dim">ozzycodes2</text>
+<line x1="{FRAME_L}" y1="{rule}" x2="{FRAME_R}" y2="{rule}" stroke="{theme.hairline}" stroke-width="{EDGE_W}" shape-rendering="crispEdges"/>'''
 
 
 def heading(theme, y, name, counter=""):

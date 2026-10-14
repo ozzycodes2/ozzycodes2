@@ -22,5 +22,5 @@ text{font-family:Inter, 'Helvetica Neue', Helvetica, Arial, system-ui, sans-seri
 <text x="52" y="52" class="heading ink"><tspan class="dim">~/</tspan>projects</text>
 <text x="828" y="52" text-anchor="end" class="mono dim">4 repos</text>
 <line x1="52" y1="68" x2="828" y2="68" stroke="#3e3e44" stroke-width="1" shape-rendering="crispEdges"/><line x1="52" y1="68" x2="172" y2="68" stroke="#f7f8f8" stroke-width="1" shape-rendering="crispEdges"/>
-<path d="M16 80V0M864 0V80" fill="none" stroke="#3e3e44" stroke-width="1" shape-rendering="crispEdges"/>
+<path d="M16 80V0M864 0V80" fill="none" stroke="#3e3e44" stroke-width="2" shape-rendering="crispEdges"/>
 </svg>

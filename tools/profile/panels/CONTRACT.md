@@ -31,15 +31,22 @@ def render(cfg, data, theme):
 | `ago(when, now=None)` | `"3 days ago"` for an ISO-8601 instant; `""` for a missing or unparseable one. Coarse by design; use it rather than formatting dates in a panel. |
 | `mix(a, b, t)` | `t` of colour `a` over `b`, as a literal hex. The way to get a shade between the theme's ink and its canvas. |
 | `Slice(file, markup, href=None)` | One output file, and the URL the README should wrap it in. `file` is a path *within* a theme directory. See rule 10. |
-| `title_bar(theme, y)` | Window chrome and title. Header panel only. |
+| `title_bar(theme)` | Window chrome and title. Header panel only. Takes no y: the band caps the frame, so it shares the frame's top edge and radius. Its content ends at `MARGIN + TITLE_H`. |
 | `heading(theme, y, name, counter="")` | `~/section` header over a hairline rule; `counter` is right-aligned mono. Full-width slices only — it positions against `CONTENT_R`, so on a partial slice the counter lands outside the viewBox. Give a split row its own full-width heading slice. |
 | `stagger(rows, y0, line_height, delay=0.15, step=0.12)` | Wraps rows (markup containing `{y}`, or `None` for a spacer) in sequential fade-ins. Returns `(markup, next_y)`. |
 | `to_grid(value)` | Rounds a height up to the next multiple of 40. |
 | `e(s)` | `html.escape`. Use on every interpolated string. |
 
 Geometry: `W` (880), `MARGIN` (16), `ROW` (40), `TEXT_X` (52), `FRAME_L` (16),
-`FRAME_R` (864), `CONTENT_R` (828), `EDGE_W` (1), and the shared radius ladder
+`FRAME_R` (864), `CONTENT_R` (828), `TITLE_H` (44), and the shared radius ladder
 `R_INLINE` (5), `R_CONTROL` (11), `R_CARD` (18).
+
+Two stroke weights: `EDGE_W` (1) for anything a panel draws, `RAIL_W` (2) for the
+frame rails only. The rails are heavier because they are the one stroke that
+spans two files: each slice is rasterised at 880px and resampled to the page's
+column width, and a 1px rail lands on one device column in a tall slice and
+spreads across two in a short one, so the frame steps at that seam. Panels do
+not draw rails — `slice_svg` does — so `EDGE_W` is the only one you need.
 
 Theme roles: `canvas` `surface` `sunken` `ink` `dim` `hairline` `accent`
 `on_accent`. `LIGHT` and `DARK` are the two instances, `THEMES` is both.

@@ -26,5 +26,5 @@ text{font-family:Inter, 'Helvetica Neue', Helvetica, Arial, system-ui, sans-seri
 <text x="30" y="141" class="caption dim">algorithms — A*, Dijkstra, BFS, DFS — on a</text>
 <text x="30" y="160" class="caption dim">grid you draw walls into.</text>
 <line x1="30" y1="195" x2="370" y2="195" stroke="#d9d9d9" stroke-width="1" shape-rendering="crispEdges"/><text x="30" y="219" class="mono ink">JavaScript</text><text x="370" y="219" text-anchor="end" class="caption dim">updated 5 years ago</text></g>
-<path d="M424 0V280" fill="none" stroke="#d9d9d9" stroke-width="1" shape-rendering="crispEdges"/>
+<path d="M424 0V280" fill="none" stroke="#d9d9d9" stroke-width="2" shape-rendering="crispEdges"/>
 </svg>

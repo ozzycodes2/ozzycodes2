@@ -27,5 +27,5 @@ text{font-family:Inter, 'Helvetica Neue', Helvetica, Arial, system-ui, sans-seri
 <text x="70" y="160" class="caption dim">git state and cost, rendered in the glyphs</text>
 <text x="70" y="179" class="caption dim">your prompt already uses.</text>
 <line x1="70" y1="195" x2="410" y2="195" stroke="#3e3e44" stroke-width="1" shape-rendering="crispEdges"/><text x="70" y="219" class="mono ink">TypeScript</text><text x="410" y="219" text-anchor="end" class="caption dim">updated 1 month ago</text></g>
-<path d="M16 280V0" fill="none" stroke="#3e3e44" stroke-width="1" shape-rendering="crispEdges"/>
+<path d="M16 280V0" fill="none" stroke="#3e3e44" stroke-width="2" shape-rendering="crispEdges"/>
 </svg>
