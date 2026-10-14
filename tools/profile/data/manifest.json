@@ -50,7 +50,7 @@
   },
   {
     "file": "footer.svg",
-    "desc": "Closing prompt: exit. This README is rendered from profile.toml and the GitHub API by a scheduled job; last run 2026-10-14.",
+    "desc": "Closing prompt: exit.",
     "width": "100%"
   }
 ]

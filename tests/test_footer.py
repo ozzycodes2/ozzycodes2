@@ -23,9 +23,13 @@ def dim(markup):
     return int(re.search(r'height="(\d+)"', markup).group(1))
 
 
-def credit_line(markup):
-    return re.search(r'text-anchor="middle" class="caption dim">([^<]*)</text>',
-                     markup).group(1)
+def painted(markup):
+    """The text the slice draws, with the inline stylesheet excluded.
+
+    `console.visible` keeps the CSS, which sits between tags rather than inside
+    one, so an equality check on the drawn text has to drop it first.
+    """
+    return c.visible(markup.split("</style>", 1)[-1])
 
 
 def test_it_closes_the_frame(markup):
@@ -51,41 +55,28 @@ def test_the_prompt_is_mono_and_dim(markup):
     assert f'<text x="{c.TEXT_X}" y="48" class="mono dim">' in markup
 
 
-def test_the_credit_is_set_at_the_caption_step(markup):
-    assert f"font-size:{c.CAPTION.size}px" in markup
-    assert credit_line(markup)
+def test_the_prompt_is_the_only_thing_drawn(markup):
+    assert len(re.findall(r"<text", markup)) == 1
+    assert painted(markup).strip() == "❯exit▌"
 
 
-def test_the_credit_stays_inside_the_content_column(markup):
-    """It is centred, so it has to be measured outward from the middle, with
-    the same pessimistic sans advance the project blurbs wrap by."""
-    half = len(credit_line(markup)) * c.CAPTION.size * 0.62 / 2
-    assert c.W // 2 - half >= c.TEXT_X
-    assert c.W // 2 + half <= c.CONTENT_R
-
-
-def test_it_credits_the_generator_and_dates_the_run(markup):
-    text = c.visible(markup)
-    assert "self" in text or "scheduled job" in text
-    assert "2026-10-12" in text
+def test_no_date_reaches_the_slice(markup):
+    """The stamp went with the credit: a date in the frame dated the whole
+    README, and the one it printed was the previous run's, not this one's."""
+    assert "2026-10-12" not in markup
+    assert not re.search(r"\d{4}-\d{2}-\d{2}", painted(markup))
 
 
 def test_desc_repeats_what_is_drawn(markup):
     desc = re.search(r'<desc id="d">([^<]*)</desc>', markup).group(1)
-    assert "exit" in desc and "2026-10-12" in desc
+    assert desc == "Closing prompt: exit."
 
 
-def test_nothing_hand_written_reaches_the_footer(markup):
-    """`cfg` is unused and underscored; only the run stamp varies."""
-    assert footer.render({"identity": {"name": "x"}}, STAMPED, c.LIGHT) == markup
-
-
-@pytest.mark.parametrize("data", [{}, {"stats": {}}, {"stats": None}])
-def test_a_missing_timestamp_does_not_print_none(data):
-    out = footer.render({}, data, c.LIGHT)
-    assert "None" not in c.visible(out)
-    assert "unknown" in c.visible(out)
-    assert dim(out) % c.ROW == 0
+@pytest.mark.parametrize("data", [{}, {"stats": {}}, {"stats": None}, STAMPED])
+def test_neither_argument_reaches_the_footer(data):
+    """Both `cfg` and `data` are unused and underscored — the slice is fixed."""
+    assert footer.render({"identity": {"name": "x"}}, data, c.LIGHT) == \
+        footer.render({}, {}, c.LIGHT)
 
 
 @pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
@@ -111,5 +102,5 @@ def test_the_two_themes_differ_in_nothing_but_colour(markup):
     """readme.py pairs them in one <picture> under a single alt text."""
     dark = footer.render({}, STAMPED, c.DARK)
     assert dim(dark) == dim(markup)
-    assert credit_line(dark) == credit_line(markup)
+    assert painted(dark) == painted(markup)
     assert dark != markup
