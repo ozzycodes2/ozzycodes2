@@ -133,3 +133,5 @@ The panels are a port of the `Panels` tab in the `design-preview` site, whose
 pins the seven theme roles against what that site's `panelTheme()` derives, and
 each panel's tests pin its geometry; a change here that is not also made there
 puts the two renderers out of agreement.
+
+Change the preview first, then port. `../BACKPORT.md` is the procedure.
