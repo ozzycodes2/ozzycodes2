@@ -60,6 +60,8 @@ def test_nothing_animates(out):
 
 
 def test_no_accent_is_spent_here(out):
+    """The footer closes the frame rather than opening a section, so it draws no
+    heading — and it reports no quantity, so it has nothing to mark."""
     assert c.LIGHT.accent not in out
 
 

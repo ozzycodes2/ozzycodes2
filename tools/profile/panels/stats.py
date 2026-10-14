@@ -110,8 +110,10 @@ def _grid(theme, stats):
 def _bars(theme, top, total):
     """Name, track, fill and share for each charted language.
 
-    The fill steps back a tenth of its opacity per row, so the order is legible
-    where the bytes are close and the chart needs no second hue to rank itself.
+    The leading language is the one fact this chart exists to deliver, so it is
+    the bar that wears the accent and the only name set in the ink. Everything
+    below it steps back a tenth of an opacity per row, which keeps the order
+    legible where the bytes are close without a second hue to rank them by.
     """
     out = []
     for i, (name, size) in enumerate(top):
@@ -119,13 +121,16 @@ def _bars(theme, top, total):
         y = BAR_Y0 + i * BAR_PITCH
         width = max(2, int(BAR_W * share + 0.5))
         shown = name if len(name) <= MAX_NAME else name[:MAX_NAME - 1] + "…"
+        fill = (f'fill="{theme.accent}"' if i == 0 else
+                f'fill="{theme.ink}" opacity="{0.82 - i * 0.1:.2f}"')
         out += [
-            c.tx(c.TEXT_X, y + 10, shown, fill=theme.dim, family=c.MONO_STACK,
-                 size=NAME_SIZE),
+            c.tx(c.TEXT_X, y + 10, shown,
+                 fill=theme.ink if i == 0 else theme.dim,
+                 family=c.MONO_STACK, size=NAME_SIZE),
             f'<rect x="{BAR_X}" y="{y}" width="{BAR_W}" height="{BAR_H}" '
             f'rx="{c.R_CHIP}" fill="{theme.ink}" opacity="{TRACK_OPACITY}"/>',
             f'<rect x="{BAR_X}" y="{y}" width="{width}" height="{BAR_H}" '
-            f'rx="{c.R_CHIP}" fill="{theme.ink}" opacity="{0.82 - i * 0.1:.2f}"/>',
+            f'rx="{c.R_CHIP}" {fill}/>',
             c.tx(c.CONTENT_R, y + 10, f"{share * 100:.1f}%", fill=theme.faint,
                  family=c.MONO_STACK, size=12, anchor="end"),
         ]
@@ -147,9 +152,6 @@ def render(_cfg, data, theme):
     top = sorted(langs.items(), key=lambda kv: -kv[1])[:TOP_N]
 
     body = [
-        # The stamp is the one thing here about now rather than about the
-        # record, but it wears no accent: the console spends that once, on the
-        # header's live dot.
         c.heading(theme, HEAD_Y, "stats",
                   counter=f"captured {stats.get('updated', '?')}"),
         *_grid(theme, stats),

@@ -13,10 +13,15 @@ render.py runs each panel once per theme and readme.py pairs the output with
 The eight role values below are not the raw tokens. They are what the preview's
 `panelTheme()` derives from them — `dim` and `faint` are pulled toward the ink
 until they clear 4.5:1 on the canvas at the 11-13px these labels run at, and
-`accent` only has to clear 3:1 because it paints one dot and never a word.
+`accent` is held to 3:1, the threshold for an object rather than a word.
 tests/test_console.py pins all sixteen against the preview's own output; that
 test is the only thing keeping the two renderers in agreement, so a change here
 that does not also change the preview is a bug in one of them.
+
+`accent` is the same value in both themes. Mine Final shares all four of its
+accent roles across the two polarities, on the grounds that a brand hue which
+changes with the reader's system setting is two brands. It clears 3:1 on both
+canvases and 4.5:1 on neither, which is the whole reason it never sets type.
 
 Type is not the token scale. A terminal has its own, and these panels set it per
 element in presentation attributes: mono at 11/12/13/15/20/30 for everything
@@ -56,7 +61,11 @@ class Theme(NamedTuple):
     the chrome band and the city's ground plane — which is the whole of this
     system's depth. There are no shadows.
 
-    `accent` is state, not decoration: it paints the live dot and nothing else.
+    `accent` does two jobs. Structurally it is the short stroke that starts
+    every section rule, identical down the window, so the eye finds the
+    sections without a second type weight. As data it marks the single highest
+    value in a set, at most once per panel. It paints objects only — a dot, a
+    bar, a tower — never a word.
     """
     name: str
     canvas: str
@@ -71,13 +80,13 @@ class Theme(NamedTuple):
 LIGHT = Theme(
     name="light",
     canvas="#f8f8f8", ink="#171717", surface="#ffffff",
-    dim="#4d4d4d", faint="#727272", hairline="#d9d9d9", accent="#cc3300",
+    dim="#4d4d4d", faint="#727272", hairline="#d9d9d9", accent="#ef6306",
 )
 
 DARK = Theme(
     name="dark",
     canvas="#010102", ink="#f7f8f8", surface="#0f1011",
-    dim="#d0d6e0", faint="#909091", hairline="#23252a", accent="#5e6ad2",
+    dim="#d0d6e0", faint="#909091", hairline="#23252a", accent="#ef6306",
 )
 
 THEMES = (LIGHT, DARK)
@@ -412,13 +421,14 @@ def heading(theme, y, name, counter=""):
     path in a monospace.
 
     The rule runs the content width in the hairline colour and is overdrawn for
-    its first 120px in the ink, which is the whole of the emphasis — there is
-    no glow and no second colour to reach for.
+    its first 120px in the accent at 2px. That stroke is identical in every
+    section, which is what makes it structure rather than emphasis: it indexes
+    the window without ranking the panels against each other.
     """
     rule = (f'<line x1="{TEXT_X}" y1="{y + 14}" x2="{CONTENT_R}" y2="{y + 14}" '
             f'stroke="{theme.hairline}" stroke-width="{EDGE_W}" shape-rendering="crispEdges"/>'
             f'<line x1="{TEXT_X}" y1="{y + 14}" x2="{TEXT_X + 120}" y2="{y + 14}" '
-            f'stroke="{theme.ink}" stroke-width="{EDGE_W}" shape-rendering="crispEdges"/>')
+            f'stroke="{theme.accent}" stroke-width="2" shape-rendering="crispEdges"/>')
     right = (tx(CONTENT_R, y, counter, fill=theme.faint, family=MONO_STACK,
                 size=12, ls=1, anchor="end") if counter else "")
     return f'''{tx(TEXT_X, y, "~/", fill=theme.faint, family=MONO_STACK, size=20, weight=700)}

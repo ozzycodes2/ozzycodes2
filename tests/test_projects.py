@@ -329,8 +329,9 @@ def test_star_count_is_never_drawn(out):
 
 # --- restraint -------------------------------------------------------------
 
-def test_the_panel_spends_no_accent(out):
-    """The accent is state, and the only state on the page is the header's dot."""
+def test_no_card_is_marked_out_from_the_others(out):
+    """The list is curated, not ranked, so there is no highest value to mark;
+    the accent reaches this panel only as the heading's section rule."""
     for markup in cards(out):
         assert c.LIGHT.accent not in paint(markup)
 

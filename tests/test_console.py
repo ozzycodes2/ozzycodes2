@@ -109,10 +109,10 @@ def test_mix_returns_a_literal_hex_with_no_opacity(theme):
 PREVIEW = {
     "dark": dict(canvas="#010102", ink="#f7f8f8", surface="#0f1011",
                  dim="#d0d6e0", faint="#909091", hairline="#23252a",
-                 accent="#5e6ad2"),
+                 accent="#ef6306"),
     "light": dict(canvas="#f8f8f8", ink="#171717", surface="#ffffff",
                   dim="#4d4d4d", faint="#727272", hairline="#d9d9d9",
-                  accent="#cc3300"),
+                  accent="#ef6306"),
 }
 
 
@@ -121,6 +121,12 @@ def test_each_theme_matches_the_preview_role_for_role(theme):
     """The README and the design preview are two renderers of one drawing."""
     assert {k: v for k, v in theme._asdict().items() if k != "name"} \
         == PREVIEW[theme.name]
+
+
+def test_the_accent_is_one_value_across_both_themes():
+    """A brand hue that changes with the reader's system setting is two brands,
+    so Mine Final shares the accent where it splits every other role."""
+    assert len({t.accent for t in c.THEMES}) == 1
 
 
 @pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
@@ -483,7 +489,8 @@ def test_the_title_bar_draws_three_faint_rings(theme):
         markup)
     assert [int(x) for x in rings] == [c.FRAME_L + 24, c.FRAME_L + 42, c.FRAME_L + 60]
     assert f'fill="{theme.surface}"' in markup
-    assert theme.accent not in markup           # the accent is state, not chrome
+    # Chrome is not a datum and not a section, so it gets neither accent job.
+    assert theme.accent not in markup
 
 
 def test_the_title_bar_centres_its_label_in_mono():
@@ -535,11 +542,14 @@ def test_the_foot_bar_mirrors_the_title_bar_at_the_frames_other_end(theme):
 
 
 @pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
-def test_a_heading_rules_the_content_width_and_emphasises_its_start(theme):
+def test_a_heading_rules_the_content_width_and_indexes_its_start(theme):
+    """The 2px accent stroke is the console's section index: identical in every
+    panel, so it marks where a section begins without ranking the sections."""
     markup = c.heading(theme, 100, "stack")
     assert f'x1="{c.TEXT_X}" y1="114" x2="{c.CONTENT_R}" y2="114" ' \
-           f'stroke="{theme.hairline}"' in markup
-    assert f'x2="{c.TEXT_X + 120}" y2="114" stroke="{theme.ink}"' in markup
+           f'stroke="{theme.hairline}" stroke-width="{c.EDGE_W}"' in markup
+    assert f'x2="{c.TEXT_X + 120}" y2="114" stroke="{theme.accent}" ' \
+           'stroke-width="2"' in markup
 
 
 @pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)

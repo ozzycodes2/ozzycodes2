@@ -26,7 +26,7 @@ TEXT = re.compile(
     r' font-size="(\d+)"([^>]*)>([^<]*)</text>')
 RECT = re.compile(
     rf'<rect x="(\d+)" y="(\d+)" width="(\d+)" height="{stats.BAR_H}"'
-    rf' rx="{c.R_CHIP}" fill="([^"]+)" opacity="([\d.]+)"/>')
+    rf' rx="{c.R_CHIP}" fill="([^"]+)"(?: opacity="([\d.]+)")?/>')
 
 
 @pytest.fixture(scope="module")
@@ -66,8 +66,12 @@ def said(svg, content):
 
 
 def rects(svg):
-    """(x, y, width, fill, opacity) of every bar rect, in draw order."""
-    return [(int(x), int(y), int(w), fill, float(o))
+    """(x, y, width, fill, opacity) of every bar rect, in draw order.
+
+    Opacity comes back as None for a rect that carries no such attribute, which
+    is how the one bar painted at full strength is told from the rest.
+    """
+    return [(int(x), int(y), int(w), fill, float(o) if o else None)
             for x, y, w, fill, o in RECT.findall(svg)]
 
 
@@ -217,11 +221,30 @@ def test_percentages_are_the_same_shares_the_bars_draw(markup):
 
 
 def test_the_bar_fill_steps_back_a_tenth_of_its_opacity_per_row(markup):
-    """Rank is carried by tone, since the bottom bars are too short to compare
-    by length and the palette has no second hue to spend on a legend."""
-    assert [r[4] for r in rects(markup)] == [
-        v for i in range(stats.TOP_N)
-        for v in (0.06, round(0.82 - i * 0.1, 2))]
+    """Rank below the leader is carried by tone, since the bottom bars are too
+    short to compare by length and there is no legend to read them against. The
+    accent is not part of that ramp: it answers "which one won", which is a
+    different question from "in what order", and so it takes no opacity."""
+    tracks, fills = rects(markup)[::2], rects(markup)[1::2]
+    assert [r[4] for r in tracks] == [0.06] * stats.TOP_N
+    assert fills[0][4] is None
+    assert [r[4] for r in fills[1:]] == [round(0.82 - i * 0.1, 2)
+                                         for i in range(1, stats.TOP_N)]
+
+
+def test_the_leading_bar_is_the_one_the_accent_marks(markup):
+    """The chart exists to deliver one fact, and the hue delivers it without
+    the reader having to compare six lengths to find the longest."""
+    fills = rects(markup)[1::2]
+    assert fills[0][3] == c.LIGHT.accent
+    assert [r[3] for r in fills[1:]] == [c.LIGHT.ink] * (stats.TOP_N - 1)
+
+
+def test_only_the_leading_language_is_named_in_the_ink(markup):
+    """The name has to sit in the same tier as the bar beside it, or the row
+    the accent picks out reads as a louder bar under an ordinary label."""
+    assert [said(markup, name)[2] for name, _ in TOP] == (
+        [c.LIGHT.ink] + [c.LIGHT.dim] * (stats.TOP_N - 1))
 
 
 def test_a_language_name_too_wide_for_its_column_is_truncated():
@@ -235,11 +258,17 @@ def test_a_language_name_too_wide_for_its_column_is_truncated():
 # --- colour and motion -----------------------------------------------------
 
 @pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
-def test_the_panel_spends_no_accent(theme):
-    """The accent is state, and the only live fact in the console is the
-    header's streak dot. Nothing on a record of the past earns it."""
+def test_the_accent_is_spent_twice_and_never_on_a_word(theme):
+    """It is corrected to 3:1, the threshold for an object rather than type, so
+    a word wearing it would be the one illegible thing on the page. Twice: the
+    stroke that indexes the section, and the single highest value in the set."""
     body = stats.render({}, {"stats": STATS}, theme).split("</style>")[1]
-    assert theme.accent not in body
+    assert body.count(theme.accent) == 2
+    assert (f'<line x1="{c.TEXT_X}" y1="{stats.HEAD_Y + 14}" '
+            f'x2="{c.TEXT_X + 120}" y2="{stats.HEAD_Y + 14}" '
+            f'stroke="{theme.accent}" stroke-width="2"') in body
+    assert f'rx="{c.R_CHIP}" fill="{theme.accent}"/>' in body
+    assert theme.accent not in [t[2] for t in texts(body)]
 
 
 def test_nothing_in_the_panel_fades_in(markup):
@@ -249,19 +278,24 @@ def test_nothing_in_the_panel_fades_in(markup):
     assert 'class="ln"' not in markup
 
 
-def test_the_two_themes_differ_in_nothing_but_their_role_colours():
+def test_the_two_themes_differ_in_nothing_but_their_polarised_roles():
     """readme.py pairs them in one <picture> under a single alt text, so any
-    difference in geometry would show as a jump when the scheme flips."""
+    difference in geometry would show as a jump when the scheme flips.
+
+    The accent is left standing rather than substituted: it is one value across
+    both polarities, so the two skeletons agreeing with the literal hex still
+    in them is what proves the brand hue does not follow the system setting.
+    """
     light, dark = (stats.render({}, {"stats": STATS}, t) for t in c.THEMES)
 
     def skeleton(svg, theme):
         out = svg.split("</style>")[1]
-        for role in ("canvas", "ink", "surface", "dim", "faint", "hairline",
-                     "accent"):
+        for role in ("canvas", "ink", "surface", "dim", "faint", "hairline"):
             out = out.replace(getattr(theme, role), role.upper())
         return out
 
     assert skeleton(light, c.LIGHT) == skeleton(dark, c.DARK)
+    assert c.LIGHT.accent in skeleton(light, c.LIGHT)
     assert light != dark
 
 

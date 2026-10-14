@@ -54,6 +54,7 @@ Theme roles: `canvas` `surface` `ink` `dim` `faint` `hairline` `accent`. Three
 text tiers, not two — `ink` carries meaning, `dim` is supporting prose, `faint`
 is the label above a value and the counter beside a heading. `surface` is the one
 step above the canvas and the whole of this system's depth; there are no shadows.
+`accent` is the same hex in both themes — see rule 6 for what it may touch.
 `LIGHT` and `DARK` are the two instances, `THEMES` is both.
 
 Type is set per element, as a presentation attribute through `tx`, not as a
@@ -83,9 +84,14 @@ two radii.
    hardcoded hex renders identically in both schemes and is therefore wrong in
    one of them. Shade with `mix(theme.ink, theme.canvas, t)`, not with
    `fill-opacity`, wherever the shapes overlap.
-6. **The accent is state, not decoration.** It is spent exactly once in the
-   whole console, on the live dot beside the handle in the header. A panel that
-   wants a second colour wants a different design.
+6. **The accent indexes, then marks — nothing else.** `heading` already spends
+   it on the 2px stroke that starts every section rule; that is structure and
+   it is identical in every panel. Beyond that a panel may mark the single
+   highest value in one set — the live streak, the leading language, the
+   tallest day — at most once, plus a legend swatch keying it. A set of equals
+   gets nothing: `~/stack` and `~/projects` carry only the rule. The accent
+   never sets type. It is corrected to 3:1, which is the threshold for an
+   object, so a word wearing it is the one illegible thing on the page.
 7. **Never reference an external font, image, or stylesheet.** GitHub strips
    them. Everything inlines; `slice_svg` handles the font subset.
 8. **Escape all interpolated content** with `c.e(...)`.

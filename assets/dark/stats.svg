@@ -15,7 +15,7 @@
 <text x="52" y="44" fill="#909091" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="20" font-weight="700">~/</text>
 <text x="76" y="44" fill="#f7f8f8" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="20" font-weight="700">stats</text>
 <text x="828" y="44" fill="#909091" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="12" letter-spacing="1" text-anchor="end">captured 2026-10-14</text>
-<line x1="52" y1="58" x2="828" y2="58" stroke="#23252a" stroke-width="1" shape-rendering="crispEdges"/><line x1="52" y1="58" x2="172" y2="58" stroke="#f7f8f8" stroke-width="1" shape-rendering="crispEdges"/>
+<line x1="52" y1="58" x2="828" y2="58" stroke="#23252a" stroke-width="1" shape-rendering="crispEdges"/><line x1="52" y1="58" x2="172" y2="58" stroke="#ef6306" stroke-width="2" shape-rendering="crispEdges"/>
 <text x="52" y="92" fill="#909091" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="11" letter-spacing="0.5">contributions 2026</text>
 <text x="52" y="126" fill="#f7f8f8" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="30" font-weight="700" letter-spacing="-0.5">1,419</text>
 <text x="52" y="146" fill="#d0d6e0" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="12">1,690 all time</text>
@@ -41,9 +41,9 @@
 <text x="568" y="230" fill="#d0d6e0" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="12">10 years</text>
 <line x1="568" y1="242" x2="802" y2="242" stroke="#23252a" stroke-width="1" shape-rendering="crispEdges"/>
 <text x="52" y="278" fill="#909091" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="11" letter-spacing="0.5">languages by bytes</text>
-<text x="52" y="310" fill="#d0d6e0" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="13">Swift</text>
+<text x="52" y="310" fill="#f7f8f8" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="13">Swift</text>
 <rect x="172" y="300" width="600" height="12" rx="5" fill="#f7f8f8" opacity="0.06"/>
-<rect x="172" y="300" width="307" height="12" rx="5" fill="#f7f8f8" opacity="0.82"/>
+<rect x="172" y="300" width="307" height="12" rx="5" fill="#ef6306"/>
 <text x="828" y="310" fill="#909091" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="12" text-anchor="end">51.1%</text>
 <text x="52" y="336" fill="#d0d6e0" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="13">Python</text>
 <rect x="172" y="326" width="600" height="12" rx="5" fill="#f7f8f8" opacity="0.06"/>

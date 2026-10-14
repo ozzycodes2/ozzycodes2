@@ -62,16 +62,29 @@ def coords(markup):
     return [xy for spec, _, _ in polys(markup) for xy in points(spec)]
 
 
-def toward_ink(theme, fill):
-    """How far `fill` has travelled from the theme's canvas toward its ink.
+def circles(markup):
+    """(cx, cy, r, trailing attributes) for every circle, in draw order.
+
+    The legend swatches are the only circles this panel draws, so a search over
+    a whole slice finds the key and nothing else.
+    """
+    return [(float(cx), float(cy), float(r), rest) for cx, cy, r, rest
+            in re.findall(r'<circle cx="([\d.-]+)" cy="([\d.-]+)" '
+                          r'r="([\d.]+)"([^/]*)/>', markup)]
+
+
+def toward(theme, fill, base):
+    """How far `fill` has travelled from the theme's canvas toward `base`.
 
     The panel shades by mixing, so a face's bucket is this fraction and nothing
     else — comparing hex strings would only hold for one of the two themes.
+    `base` is a parameter because the plan rides two ramps: the ink one every
+    block is shaded on, and the accent one the tallest block has to itself.
     """
     channels = [(int(fill[i:i + 2], 16), int(theme.canvas[i:i + 2], 16),
-                 int(theme.ink[i:i + 2], 16)) for i in (1, 3, 5)]
+                 int(base[i:i + 2], 16)) for i in (1, 3, 5)]
     return (sum(abs(f - canvas) for f, canvas, _ in channels)
-            / sum(abs(ink - canvas) for _, canvas, ink in channels))
+            / sum(abs(b - canvas) for _, canvas, b in channels))
 
 
 def height_of(svg):
@@ -191,12 +204,13 @@ def test_shades_light_the_roof_hardest_and_the_right_wall_least(theme):
     """One light direction for the whole plan: the roof is the face nearest the
     canvas, the right wall the face nearest the ink."""
     for lvl in range(1, city.LEVELS):
-        left, right, roof = (toward_ink(theme, f) for f in city.shades(theme, lvl))
+        faces = city.shades(theme, lvl)
+        left, right, roof = (toward(theme, f, theme.ink) for f in faces)
         assert roof < left < right
 
 
 def test_shades_deepen_with_the_bucket(theme):
-    roofs = [toward_ink(theme, city.shades(theme, lvl)[2])
+    roofs = [toward(theme, city.shades(theme, lvl)[2], theme.ink)
              for lvl in range(city.LEVELS)]
     assert roofs == sorted(roofs)
     assert len(set(roofs)) == city.LEVELS
@@ -211,6 +225,28 @@ def test_the_busiest_bucket_saturates_at_the_ink(theme):
 def test_shades_are_mixed_out_of_the_theme_that_asked_for_them():
     for lvl in range(city.LEVELS):
         assert city.shades(c.LIGHT, lvl) != city.shades(c.DARK, lvl)
+
+
+def test_the_peak_block_is_mixed_off_the_accent_instead_of_the_ink(theme):
+    """Its one job is to be the block the eye lands on, so no bucket of the ink
+    ramp may land on the same three faces."""
+    for lvl in range(1, city.LEVELS):
+        assert city.shades(theme, lvl, peak=True) != city.shades(theme, lvl)
+
+
+def test_the_peak_block_is_lit_from_the_same_side_as_its_neighbours(theme):
+    """Same three ratios off a different base: the accent changes which paint
+    the tall block wears, not where the light falls on it."""
+    for lvl in range(1, city.LEVELS):
+        faces = city.shades(theme, lvl, peak=True)
+        left, right, roof = (toward(theme, f, theme.accent) for f in faces)
+        assert roof < left <= right
+
+
+def test_the_busiest_peak_bucket_saturates_at_the_accent(theme):
+    """The legend's last swatch is the bare accent, so the face the eye reads
+    the tall block by has to arrive at exactly that value."""
+    assert city.shades(theme, city.LEVELS - 1, peak=True)[1] == theme.accent
 
 
 # --- projection ------------------------------------------------------------
@@ -278,17 +314,42 @@ def test_block_wears_the_shades_of_its_own_bucket(theme):
         assert [fill for _, fill, _ in polys(markup)] == list(city.shades(theme, lvl))
 
 
+def test_block_wears_the_accent_shades_when_it_is_the_peak(theme):
+    for lvl in range(1, city.LEVELS):
+        markup = city.block(theme, 100, 200, 30, lvl, peak=True)
+        assert [fill for _, fill, _ in polys(markup)] == list(
+            city.shades(theme, lvl, peak=True))
+
+
+# --- cells -----------------------------------------------------------------
+
+def test_a_tie_for_the_peak_marks_only_the_first_day_holding_it():
+    """Two tall blocks in the accent would contradict the note beside the
+    legend, which names a single date."""
+    values = [3, 9, 4, 9, 2, 1, 9]
+    cells = city.cells_for(values, 1, 9, city.thresholds_for(values))
+    assert [is_peak for *_, is_peak in cells] == [i == 1 for i in range(7)]
+
+
+def test_an_all_quiet_calendar_marks_no_peak_at_all():
+    """`render` floors the peak at 1 so the heights stay finite, but no day
+    holds that value, so there is no block for the accent to land on."""
+    values = [0] * 7
+    cells = city.cells_for(values, 1, 1, city.thresholds_for(values))
+    assert not any(is_peak for *_, is_peak in cells)
+
+
 # --- overhang --------------------------------------------------------------
 
 def test_overhang_is_nothing_when_no_block_outgrows_its_own_depth():
     """A block standing far back is already below the plane's top edge by its
     own depth, so it needs no extra room above the plane."""
-    assert city.overhang_of([(5, 5, 4, 60)]) == 0
+    assert city.overhang_of([(5, 5, 4, 60, False)]) == 0
 
 
 def test_overhang_is_measured_from_the_nearest_tall_block():
     """Only a block at the far corner of the grid can push the plane down."""
-    assert city.overhang_of([(0, 0, 4, 120), (5, 5, 4, 120)]) == 120
+    assert city.overhang_of([(0, 0, 4, 120, True), (5, 5, 4, 120, False)]) == 120
 
 
 def test_overhang_of_an_empty_grid():
@@ -313,7 +374,7 @@ def test_render_height_is_on_the_grid(panel):
 
 def test_render_height_clears_the_legend(panel):
     """The legend is the lowest thing drawn; the slice has to close below it."""
-    legend_y = max(y for _, y in coords(panel.split("</g>")[-1]))
+    legend_y = max(cy + r for _, cy, r, _ in circles(panel))
     assert legend_y < height_of(panel) <= legend_y + c.ROW + 24
 
 
@@ -397,9 +458,29 @@ def test_render_reports_real_numbers_in_the_description(theme):
     assert "Tallest block is 5 on 2026-04-17" in desc
 
 
-def test_render_spends_no_accent(panel, theme):
-    """The accent is state; this panel reports no state, so it paints none."""
-    assert theme.accent not in panel
+def test_render_spends_the_accent_in_exactly_three_places(panel, theme):
+    """The section rule's 120px overstroke, the last legend swatch and the
+    saturated face of the one tall block. Everything else is the ink ramp, so
+    the bare hex may not appear anywhere a fourth time."""
+    assert panel.count(theme.accent) == 3
+    assert f'stroke="{theme.accent}" stroke-width="2"' in panel
+    assert sum(f'fill="{theme.accent}"' in rest for *_, rest in circles(panel)) == 1
+    _, blocks = layers(panel)
+    saturated = city.shades(theme, city.LEVELS - 1, peak=True)[1]
+    assert [fill for _, fill, _ in polys(blocks)].count(saturated) == 1
+
+
+def test_render_paints_one_block_off_the_accent_and_it_is_the_tallest(panel, theme):
+    """The whole point of the panel: the eye should land on the busiest day
+    without reading the note. Two accented blocks would name two days, none
+    would leave the legend's last swatch keying nothing."""
+    _, blocks = layers(panel)
+    walls = polys(blocks)[::3]   # the left wall of each block, in draw order
+    heights = [points(spec)[1][1] - points(spec)[2][1] for spec, _, _ in walls]
+    accented = [i for i, (_, fill, _) in enumerate(walls)
+                if fill == city.shades(theme, city.LEVELS - 1, peak=True)[0]]
+    assert len(accented) == 1
+    assert heights[accented[0]] == max(heights) == city.MAX_H
 
 
 def test_render_is_flat_fills_and_nothing_else(panel):
@@ -421,32 +502,47 @@ def test_render_emits_one_well_formed_document(panel):
 
 # --- legend ----------------------------------------------------------------
 
-def test_legend_draws_one_diamond_per_occupied_bucket(panel):
-    swatches = re.findall(r'<polygon points="[^"]+" fill="#[0-9a-f]{6}" opacity', panel)
-    assert len(swatches) == city.LEVELS - 1
+def test_legend_draws_one_circle_per_occupied_bucket(panel):
+    """Dots, not little rhombi: drawn as tiles the swatches invited reading as
+    four more buildings standing beside the plan."""
+    assert len(circles(panel)) == city.LEVELS - 1
+    assert not polys(panel.split("</g>")[-1])
 
 
 def test_legend_swatches_step_at_the_block_ramp(theme):
     """The swatches are the only thing the panel paints at an opacity —
     nothing overlaps them — so the ladder has to be the blocks' own."""
     found = re.findall(r'opacity="([\d.]+)"', city.legend(theme, 400))
-    assert found == [f"{0.18 + lvl * 0.16:.2f}" for lvl in range(1, city.LEVELS)]
+    assert found == [f"{0.18 + lvl * 0.16:.2f}" for lvl in range(1, city.LEVELS - 1)]
+
+
+def test_the_last_legend_swatch_is_the_accent_at_full_strength(theme):
+    """It keys the block painted off the accent, so it has to be that paint and
+    not a dimmed sample of it — the ink ramp's top step is a different colour."""
+    *ramp, top = circles(city.legend(theme, 400))
+    assert f'fill="{theme.accent}"' in top[3] and "opacity" not in top[3]
+    assert all("opacity" in rest for *_, rest in ramp)
 
 
 def test_legend_swatches_sit_between_their_two_labels(theme):
     markup = city.legend(theme, 400)
-    xs = [x for spec, _, _ in polys(markup) for x, _ in points(spec)]
+    edges = [x for cx, _, r, _ in circles(markup) for x in (cx - r, cx + r)]
     labelled = dict((body, x) for x, body in texts(markup))
-    assert labelled["quieter"] < min(xs)
-    assert max(xs) < labelled["busier"]
+    assert labelled["quieter"] < min(edges)
+    assert max(edges) < labelled["busier"]
 
 
 def test_legend_swatches_are_evenly_pitched(theme):
-    xs = sorted({x for spec, _, _ in polys(city.legend(theme, 400))
-                 for x, _ in points(spec)})
-    assert xs[0] == city.LEGEND_X - 9
-    centres = [city.LEGEND_X + i * city.LEGEND_PITCH for i in range(city.LEVELS - 1)]
-    assert set(centres) <= set(xs)
+    centres = [cx for cx, _, _, _ in circles(city.legend(theme, 400))]
+    assert centres == [city.LEGEND_X + i * city.LEGEND_PITCH
+                       for i in range(city.LEVELS - 1)]
+
+
+def test_legend_swatches_share_one_baseline_and_one_radius(theme):
+    """A ladder of four steps reads as a ladder only if the dots differ in
+    nothing but their paint."""
+    rows = {(cy, r) for _, cy, r, _ in circles(city.legend(theme, 400))}
+    assert len(rows) == 1
 
 
 def test_render_ends_the_peak_note_at_the_content_edge(panel):
@@ -479,13 +575,25 @@ def test_render_with_an_all_quiet_calendar(theme):
     assert height_of(svg) % c.ROW == 0
 
 
+def test_a_window_of_part_weeks_keeps_its_newest_days(theme):
+    """The part-week is trimmed off the far end, so the peak is always inside
+    the plan. Trimming the near end instead would drop the most recent days —
+    where the peak usually is — and leave the legend keying nothing."""
+    counts = [1] * 179 + [99]
+    svg = city.render({"city": {"window_days": 180}},
+                      {"calendar": calendar(counts)}, theme)
+    assert svg.count(theme.accent) == 3     # rule, legend swatch, peak wall
+    assert "tallest 99 on 2026-10-11" in svg
+    assert "175 tiles" in desc_of(svg)
+
+
 def test_render_with_less_than_one_week_of_history(theme):
-    """Fewer than seven days is no columns at all; the panel still has to be a
-    valid slice rather than an empty one."""
+    """Fewer than seven days is no columns at all, so the panel says so rather
+    than captioning an empty plane with a tile count it never drew."""
     svg = city.render({"city": {"window_days": 3}},
                       {"calendar": calendar([1, 2, 3])}, theme)
-    assert layers(svg) == ["", ""]
-    assert "3 tiles" in desc_of(svg)
+    assert "3 days of history" in desc_of(svg)
+    assert "less than a week of history" in svg
     assert height_of(svg) % c.ROW == 0
 
 
@@ -502,10 +610,14 @@ def test_both_themes_render_identical_geometry():
 
 
 def test_neither_theme_borrows_the_other_s_ink():
+    """Every role but `accent` is per-polarity, and the accent is deliberately
+    one value across both — a brand hue that follows the system setting is two
+    brands — so the peak block is the one face the two renders may share."""
     cfg, data = {"city": {"window_days": 182}}, {"calendar": YEAR}
     fills = {}
     for scheme in (c.LIGHT, c.DARK):
         _, blocks = layers(city.render(cfg, data, scheme))
         fills[scheme.name] = {fill for _, fill, _ in polys(blocks)}
         assert fills[scheme.name]
-    assert not fills["light"] & fills["dark"]
+    assert fills["light"] & fills["dark"] == {c.LIGHT.accent}
+    assert c.LIGHT.accent == c.DARK.accent

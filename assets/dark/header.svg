@@ -18,7 +18,7 @@
 <line x1="16" y1="60" x2="864" y2="60" stroke="#23252a" stroke-width="1" shape-rendering="crispEdges"/>
 <text x="52" y="104" fill="#f7f8f8" font-family="Inter, &#x27;Helvetica Neue&#x27;, Helvetica, Arial, system-ui, sans-serif" font-size="30" font-weight="600" letter-spacing="-0.5">Osniel Quintana</text>
 <text x="52" y="130" fill="#d0d6e0" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="13">@ozzycodes2 · platform engineer</text>
-<circle class="live" cx="722" cy="125" r="4" fill="#5e6ad2"/>
+<circle class="live" cx="722" cy="125" r="4" fill="#ef6306"/>
 <text x="828" y="130" fill="#f7f8f8" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="13" text-anchor="end">3-day streak</text>
 <text x="52" y="176" fill="#d0d6e0" font-family="Inter, &#x27;Helvetica Neue&#x27;, Helvetica, Arial, system-ui, sans-serif" font-size="15">Backend by trade, platform by habit.</text>
 <text x="52" y="198" fill="#d0d6e0" font-family="Inter, &#x27;Helvetica Neue&#x27;, Helvetica, Arial, system-ui, sans-serif" font-size="15">Java, Rust, Python and TypeScript at the core,</text>

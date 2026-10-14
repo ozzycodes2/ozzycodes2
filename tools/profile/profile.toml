@@ -18,9 +18,10 @@ tagline = [
 # longer window does not shrink the blocks — it widens the plane, and the plane
 # is centred for 26 weeks. Much past 182 days it runs off the right rail.
 #
-# 180 keeps 1,301 of the year's 1,303 contributions and sits 11px left of
-# centre. A full year would be two thirds bare ground and half of it off-frame.
-window_days = 180
+# The panel rounds this down to whole weeks, so 182 is the one value that both
+# fills the plane OX is cut for and wastes none of the window. A full year would
+# be two thirds bare ground and half of it off-frame.
+window_days = 182
 
 [stack]
 Languages = ["Java", "Rust", "Python", "TypeScript", "Swift", "Shell"]

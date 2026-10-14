@@ -3,8 +3,8 @@
 One block per day of the window, laid out on a 7-row week grid and projected
 2:1 isometric. Height encodes the day's contribution count; how far the three
 faces are mixed toward the ink encodes its quartile. There is no sky, no night
-and no lit windows — the palette has one accent and it is spent on live state,
-so this panel is built out of the ink ramp alone.
+and no lit windows: the plan is the ink ramp, and the one block shaded off the
+accent instead is the tallest — which is the fact the panel is read for.
 
 The ground is paved over the whole week grid rather than over the days that
 have data: a window rarely starts on a Monday, and tiling only the days present
@@ -91,33 +91,42 @@ def height_for(value, peak, lvl):
     return max(MIN_H, _round(math.sqrt(value / peak) * MAX_H))
 
 
-def shades(theme, lvl):
+def shades(theme, lvl, peak=False):
     """(left wall, right wall, roof) for a block in bucket `lvl`.
 
     Solid mixes rather than one fill at three opacities: the blocks overlap,
     and a translucent face shows whatever stands behind it through its own
     wall, which stops the plan reading as solid. The right wall is the darkest
     face and the roof the lightest, so light arrives from the same direction
-    across the whole plane. The right wall saturates at the ink for the top
-    bucket, which is where the ramp runs out.
+    across the whole plane. The right wall saturates at the base colour for the
+    top bucket, which is where the ramp runs out.
+
+    The peak block mixes off the accent instead of the ink at the same three
+    ratios, so it is still lit from the same side as everything around it.
     """
+    base = theme.accent if peak else theme.ink
     o = 0.18 + lvl * 0.16
-    return (c.mix(theme.ink, theme.canvas, o),
-            c.mix(theme.ink, theme.canvas, min(1, o * 1.3)),
-            c.mix(theme.ink, theme.canvas, o * 0.62))
+    return (c.mix(base, theme.canvas, o),
+            c.mix(base, theme.canvas, min(1, o * 1.3)),
+            c.mix(base, theme.canvas, o * 0.62))
 
 
 def cells_for(values, weeks, peak, cuts):
-    """(col, row, level, height) for every tile of the `weeks`-wide grid.
+    """(col, row, level, height, is_peak) for every tile of the grid.
 
     Column-major, the way GitHub reads a calendar: seven consecutive days fill
     a column top to bottom, then the next week starts a new one. A trailing
     part-week is dropped rather than drawn as a short column.
+
+    Only the first day holding the peak is flagged. A tie would otherwise mark
+    two blocks, and the note beside the legend names one date.
     """
+    peak_i = values.index(peak) if peak in values else -1
     out = []
     for i in range(weeks * ROWS):
         lvl = level(values[i], cuts)
-        out.append((i // ROWS, i % ROWS, lvl, height_for(values[i], peak, lvl)))
+        out.append((i // ROWS, i % ROWS, lvl,
+                    height_for(values[i], peak, lvl), i == peak_i))
     return out
 
 
@@ -130,7 +139,7 @@ def overhang_of(cells):
     rule. Measured, not reserved: a window with no tall block near the front
     wastes no vertical space on one.
     """
-    return max([0, *(h - (col + row) * HALF_H for col, row, _, h in cells)])
+    return max([0, *(h - (col + row) * HALF_H for col, row, _, h, _p in cells)])
 
 
 def project(col, row, oy):
@@ -144,13 +153,13 @@ def diamond(x, y, dy=0):
             f"{x},{y + TILE_H - dy} {x - HALF_W},{y + HALF_H - dy}")
 
 
-def block(theme, x, y, h, lvl):
+def block(theme, x, y, h, lvl, peak=False):
     """The two visible walls and the roof of the block standing on (x, y).
 
     Unstroked: at this tile size an outline reads as a gap between neighbours
     rather than as an edge, and the shading alone already separates the faces.
     """
-    left, right, roof = shades(theme, lvl)
+    left, right, roof = shades(theme, lvl, peak)
     return (f'<polygon points="{x - HALF_W},{y + HALF_H} {x},{y + TILE_H} '
             f'{x},{y + TILE_H - h} {x - HALF_W},{y + HALF_H - h}" fill="{left}"/>'
             f'<polygon points="{x},{y + TILE_H} {x + HALF_W},{y + HALF_H} '
@@ -159,7 +168,12 @@ def block(theme, x, y, h, lvl):
 
 
 def legend(theme, y):
-    """Four diamonds between "quieter" and "busier", one per occupied bucket.
+    """Four circles between "quieter" and "busier", one per occupied bucket.
+
+    Circles, not tiles: the swatches key intensity, and drawn as little rhombi
+    they invited reading as four more buildings. The last one is the accent at
+    full strength, which is what the tallest block is painted in — the key has
+    to name the paint, or it lies about which block is the tall one.
 
     These are the one place the panel paints at an opacity instead of mixing:
     nothing overlaps a swatch, and the ladder reads as the same four steps the
@@ -167,8 +181,9 @@ def legend(theme, y):
     """
     note = dict(fill=theme.faint, family=c.MONO_STACK, size=11)
     swatches = "".join(
-        f'<polygon points="{x},{y - 9} {x + 9},{y - 4} {x},{y + 1} {x - 9},{y - 4}" '
-        f'fill="{theme.ink}" opacity="{0.18 + lvl * 0.16:.2f}"/>'
+        f'<circle cx="{x}" cy="{y - 4}" r="5" ' + (
+            f'fill="{theme.accent}"/>' if lvl == LEVELS - 1 else
+            f'fill="{theme.ink}" opacity="{0.18 + lvl * 0.16:.2f}"/>')
         for lvl, x in enumerate(
             (LEGEND_X + i * LEGEND_PITCH for i in range(LEVELS - 1)), start=1)
     )
@@ -177,20 +192,33 @@ def legend(theme, y):
             + "\n" + c.tx(c.TEXT_X + 212, y, "busier", **note))
 
 
-def _empty(theme):
-    """A short slice for a profile with no calendar at all."""
-    body = (c.heading(theme, 44, "skyline", "0 days") + "\n"
-            + c.tx(c.TEXT_X, 88, "no contribution data yet",
+def _empty(theme, days=0):
+    """A short slice for a window with no whole week in it.
+
+    Under seven days there are no columns to draw. Saying so is the honest
+    answer; the alternative is captioning an empty plane with a tile count the
+    panel never drew.
+    """
+    note = "no contribution data yet" if not days else "less than a week of history"
+    desc = ("No contribution data available." if not days else
+            f"Only {days} days of history, fewer than the seven a column needs.")
+    body = (c.heading(theme, 44, "skyline", f"{days} days") + "\n"
+            + c.tx(c.TEXT_X, 88, note,
                    fill=theme.dim, family=c.MONO_STACK, size=13))
-    return c.slice_svg(theme, 160, body, title="Contribution skyline",
-                       desc="No contribution data available.")
+    return c.slice_svg(theme, 160, body, title="Contribution skyline", desc=desc)
 
 
 def render(cfg, data, theme):
     window = (cfg.get("city") or {}).get("window_days") or WINDOW_DAYS
     days = (data.get("calendar") or [])[-window:]
-    if not days:
-        return _empty(theme)
+    # Whole weeks only, counted back from the newest day. A part-week draws as a
+    # short column, and trimming it off the near end instead would drop the most
+    # recent days — the ones most likely to hold the peak — out of a plan whose
+    # legend and note both claim to key the tallest block.
+    whole = days[len(days) % ROWS:]
+    if not whole:
+        return _empty(theme, len(days))
+    days = whole
 
     weeks = len(days) // ROWS
     values = [n for _, n in days]
@@ -205,12 +233,12 @@ def render(cfg, data, theme):
     oy = OY + math.ceil(overhang_of(cells))
 
     ground, blocks = [], []
-    for col, row, lvl, h in cells:
+    for col, row, lvl, h, is_peak in cells:
         x, y = project(col, row, oy)
         ground.append(f'<polygon points="{diamond(x, y)}" fill="{theme.surface}" '
                       f'stroke="{theme.hairline}" stroke-width="0.5"/>')
         if lvl:
-            blocks.append((col + row, block(theme, x, y, h, lvl)))
+            blocks.append((col + row, block(theme, x, y, h, lvl, is_peak)))
     blocks.sort(key=lambda b: b[0])
 
     # 32px below the plane's lowest corner, which is the far end of the rhombus.

@@ -168,11 +168,12 @@ def test_the_label_is_a_tier_quieter_than_the_chips_it_names(theme):
 
 
 @pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
-def test_the_panel_reaches_for_no_accent_at_all(theme):
-    """The one accent in the console belongs to the header's live dot."""
+def test_the_panel_marks_nothing_and_carries_only_the_section_rule(theme):
+    """A list of equals has no one item worth pointing at, so the accent gets
+    no second use here — the heading's index stroke is the whole of it."""
     body = body_of(stack.render(CFG, {}, theme))
-    assert theme.accent not in body
-    assert "accent" not in body
+    assert body.count(theme.accent) == 1
+    assert f'stroke="{theme.accent}" stroke-width="2"' in body
 
 
 def test_both_themes_draw_the_same_geometry():

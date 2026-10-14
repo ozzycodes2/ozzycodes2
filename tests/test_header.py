@@ -176,8 +176,9 @@ def test_the_live_dot_sits_one_label_width_in_from_the_right():
 
 
 @pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
-def test_the_accent_is_spent_once_and_only_on_the_live_dot(theme):
-    """It is state, not decoration — one dot in the whole console."""
+def test_the_accent_marks_the_live_dot_and_nothing_else_here(theme):
+    """The streak is this panel's one datum worth pointing at. The header draws
+    no section heading, so the dot is the only accent in the slice."""
     svg = header.render(CFG, DATA, theme)
     assert svg.count(theme.accent) == 1
     assert f'class="live" cx="722" cy="125" r="4" fill="{theme.accent}"' in svg

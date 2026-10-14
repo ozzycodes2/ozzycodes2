@@ -33,7 +33,7 @@ def render(cfg, data, theme):
         # 0.6·n·size back from the right edge — which is where the dot goes.
         dot_x = c.CONTENT_R - round(len(label) * STREAK_SIZE * c.MONO_ADVANCE) - 12
         body += [
-            # The one live fact on the page, and the only thing wearing the accent.
+            # The header's one marked datum: the only live fact on the page.
             f'<circle class="live" cx="{dot_x}" cy="{META_Y - 5}" r="4" '
             f'fill="{theme.accent}"/>',
             c.tx(c.CONTENT_R, META_Y, label, fill=theme.ink,
