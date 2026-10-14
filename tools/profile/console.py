@@ -5,21 +5,34 @@ consecutive <img> tags. Each slice is W wide, a multiple of ROW px tall, and
 redraws the same side rails. Only the first slice caps the top and draws the
 title bar; only the last closes the frame.
 
-Every colour comes from a Theme. LIGHT is the Mine v2 token set, DARK is Mine's;
-panels never name a colour, they ask the theme for a role. render.py runs each
-panel once per theme and readme.py pairs the output with <picture>, so the
-console follows the reader's system setting.
+Both themes are the Mine Final token set: DARK is its `dark` theme, LIGHT its
+`light` one. Panels never name a colour, they ask the theme for a role.
+render.py runs each panel once per theme and readme.py pairs the output with
+<picture>, so the console follows the reader's system setting.
 
-Type is Mine v2's five steps for both themes — the systems differ in palette and
-depth, not in how they name type. Inter is embedded because GitHub strips
-<link> and external url() from a rendered SVG. SF Mono cannot be: it is not
-redistributable, so the mono stack asks for it first and falls back to an
-embedded JetBrains Mono subset everywhere it is absent.
+The eight role values below are not the raw tokens. They are what the preview's
+`panelTheme()` derives from them — `dim` and `faint` are pulled toward the ink
+until they clear 4.5:1 on the canvas at the 11-13px these labels run at, and
+`accent` only has to clear 3:1 because it paints one dot and never a word.
+tests/test_console.py pins all sixteen against the preview's own output; that
+test is the only thing keeping the two renderers in agreement, so a change here
+that does not also change the preview is a bug in one of them.
+
+Type is not the token scale. A terminal has its own, and these panels set it per
+element in presentation attributes: mono at 11/12/13/15/20/30 for everything
+structural, sans at 13/15/30 for the two runs of prose. What the tokens supply
+is the two families and the two radii.
+
+Inter and JetBrains Mono are embedded because GitHub strips <link> and external
+url() from a rendered SVG. SF Mono cannot be — it is not redistributable — so
+the mono stack asks for it first and falls back to the embedded JBM subset
+everywhere it is absent.
 """
 import base64
 import datetime
 import html
 import io
+import math
 import pathlib
 import re
 from typing import NamedTuple
@@ -37,57 +50,42 @@ FONT_DIR = HERE / "fonts"
 class Theme(NamedTuple):
     """One palette, named for the `prefers-color-scheme` value it answers.
 
+    Three text tiers, not two: `ink` for anything that carries meaning, `dim`
+    for supporting prose, `faint` for the labels above a value and the counters
+    beside a heading. `surface` is the one step above the canvas — cards, chips,
+    the chrome band and the city's ground plane — which is the whole of this
+    system's depth. There are no shadows.
+
     `accent` is state, not decoration: it paints the live dot and nothing else.
-    `surface` sits one step toward the ink from `canvas`, `sunken` one step
-    further, which is the whole of this system's depth — there are no shadows.
     """
     name: str
     canvas: str
-    surface: str
-    sunken: str
     ink: str
+    surface: str
     dim: str
+    faint: str
     hairline: str
     accent: str
-    on_accent: str
 
 
-# Mine v2: eight achromatic tokens with signal red reserved for state.
 LIGHT = Theme(
     name="light",
-    canvas="#f8f8f8", surface="#ffffff", sunken="#ededed",
-    ink="#171717", dim="#616161", hairline="#d9d9d9",
-    accent="#cc3300", on_accent="#ffffff",
+    canvas="#f8f8f8", ink="#171717", surface="#ffffff",
+    dim="#4d4d4d", faint="#727272", hairline="#d9d9d9", accent="#cc3300",
 )
 
-# Mine: Linear's near-black ladder under Apple's component vocabulary.
 DARK = Theme(
     name="dark",
-    canvas="#010102", surface="#0f1011", sunken="#141516",
-    ink="#f7f8f8", dim="#8a8f98", hairline="#3e3e44",
-    accent="#5e6ad2", on_accent="#ffffff",
+    canvas="#010102", ink="#f7f8f8", surface="#0f1011",
+    dim="#d0d6e0", faint="#909091", hairline="#23252a", accent="#5e6ad2",
 )
 
 THEMES = (LIGHT, DARK)
 
-# Both token sets declare the same Apple-derived ladder, so these are shared.
+# `{rounded.lg}` and `{rounded.xs}`: cards and chips are the only two radii a
+# panel draws, and the token set is shared by both themes.
 R_CARD = 18
-R_CONTROL = 11
-R_INLINE = 5
-
-
-class Step(NamedTuple):
-    """A type step: px size, weight, and tracking in px."""
-    size: float
-    weight: int
-    tracking: float = 0
-
-
-DISPLAY = Step(40, 600, -0.8)
-HEADING = Step(24, 600, -0.24)
-BODY = Step(16, 400)
-CAPTION = Step(13, 400)
-MONO = Step(14, 400)
+R_CHIP = 5
 
 SANS_STACK = "Inter, 'Helvetica Neue', Helvetica, Arial, system-ui, sans-serif"
 MONO_STACK = "'SF Mono', ui-monospace, SFMono-Regular, JBM, Menlo, monospace"
@@ -126,36 +124,58 @@ e = html.escape
 
 
 def ago(when, now=None):
-    """Coarse "N units ago" for an ISO-8601 instant, or "" if there isn't one.
+    """Abbreviated age for an ISO-8601 instant, or "" if there isn't one.
 
-    Panels print this next to repo and event timestamps, so it rounds hard —
-    the reader wants "2 months ago", not a duration. Returns the empty string
+    Panels set this in mono beside a repo name, where it has to fit a card
+    corner: "today", "9d ago", "14mo ago", "3y ago". Returns the empty string
     for None or anything unparseable rather than raising, because the only
     caller is a renderer that must still produce a panel.
+
+    Whole days, floored, so a push a few hours old reads "today" rather than
+    "0d ago". Months and years use the mean Gregorian length and round, so the
+    label tracks what a calendar would say to within a day.
     """
     if not when:
         return ""
     try:
-        at = datetime.datetime.fromisoformat(when)
-    except (TypeError, ValueError):
+        at = datetime.datetime.fromisoformat(when.replace("Z", "+00:00"))
+    except (TypeError, ValueError, AttributeError):
         return ""
     if at.tzinfo is None:
         at = at.replace(tzinfo=datetime.timezone.utc)
     now = now or datetime.datetime.now(datetime.timezone.utc)
 
-    seconds = (now - at).total_seconds()
-    if seconds < 90:
-        return "just now"
-    # (singular unit, seconds per unit, how many fit before promoting). Months
-    # and years use the mean Gregorian length, so "11 months" never rounds up
-    # into "1 year" while the calendar still says otherwise.
-    for unit, size, limit in (("minute", 60, 60), ("hour", 3600, 24),
-                              ("day", 86400, 31), ("month", 2629800, 12)):
-        if seconds < size * limit:
-            n = max(int(seconds // size), 1)
-            return f"{n} {unit}{'s' if n > 1 else ''} ago"
-    n = max(int(seconds // 31557600), 1)
-    return f"{n} year{'s' if n > 1 else ''} ago"
+    days = int((now - at).total_seconds() // 86400)
+    if days < 1:
+        return "today"
+    if days < 45:
+        return f"{days}d ago"
+    months = round(days / 30.44)
+    if months < 24:
+        return f"{months}mo ago"
+    return f"{round(days / 365.25)}y ago"
+
+
+def num(value):
+    """Thousands-separated, for counters set in mono."""
+    return f"{int(value or 0):,}"
+
+
+def tx(x, y, text, *, fill, family, size, weight=None, ls=None, anchor=None):
+    """One <text> element, typed by presentation attribute rather than class.
+
+    Size and weight vary per element here and the slices share no stylesheet
+    between them, so a class per combination would be a class per element.
+    """
+    attrs = [f'x="{x}"', f'y="{y}"', f'fill="{fill}"',
+             f'font-family="{e(family)}"', f'font-size="{size}"']
+    if weight:
+        attrs.append(f'font-weight="{weight}"')
+    if ls:
+        attrs.append(f'letter-spacing="{ls}"')
+    if anchor:
+        attrs.append(f'text-anchor="{anchor}"')
+    return f'<text {" ".join(attrs)}>{e(text)}</text>'
 
 
 def mix(a, b, t):
@@ -164,9 +184,15 @@ def mix(a, b, t):
     Panels shade with this rather than with `fill-opacity`, because the city's
     blocks overlap: a translucent face shows the block behind it through its own
     wall and the plan stops reading as solid. Both arguments must be #rrggbb.
+
+    Rounds half away from zero, not half to even as `round` would. The preview
+    this is ported from rounds through `Math.round`, and a channel landing on
+    exactly .5 is common enough in a ramp of evenly spaced shades to show up:
+    it is what put the dark skyline's second bucket one unit off the browser's.
     """
     x, y = (tuple(int(h[i:i + 2], 16) for i in (1, 3, 5)) for h in (a, b))
-    return "#" + "".join(f"{round(p * t + q * (1 - t)):02x}" for p, q in zip(x, y))
+    return "#" + "".join(f"{math.floor(p * t + q * (1 - t) + 0.5):02x}"
+                         for p, q in zip(x, y))
 
 
 def visible(markup):
@@ -179,12 +205,15 @@ def visible(markup):
     return html.unescape(re.sub(r"<[^>]+>", "", markup))
 
 
-# (family name the CSS asks for, file stem, weight). Inter carries the four
-# sans steps; JBM is the fallback under SF Mono, which cannot be embedded.
+# (family name the CSS asks for, file stem, weight). Both families carry a
+# regular and a bold: the panels set 700 on every value, repo name and section
+# heading, and 600 on the one display-size name. JBM is the fallback under SF
+# Mono, which cannot be embedded.
 FACES = (
     ("Inter", "inter-latin-400-normal", 400),
     ("Inter", "inter-latin-600-normal", 600),
     ("JBM", "jetbrains-mono-latin-400-normal", 400),
+    ("JBM", "jetbrains-mono-latin-700-normal", 700),
 )
 
 
@@ -213,27 +242,18 @@ def font_faces(text):
     return "".join(rules)
 
 
-def _step_css(name, step, family=None):
-    face = f"font-family:{family};" if family else ""
-    tracking = f";letter-spacing:{step.tracking}px" if step.tracking else ""
-    return f".{name}{{{face}font-size:{step.size}px;font-weight:{step.weight}{tracking}}}"
+def base_css(_theme):
+    """The one animation in the system, and nothing else.
 
-
-def base_css(theme):
-    """The five type steps as classes, plus the theme's three text fills."""
-    steps = "".join(_step_css(*s) for s in (
-        ("display", DISPLAY), ("heading", HEADING),
-        ("body", BODY), ("caption", CAPTION), ("mono", MONO, MONO_STACK),
-    ))
-    return f"""text{{font-family:{SANS_STACK};font-size:{BODY.size}px;fill:{theme.ink}}}
-{steps}
-.ink{{fill:{theme.ink}}}.dim{{fill:{theme.dim}}}.accent{{fill:{theme.accent}}}
-@keyframes fadein{{from{{opacity:0;transform:translateX(-6px)}}to{{opacity:1;transform:none}}}}
-@keyframes blink{{0%,49%{{opacity:1}}50%,100%{{opacity:0}}}}
-@keyframes pulse{{0%,100%{{opacity:1}}50%{{opacity:.2}}}}
-.ln{{animation:fadein .35s ease-out both}}
-.cursor{{animation:blink 1.05s step-end infinite}}
-.dot{{animation:pulse 2.4s ease-in-out infinite}}"""
+    Every fill, size and weight is a presentation attribute on the element that
+    needs it, so there are no utility classes left to declare. What cannot be an
+    attribute is the pulse on the live dot — and it is deliberately the only
+    thing moving. A rendered SVG is painted by GitHub as a still image at frame
+    zero, so anything that animates *in* is simply invisible; the dot survives
+    because it starts at full opacity and the pulse only ever dims it.
+    """
+    return """@keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
+.live{animation:pulse 2.4s ease-in-out infinite}"""
 
 
 def _outline(x0, x1, y0, y1, r, *, top, bottom, left, right):
@@ -346,7 +366,7 @@ def slice_svg(theme, height, body, *, title, desc, text="", top=False,
 '''
 
 
-def title_bar(theme):
+def title_bar(theme, label):
     """Window chrome and title. Only the top slice draws one.
 
     Takes no y: the band caps the frame, so it has to share the frame's top
@@ -360,50 +380,51 @@ def title_bar(theme):
     """
     mid, rule = MARGIN + TITLE_H // 2, MARGIN + TITLE_H
     rings = "".join(
-        f'<circle cx="{FRAME_L + 28 + i * 20}" cy="{mid}" r="5" fill="none" '
-        f'stroke="{theme.hairline}" stroke-width="{EDGE_W}"/>'
+        f'<circle cx="{FRAME_L + 24 + i * 18}" cy="{mid}" r="5" fill="none" '
+        f'stroke="{theme.faint}" stroke-width="{EDGE_W}"/>'
         for i in range(3)
     )
     return f'''<path d="{_fill(FRAME_L, FRAME_R, MARGIN, rule, R_CARD, tl=True, tr=True, br=False, bl=False)}" fill="{theme.surface}"/>
 {rings}
-<text x="{W // 2}" y="{mid + 4}" text-anchor="middle" class="caption dim">ozzycodes2</text>
+{tx(W // 2, mid + 5, label, fill=theme.faint, family=MONO_STACK, size=12, ls=1, anchor="middle")}
 <line x1="{FRAME_L}" y1="{rule}" x2="{FRAME_R}" y2="{rule}" stroke="{theme.hairline}" stroke-width="{EDGE_W}" shape-rendering="crispEdges"/>'''
+
+
+def foot_bar(theme, height):
+    """The closing band, mirroring the title bar. Only the last slice draws one.
+
+    Same depth and same surface as the chrome at the top, so the window reads as
+    having two ends rather than one. It carries no text: the title bar already
+    names the window, and repeating that at the foot is the generator credit
+    this profile deliberately does not print.
+    """
+    y1 = height - MARGIN
+    y0 = y1 - TITLE_H
+    return f'''<line x1="{FRAME_L}" y1="{y0}" x2="{FRAME_R}" y2="{y0}" stroke="{theme.hairline}" stroke-width="{EDGE_W}" shape-rendering="crispEdges"/>
+<path d="{_fill(FRAME_L, FRAME_R, y0, y1, R_CARD, tl=False, tr=False, br=True, bl=True)}" fill="{theme.surface}"/>'''
 
 
 def heading(theme, y, name, counter=""):
     """A `~/section` header over a hairline rule.
 
+    Set in mono at 20/700 rather than at a display step: the section markers are
+    part of the shell's own voice, not the document's, and `~/` only reads as a
+    path in a monospace.
+
     The rule runs the content width in the hairline colour and is overdrawn for
     its first 120px in the ink, which is the whole of the emphasis — there is
     no glow and no second colour to reach for.
     """
-    rule = (f'<line x1="{TEXT_X}" y1="{y + 16}" x2="{CONTENT_R}" y2="{y + 16}" '
+    rule = (f'<line x1="{TEXT_X}" y1="{y + 14}" x2="{CONTENT_R}" y2="{y + 14}" '
             f'stroke="{theme.hairline}" stroke-width="{EDGE_W}" shape-rendering="crispEdges"/>'
-            f'<line x1="{TEXT_X}" y1="{y + 16}" x2="{TEXT_X + 120}" y2="{y + 16}" '
+            f'<line x1="{TEXT_X}" y1="{y + 14}" x2="{TEXT_X + 120}" y2="{y + 14}" '
             f'stroke="{theme.ink}" stroke-width="{EDGE_W}" shape-rendering="crispEdges"/>')
-    right = (f'<text x="{CONTENT_R}" y="{y}" text-anchor="end" class="mono dim">{e(counter)}</text>'
-             if counter else "")
-    return f'''<text x="{TEXT_X}" y="{y}" class="heading ink"><tspan class="dim">~/</tspan>{e(name)}</text>
+    right = (tx(CONTENT_R, y, counter, fill=theme.faint, family=MONO_STACK,
+                size=12, ls=1, anchor="end") if counter else "")
+    return f'''{tx(TEXT_X, y, "~/", fill=theme.faint, family=MONO_STACK, size=20, weight=700)}
+{tx(TEXT_X + 24, y, name, fill=theme.ink, family=MONO_STACK, size=20, weight=700)}
 {right}
 {rule}'''
-
-
-def stagger(rows, y0, line_height, delay=0.15, step=0.12):
-    """Wrap rows in fade-in groups that arrive one after another, like typed output.
-
-    Each row is markup containing `{y}`; None inserts a small spacer instead
-    of a row. Returns (markup, y below the last row).
-    """
-    out, y, n = [], y0, 0
-    for row in rows:
-        if row is None:
-            y += 14
-            continue
-        n += 1
-        out.append(f'<g class="ln" style="animation-delay:{delay + n * step:.2f}s">'
-                   + row.replace("{y}", str(y)) + "</g>")
-        y += line_height
-    return "\n".join(out), y
 
 
 def to_grid(value):

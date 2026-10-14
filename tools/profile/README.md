@@ -55,16 +55,21 @@ only the last closes the frame.
 
 ## Why there are two of everything
 
-The console is drawn from two design systems: the light theme is the Mine v2
-token set, the dark theme is Mine's. Panels name roles, never colours, so one
-renderer produces both — `render.py` runs every panel once per theme and
-`readme.py` pairs the output in a `<picture>` with a
+Both themes are the Mine Final token set — `dark` and `light`. Panels name
+roles, never colours, so one renderer produces both: `render.py` runs every
+panel once per theme and `readme.py` pairs the output in a `<picture>` with a
 `prefers-color-scheme: dark` source, which GitHub honours. Light is the `<img>`
 fallback, so a client that ignores `<picture>` still gets a readable console.
 
-Type is Mine v2's five steps in both themes. The systems differ in palette and
-depth, not in how they name type, and a console that changed size with the
-colour scheme would be two designs rather than one in two finishes.
+The two differ in palette and nothing else. Type, geometry and radii are the
+same in both; a console that changed size with the colour scheme would be two
+designs rather than one in two finishes.
+
+The drawing itself is a port of the `Panels` tab in the `design-preview` site.
+Its `site/assets/panels.js` is the reference, down to the per-element type sizes
+— which is why those are a terminal's own scale rather than the token type
+steps. `tests/test_console.py` pins the seven theme roles against what that
+site derives from the tokens; each panel's tests pin its geometry.
 
 ## Adding or changing a panel
 
@@ -93,9 +98,8 @@ previewed as the README — GitHub picks one theme and the other stays hidden �
 `preview.py` writes a page carrying both.
 
 A slice is rendered into an `<img>`, where a CSS animation paints its first
-frame and stops. Since `.ln` starts at `opacity:0`, a screenshot taken without
-forcing reduced motion shows an empty frame; Chrome needs
-`--force-prefers-reduced-motion` to show the final state.
+frame and stops. Nothing animates in for that reason — the live dot is the only
+moving element and it starts opaque, so a screenshot needs no flags.
 
 ## Why the contribution counts come from a web page
 

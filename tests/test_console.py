@@ -21,44 +21,51 @@ def test_ago_returns_empty_for_anything_unusable(when):
 
 
 @pytest.mark.parametrize("delta,expected", [
-    ({"seconds": 5}, "just now"),
-    ({"seconds": 89}, "just now"),
-    ({"seconds": 120}, "2 minutes ago"),
-    ({"minutes": 59}, "59 minutes ago"),
-    ({"minutes": 60}, "1 hour ago"),
-    ({"hours": 23}, "23 hours ago"),
-    ({"hours": 24}, "1 day ago"),
-    ({"days": 30}, "30 days ago"),
-    ({"days": 31}, "1 month ago"),
-    ({"days": 300}, "9 months ago"),
-    ({"days": 364}, "11 months ago"),
-    ({"days": 366}, "1 year ago"),
-    ({"days": 2600}, "7 years ago"),
+    ({"seconds": 5}, "today"),
+    ({"hours": 23}, "today"),
+    ({"hours": 24}, "1d ago"),
+    ({"days": 9}, "9d ago"),
+    ({"days": 44}, "44d ago"),
+    ({"days": 45}, "1mo ago"),       # 45/30.44 rounds to 1, not 2
+    ({"days": 300}, "10mo ago"),
+    ({"days": 700}, "23mo ago"),
+    ({"days": 731}, "2y ago"),       # 24 months promotes to years
+    ({"days": 2600}, "7y ago"),
 ])
-def test_ago_rounds_to_one_coarse_unit(delta, expected):
+def test_ago_abbreviates_to_one_unit(delta, expected):
+    """Set in mono in a card corner, so it has to be short before it is precise."""
     assert c.ago(at(**delta), NOW) == expected
 
 
-@pytest.mark.parametrize("delta", [
-    {"minutes": 2}, {"hours": 1}, {"days": 1}, {"days": 32}, {"days": 370},
-    {"days": 2600},
-])
-def test_ago_agrees_in_number(delta):
-    n, unit, _ = c.ago(at(**delta), NOW).split()
-    assert unit.endswith("s") == (n != "1"), (n, unit)
+def test_ago_floors_rather_than_rounds_the_first_day():
+    """A push a few hours old reads "today", never "0d ago"."""
+    assert c.ago(at(hours=20), NOW) == "today"
+
+
+def test_ago_accepts_the_z_suffix_github_actually_sends():
+    assert c.ago("2026-10-03T00:00:00Z", NOW) == "9d ago"
 
 
 def test_ago_treats_a_naive_timestamp_as_utc():
     naive = (NOW - datetime.timedelta(days=40)).replace(tzinfo=None).isoformat()
-    assert c.ago(naive, NOW) == "1 month ago"
+    assert c.ago(naive, NOW) == "40d ago"
 
 
 def test_ago_does_not_count_backwards_for_a_future_timestamp():
-    assert c.ago(at(days=-5), NOW) == "just now"
+    assert c.ago(at(days=-5), NOW) == "today"
 
 
 def test_ago_defaults_to_the_current_clock():
-    assert c.ago(datetime.datetime.now(datetime.timezone.utc).isoformat()) == "just now"
+    assert c.ago(datetime.datetime.now(datetime.timezone.utc).isoformat()) == "today"
+
+
+# --- num -------------------------------------------------------------------
+
+@pytest.mark.parametrize("value,expected", [
+    (0, "0"), (None, "0"), (999, "999"), (1000, "1,000"), (1234567, "1,234,567"),
+])
+def test_num_separates_thousands(value, expected):
+    assert c.num(value) == expected
 
 
 # --- colour ----------------------------------------------------------------
@@ -79,6 +86,12 @@ def test_mix_at_the_midpoint_averages_every_channel(a, b, expected):
     assert c.mix(a, b, 0.5) == expected
 
 
+def test_mix_rounds_a_half_up_the_way_the_browser_does():
+    """`#f7f8f8` at 0.5 over `#010102` puts green on exactly 124.5; `round` would
+    take it to 124 and the skyline would differ from the preview by one unit."""
+    assert c.mix("#f7f8f8", "#010102", 0.5) == "#7c7d7d"
+
+
 @pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
 def test_mix_returns_a_literal_hex_with_no_opacity(theme):
     """Shading has to be literal: the city's blocks overlap, and a translucent
@@ -86,44 +99,79 @@ def test_mix_returns_a_literal_hex_with_no_opacity(theme):
     assert re.fullmatch(r"#[0-9a-f]{6}", c.mix(theme.ink, theme.canvas, 0.37))
 
 
-# --- base_css --------------------------------------------------------------
+# --- the themes ------------------------------------------------------------
+
+# What the preview's panelTheme() derives from DESIGN-mine-final.md. These are
+# the numbers that make the two renderers agree, so they are pinned literally
+# rather than recomputed — a test that derived them the same way console.py does
+# would pass whatever console.py said. Regenerate by running panelTheme() in
+# design-preview against mine-final and reading off both themes.
+PREVIEW = {
+    "dark": dict(canvas="#010102", ink="#f7f8f8", surface="#0f1011",
+                 dim="#d0d6e0", faint="#909091", hairline="#23252a",
+                 accent="#5e6ad2"),
+    "light": dict(canvas="#f8f8f8", ink="#171717", surface="#ffffff",
+                  dim="#4d4d4d", faint="#727272", hairline="#d9d9d9",
+                  accent="#cc3300"),
+}
+
 
 @pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
-def test_base_css_carries_the_themes_own_three_text_fills(theme):
-    css = c.base_css(theme)
-    assert f".ink{{fill:{theme.ink}}}" in css
-    assert f".dim{{fill:{theme.dim}}}" in css
-    assert f".accent{{fill:{theme.accent}}}" in css
-    assert f"fill:{theme.ink}}}" in css.splitlines()[0]      # the default text fill
+def test_each_theme_matches_the_preview_role_for_role(theme):
+    """The README and the design preview are two renderers of one drawing."""
+    assert {k: v for k, v in theme._asdict().items() if k != "name"} \
+        == PREVIEW[theme.name]
 
 
 @pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
-def test_base_css_names_no_other_themes_colours(theme):
-    """One stylesheet per theme; a leaked token renders wrong in one scheme."""
+def test_the_three_text_tiers_are_distinct_and_ordered(theme):
+    """ink > dim > faint in contrast against the canvas, or the tiers are decor."""
+    def lum(hexa):
+        parts = [int(hexa[i:i + 2], 16) / 255 for i in (1, 3, 5)]
+        lin = [p / 12.92 if p <= 0.04045 else ((p + 0.055) / 1.055) ** 2.4
+               for p in parts]
+        return 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2]
+
+    def ratio(a, b):
+        x, y = sorted((lum(a) + 0.05, lum(b) + 0.05))
+        return y / x
+
+    tiers = [ratio(v, theme.canvas) for v in (theme.ink, theme.dim, theme.faint)]
+    assert tiers == sorted(tiers, reverse=True), tiers
+    assert tiers[-1] >= 4.5, f"faint is only {tiers[-1]:.2f}:1 on the canvas"
+
+
+@pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
+def test_base_css_declares_only_the_pulse(theme):
+    """Type is set per element now; the stylesheet has one job left."""
     css = c.base_css(theme)
-    for other in c.THEMES:
-        if other.name != theme.name:
-            assert other.ink not in css
-            assert other.accent not in css
-
-
-def test_base_css_declares_every_type_step_as_a_class():
-    css = c.base_css(c.LIGHT)
-    for name, step in (("display", c.DISPLAY), ("heading", c.HEADING),
-                       ("body", c.BODY), ("caption", c.CAPTION)):
-        assert f".{name}{{font-size:{step.size}px;font-weight:{step.weight}" in css
-    assert f".mono{{font-family:{c.MONO_STACK};font-size:{c.MONO.size}px" in css
-
-
-def test_base_css_tracks_only_the_steps_that_ask_for_it():
-    css = c.base_css(c.LIGHT)
-    assert f"letter-spacing:{c.DISPLAY.tracking}px" in css
-    assert ".body{font-size:16px;font-weight:400}" in css
+    assert ".live{animation:pulse" in css
+    assert "font-size" not in css and "fill:" not in css
 
 
 def test_the_mono_stack_asks_for_sf_mono_before_the_embedded_fallback():
     """SF Mono is not redistributable, so JBM only covers the machines without it."""
     assert c.MONO_STACK.index("SF Mono") < c.MONO_STACK.index("JBM")
+
+
+# --- tx --------------------------------------------------------------------
+
+def test_tx_emits_only_the_attributes_it_was_given():
+    plain = c.tx(10, 20, "hi", fill="#fff", family="Inter", size=13)
+    assert plain == '<text x="10" y="20" fill="#fff" font-family="Inter" font-size="13">hi</text>'
+
+
+def test_tx_adds_weight_tracking_and_anchor_when_asked():
+    markup = c.tx(0, 0, "x", fill="#000", family="Inter", size=30,
+                  weight=700, ls="-0.5", anchor="end")
+    for part in ('font-weight="700"', 'letter-spacing="-0.5"', 'text-anchor="end"'):
+        assert part in markup
+
+
+def test_tx_escapes_the_text_and_the_family():
+    markup = c.tx(0, 0, "<b> & 'q'", fill="#000", family="'SF Mono', x", size=13)
+    assert "<b>" not in markup and "&amp;" in markup
+    assert "&#x27;SF Mono&#x27;" in markup
 
 
 # --- the frame's own edge --------------------------------------------------
@@ -340,7 +388,8 @@ def test_both_themes_produce_a_complete_frame(theme):
 
 @pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
 def test_a_slice_names_only_its_own_themes_colours(theme):
-    markup = c.slice_svg(theme, 80, c.title_bar(theme) + c.heading(theme, 70, "x"),
+    markup = c.slice_svg(theme, 80,
+                         c.title_bar(theme, "zsh") + c.heading(theme, 70, "x"),
                          title="t", desc="d", top=True)
     for other in c.THEMES:
         if other.name != theme.name:
@@ -377,12 +426,10 @@ def test_a_slice_escapes_markup_in_its_title_and_desc():
     assert "&lt;script&gt;" in markup
 
 
-def test_reduced_motion_switches_every_animation_off():
-    """Panels animate through shared classes so this one override reaches them."""
+def test_reduced_motion_switches_the_one_animation_off():
     markup = bare()
     assert "@media (prefers-reduced-motion:reduce){*{animation:none!important}}" in markup
-    for cls in (".ln", ".cursor", ".dot"):
-        assert f"{cls}{{animation:" in markup
+    assert ".live{animation:" in markup
 
 
 # --- font embedding --------------------------------------------------------
@@ -391,12 +438,16 @@ def payloads(markup):
     return re.findall(r"src:url\(data:font/woff2;base64,([^)]+)\) format", markup)
 
 
-def test_a_slice_embeds_the_three_faces_the_css_asks_for():
-    """GitHub strips <link> and external url(), so the subset has to inline."""
+def test_a_slice_embeds_the_four_faces_the_css_asks_for():
+    """GitHub strips <link> and external url(), so the subset has to inline.
+
+    Both families carry a bold: the panels set 700 on every value and section
+    heading, which in a terminal are set in mono as often as in sans.
+    """
     markup = bare()
     assert re.findall(r"font-family:'(\w+)';font-weight:(\d+)", markup) == [
-        ("Inter", "400"), ("Inter", "600"), ("JBM", "400")]
-    assert len(payloads(markup)) == 3
+        ("Inter", "400"), ("Inter", "600"), ("JBM", "400"), ("JBM", "700")]
+    assert len(payloads(markup)) == 4
     assert all(p for p in payloads(markup))
 
 
@@ -424,15 +475,26 @@ def test_the_text_argument_adds_glyphs_the_body_does_not_contain():
 # --- chrome ----------------------------------------------------------------
 
 @pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
-def test_the_title_bar_draws_three_hairline_rings(theme):
-    markup = c.title_bar(theme)
+def test_the_title_bar_draws_three_faint_rings(theme):
+    markup = c.title_bar(theme, "ozzycodes2 — zsh")
     mid = c.MARGIN + c.TITLE_H // 2
     rings = re.findall(
-        rf'<circle cx="(\d+)" cy="{mid}" r="5" fill="none" stroke="{theme.hairline}"',
+        rf'<circle cx="(\d+)" cy="{mid}" r="5" fill="none" stroke="{theme.faint}"',
         markup)
-    assert [int(x) for x in rings] == [c.FRAME_L + 28, c.FRAME_L + 48, c.FRAME_L + 68]
+    assert [int(x) for x in rings] == [c.FRAME_L + 24, c.FRAME_L + 42, c.FRAME_L + 60]
     assert f'fill="{theme.surface}"' in markup
     assert theme.accent not in markup           # the accent is state, not chrome
+
+
+def test_the_title_bar_centres_its_label_in_mono():
+    markup = c.title_bar(c.LIGHT, "ozzycodes2 — zsh")
+    assert f'<text x="{c.W // 2}" y="{c.MARGIN + c.TITLE_H // 2 + 5}" ' \
+           f'fill="{c.LIGHT.faint}" font-family="{c.e(c.MONO_STACK)}" ' \
+           'font-size="12" letter-spacing="1" text-anchor="middle">' in markup
+
+
+def test_the_title_bar_escapes_its_label():
+    assert "<b>" not in c.title_bar(c.LIGHT, "<b>")
 
 
 def test_the_title_bar_sits_on_the_frames_rounded_cap():
@@ -441,7 +503,7 @@ def test_the_title_bar_sits_on_the_frames_rounded_cap():
     Floated below the cap it leaves a strip of canvas above itself and the two
     sets of corners read as two misaligned windows.
     """
-    band = fill_path(c.title_bar(c.LIGHT))
+    band = fill_path(c.title_bar(c.LIGHT, "ozzycodes2 — zsh"))
     assert arcs(band) == [(c.R_CARD, c.R_CARD, c.R_CARD),
                           (c.R_CARD, c.R_CARD, -c.R_CARD)]
     frame = caps_path(c.slice_svg(c.LIGHT, 120, "", title="t", desc="d", top=True))
@@ -454,29 +516,52 @@ def test_the_title_bar_sits_on_the_frames_rounded_cap():
 
 
 def test_the_title_bar_rules_off_at_a_fixed_depth():
-    markup = c.title_bar(c.LIGHT)
+    markup = c.title_bar(c.LIGHT, "ozzycodes2 — zsh")
     rule = c.MARGIN + c.TITLE_H
     assert f'<line x1="{c.FRAME_L}" y1="{rule}" x2="{c.FRAME_R}" y2="{rule}"' in markup
     assert f'V{rule}H{c.FRAME_L}' in fill_path(markup)
 
 
 @pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
+def test_the_foot_bar_mirrors_the_title_bar_at_the_frames_other_end(theme):
+    """Same depth, same surface, rounded the other way, so the window has two ends."""
+    markup = c.foot_bar(theme, 200)
+    y0 = 200 - c.MARGIN - c.TITLE_H
+    assert f'y1="{y0}" x2="{c.FRAME_R}" y2="{y0}" stroke="{theme.hairline}"' in markup
+    assert f'fill="{theme.surface}"' in markup
+    band, r = fill_path(markup), c.R_CARD
+    assert band.startswith(f"M{c.FRAME_L} {y0}H{c.FRAME_R}")
+    assert f"a{r} {r} 0 0 1 {-r} {r}H{c.FRAME_L + r}a{r} {r} 0 0 1 {-r} {-r}" in band
+
+
+@pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
 def test_a_heading_rules_the_content_width_and_emphasises_its_start(theme):
     markup = c.heading(theme, 100, "stack")
-    assert f'x1="{c.TEXT_X}" y1="116" x2="{c.CONTENT_R}" y2="116" ' \
+    assert f'x1="{c.TEXT_X}" y1="114" x2="{c.CONTENT_R}" y2="114" ' \
            f'stroke="{theme.hairline}"' in markup
-    assert f'x2="{c.TEXT_X + 120}" y2="116" stroke="{theme.ink}"' in markup
+    assert f'x2="{c.TEXT_X + 120}" y2="114" stroke="{theme.ink}"' in markup
+
+
+@pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
+def test_a_heading_sets_its_path_in_mono_with_the_prefix_dropped_back(theme):
+    """`~/` only reads as a path in a monospace, and it is chrome, not the name."""
+    markup = c.heading(theme, 100, "stack")
+    mono = c.e(c.MONO_STACK)
+    assert f'<text x="{c.TEXT_X}" y="100" fill="{theme.faint}" ' \
+           f'font-family="{mono}" font-size="20" font-weight="700">~/</text>' in markup
+    assert f'<text x="{c.TEXT_X + 24}" y="100" fill="{theme.ink}" ' \
+           f'font-family="{mono}" font-size="20" font-weight="700">stack</text>' in markup
 
 
 def test_a_heading_right_aligns_its_counter_in_mono():
     markup = c.heading(c.LIGHT, 100, "stack", "12 repos")
-    assert f'<text x="{c.CONTENT_R}" y="100" text-anchor="end" ' \
-           'class="mono dim">12 repos</text>' in markup
-    assert 'class="heading ink"><tspan class="dim">~/</tspan>stack' in markup
+    assert f'<text x="{c.CONTENT_R}" y="100" fill="{c.LIGHT.faint}" ' \
+           f'font-family="{c.e(c.MONO_STACK)}" font-size="12" ' \
+           'letter-spacing="1" text-anchor="end">12 repos</text>' in markup
 
 
-def test_a_heading_without_a_counter_emits_no_second_text():
-    assert c.heading(c.LIGHT, 100, "stack").count("<text") == 1
+def test_a_heading_without_a_counter_emits_only_the_path():
+    assert c.heading(c.LIGHT, 100, "stack").count("<text") == 2
 
 
 def test_a_heading_escapes_its_name_and_counter():
@@ -489,15 +574,7 @@ def test_headings_stay_inside_the_content_width():
     assert c.TEXT_X < c.CONTENT_R < c.FRAME_R
 
 
-# --- stagger, grid, output -------------------------------------------------
-
-def test_stagger_delays_each_row_a_step_further_and_skips_spacers():
-    markup, y = c.stagger(['<text y="{y}"/>', None, '<text y="{y}"/>'], 100, 20)
-    assert 'animation-delay:0.27s' in markup and 'animation-delay:0.39s' in markup
-    assert markup.count('class="ln"') == 2
-    assert y == 100 + 20 + 14 + 20
-    assert "{y}" not in markup
-
+# --- grid, output ----------------------------------------------------------
 
 @pytest.mark.parametrize("value,expected", [(0, 0), (1, 40), (40, 40), (41, 80)])
 def test_to_grid_rounds_up_to_the_next_row(value, expected):

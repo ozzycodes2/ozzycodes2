@@ -5,31 +5,47 @@ rendered SVG, so a clickable card has to be an <img> the README itself wraps in
 an anchor — which means one file per card. Each card is therefore a half-width
 slice of the same window row, drawing the side rail on its outer edge only and
 running flush to the seam on the inner one, so a pair tiles back into one row.
+
+The card's own geometry is the reference design's, unchanged: a 378×164 box, its
+name at +14/+30, three lines of blurb from +56, chips along the bottom. Only the
+vertical rhythm *between* rows differs, because a slice height must be a
+multiple of ROW and 164 + 20 is not: the row gap comes out at 36 rather than 20.
 """
 import textwrap
 
 from .. import console as c
 
 HALF = c.W // 2
-GAP = 24                                    # between the cards, straddling the seam
-CARD_W = ((c.CONTENT_R - c.TEXT_X) - GAP) // 2
-PAD = 18                                    # card edge to its own text
+GAP = 20                                    # between the cards, straddling the seam
+CARD_W = (c.CONTENT_R - c.TEXT_X - GAP) // 2
+CARD_H = 164
+PAD = 14                                    # card edge to its own text
 
-# Blurbs are prose, so they are set in the sans face — which cannot be measured
-# by character count the way the mono face can. textwrap still needs a column
-# count, so this assumes 0.62em per glyph: more than Inter's average lowercase
-# advance and less than its widest, which wraps a line or two short of the
-# available width rather than past it.
-BLURB_PX = c.CAPTION.size
-BLURB_COLS = int((CARD_W - 2 * PAD) // (BLURB_PX * 0.62))
+# One width estimate for everything measured before it is drawn. At 11px the
+# mono face advances exactly this, so the chips are sized to their label; the
+# 13px sans blurb is measured with the same figure, which is 0.51em there —
+# under Inter's average advance, so a line wraps short of the card, never past.
+GLYPH = 11 * c.MONO_ADVANCE
+
+BLURB_COLS = int((CARD_W - 2 * PAD) / GLYPH)
+BLURB_MAX = 3                               # a fourth line would run into the chips
 LINE_H = 19
 
-NAME_DY = 32                                # card top to repo-name baseline
-TAGS_DY = 54
-BLURB_DY = 80
-BLURB_TAIL = 16                             # breathing room under the last blurb line
-FOOT_H = 42                                 # rule, footer line and bottom padding
-VPAD = 24                                   # slice edge to card, before centring
+NAME_DY = 30                                # card top to repo-name baseline
+BLURB_DY = 56
+CHIP_DY = CARD_H - 36                       # chips hang off the card's bottom
+CHIP_H = 22
+CHIP_PAD = 9                                # chip edge to its label
+CHIP_GAP = 6
+CHIP_BASE = CHIP_DY + 16                    # label baseline inside the chip
+CHIP_TINT = 0.06                            # ink over surface, a tint not a fill
+
+# The card is centred in its slice: 164 plus breathing room rounds to 200, so
+# the 18px left over at each end puts 36px between the two rows.
+SLICE_H = c.to_grid(CARD_H + 24)
+TOP = (SLICE_H - CARD_H) // 2
+
+HEAD_Y = 44
 
 
 def render(cfg, data, theme):
@@ -38,17 +54,9 @@ def render(cfg, data, theme):
     if not entries or not live:
         return [c.Slice("projects.svg", _unavailable(theme, len(entries)))]
 
-    cards = [_measure(entry, live.get(entry.get("repo"), {})) for entry in entries]
-
-    # One height for every card, from the longest blurb: cards sit side by side,
-    # so a per-card height would leave a step in the middle of each row.
-    tallest = max(len(card["blurb"]) for card in cards)
-    card_h = BLURB_DY + (tallest - 1) * LINE_H + BLURB_TAIL + FOOT_H
-    slice_h = c.to_grid(card_h + 2 * VPAD)
-    top = (slice_h - card_h) // 2
-
-    out = [c.Slice("projects.svg", _heading_slice(theme, len(cards)))]
-    for i, (card, entry) in enumerate(zip(cards, entries)):
+    out = [c.Slice("projects.svg", _heading_slice(theme, len(entries)))]
+    for i, entry in enumerate(entries):
+        card = _merge(entry, live.get(entry.get("repo")) or {})
         # Even index sits left of the seam and owns the left rail; odd sits
         # right. The right card's own origin is the seam, hence the shifted x.
         left = i % 2 == 0
@@ -56,85 +64,106 @@ def render(cfg, data, theme):
         out.append(c.Slice(
             f"projects-{i + 1}.svg",
             c.slice_svg(
-                theme, slice_h, _card(theme, card, x, top, card_h),
-                title=f"{card['name']} — {card['language']}",
-                desc=card["desc"], text="·",
+                theme, SLICE_H, _card(theme, card, x, TOP),
+                title=card["title"], desc=card["desc"],
                 width=HALF, rails="left" if left else "right",
             ),
-            f"https://github.com/{entry['repo']}",
+            f"https://github.com/{entry.get('repo', '')}",
         ))
     return out
 
 
-def _measure(entry, record):
+def _merge(entry, record):
     """Fold a profile.toml entry together with its fetched repo record.
 
     Star counts are deliberately dropped: every repo here has none, and a row
     of zeroes reads as neglect rather than as data.
     """
     name = entry.get("name") or (entry.get("repo") or "").split("/")[-1]
+    # profile.toml wins over the fetch: GitHub picks a repo's language by byte
+    # count, which on a small project is often a vendored stylesheet rather
+    # than what the thing is written in, and the card would then contradict its
+    # own tags. What the fetch does win is the tag list — the language leads the
+    # chips, and a hand-written tag naming it is folded into that one chip.
+    language = entry.get("language") or record.get("language") or ""
     tags = [str(t) for t in entry.get("tags") or []]
-    # profile.toml wins: GitHub picks a repo's language by byte count, which on
-    # a small project is often a vendored stylesheet rather than what the thing
-    # is written in, and the card would then contradict its own tags.
-    language = entry.get("language") or record.get("language") or "—"
-    updated = c.ago(record.get("pushed_at"))
-    blurb = textwrap.wrap(entry.get("blurb") or "", BLURB_COLS) or [""]
+    if language:
+        tags = [language] + [t for t in tags if t.casefold() != language.casefold()]
 
-    desc = f"{name}, {language}"
-    if updated:
-        desc += f", updated {updated}"
+    blurb = entry.get("blurb") or ""
+    age = c.ago(record.get("pushed_at"))
+
+    desc = name
+    if age:
+        desc += f", updated {age}"
     if tags:
         desc += f". Tagged {', '.join(tags)}"
-    return {"name": name, "tags": tags, "language": language,
-            "updated": f"updated {updated}" if updated else "",
-            "blurb": blurb, "desc": f"{desc}. {entry.get('blurb') or ''}".strip()}
+    return {
+        "name": name,
+        "tags": tags,
+        "age": age,
+        # The drawn blurb stops at three lines; `desc` carries all of it, since
+        # a screen reader has the room the card does not.
+        "blurb": _wrap(blurb)[:BLURB_MAX],
+        "title": f"{name} — {language}" if language else name,
+        "desc": f"{desc}. {blurb}".strip(),
+    }
 
 
-def _card(theme, card, x, y, height):
-    tx, inner = x + PAD, CARD_W - 2 * PAD
-    bottom = y + height
+def _wrap(text):
+    """Greedy wrap on whitespace only, matching the reference's own `wrap()`.
 
-    box = (f'<rect x="{x}" y="{y}" width="{CARD_W}" height="{height}" rx="{c.R_CARD}" '
-           f'fill="{theme.surface}" stroke="{theme.hairline}" stroke-width="{c.EDGE_W}"/>')
+    Neither long words nor hyphens are broken: a word wider than the card
+    overhangs it rather than being cut mid-token, which is what the reference
+    does and is the lesser of the two wrongs for a repo name in a blurb.
+    """
+    return textwrap.wrap(text, BLURB_COLS,
+                         break_long_words=False, break_on_hyphens=False)
 
-    name = f'<text x="{tx}" y="{y + NAME_DY}" class="body ink">{c.e(card["name"])}</text>'
 
-    tags = (f'<text x="{tx}" y="{y + TAGS_DY}" class="caption dim">'
-            f'{c.e(" · ".join(t.upper() for t in card["tags"]))}</text>'
-            if card["tags"] else "")
+def _card(theme, card, x, y):
+    parts = [
+        f'<rect x="{x}" y="{y}" width="{CARD_W}" height="{CARD_H}" rx="{c.R_CARD}" '
+        f'fill="{theme.surface}" stroke="{theme.hairline}" stroke-width="{c.EDGE_W}"/>',
+        c.tx(x + PAD, y + NAME_DY, card["name"], fill=theme.ink,
+             family=c.MONO_STACK, size=15, weight=700),
+    ]
+    if card["age"]:
+        parts.append(c.tx(x + CARD_W - PAD, y + NAME_DY, card["age"], fill=theme.faint,
+                          family=c.MONO_STACK, size=11, anchor="end"))
 
-    blurb = "\n".join(
-        f'<text x="{tx}" y="{y + BLURB_DY + i * LINE_H}" class="caption dim">{c.e(line)}</text>'
+    parts += [
+        c.tx(x + PAD, y + BLURB_DY + i * LINE_H, line, fill=theme.dim,
+             family=c.SANS_STACK, size=13)
         for i, line in enumerate(card["blurb"])
-    )
+    ]
 
-    # The footer hangs off the card's bottom, not off the blurb, so it lands on
-    # the same baseline in all four cards however short the blurb wrapped.
-    fy = bottom - 18
-    foot = (f'<line x1="{tx}" y1="{bottom - 42}" x2="{tx + inner}" y2="{bottom - 42}" '
-            f'stroke="{theme.hairline}" stroke-width="{c.EDGE_W}" shape-rendering="crispEdges"/>'
-            f'<text x="{tx}" y="{fy}" class="mono ink">{c.e(card["language"])}</text>')
-    if card["updated"]:
-        foot += (f'<text x="{tx + inner}" y="{fy}" text-anchor="end" class="caption dim">'
-                 f'{c.e(card["updated"])}</text>')
+    chip_x = x + PAD
+    for tag in card["tags"]:
+        width = round(len(tag) * GLYPH) + 2 * CHIP_PAD
+        parts.append(
+            f'<rect x="{chip_x}" y="{y + CHIP_DY}" width="{width}" height="{CHIP_H}" '
+            f'rx="{c.R_CHIP}" fill="{theme.ink}" opacity="{CHIP_TINT}"/>')
+        parts.append(c.tx(chip_x + CHIP_PAD, y + CHIP_BASE, tag, fill=theme.dim,
+                          family=c.MONO_STACK, size=11))
+        chip_x += width + CHIP_GAP
 
-    return f'<g class="ln" style="animation-delay:0.20s">{box}\n{name}\n{tags}\n{blurb}\n{foot}</g>'
+    return "\n".join(parts)
 
 
 def _heading_slice(theme, n):
     """`~/projects` on its own full-width row, so the title is not inside a link."""
-    body = c.heading(theme, 52, "projects", f"{n} repos")
     return c.slice_svg(
-        theme, c.to_grid(72), body,
+        theme, c.to_grid(HEAD_Y + 28), c.heading(theme, HEAD_Y, "projects", f"{n} repos"),
         title="~/projects", desc=f"Section heading: projects, {n} public repositories.",
     )
 
 
 def _unavailable(theme, n):
-    body = c.heading(theme, 52, "projects", f"{n} repos") + (
-        f'<text x="{c.TEXT_X}" y="96" class="body dim">No repository data available.</text>')
+    body = c.heading(theme, HEAD_Y, "projects", f"{n} repos") + c.tx(
+        c.TEXT_X, HEAD_Y + 52, "No repository data available.",
+        fill=theme.dim, family=c.SANS_STACK, size=15)
     return c.slice_svg(
-        theme, c.to_grid(128), body,
+        theme, c.to_grid(HEAD_Y + 80), body,
         title="~/projects", desc="Projects section: no repository data available.",
     )

@@ -1,4 +1,9 @@
-"""Tests for the top slice."""
+"""Tests for the top slice.
+
+Every fill, size and weight in this panel is a presentation attribute on the
+element that needs it, so the assertions read attributes rather than classes:
+there is no stylesheet left to check against.
+"""
 import re
 
 import pytest
@@ -10,15 +15,13 @@ CFG = {"identity": {
     "name": "Osniel Quintana",
     "handle": "ozzycodes2",
     "role": "platform engineer",
-    "tagline": ["first line", "second line", "third line"],
+    "tagline": ["first line", "second line", "third line", "fourth line"],
 }}
 
-# `.ink .dim .accent` for fill, the five type steps, `.ln .cursor .dot` for
-# motion. Anything outside this set is a class one of the retired palettes
-# used to define, and a panel that still names one renders unstyled rather
-# than failing loudly.
-LIVE = {"ink", "dim", "accent", "display", "heading", "body", "caption", "mono",
-        "ln", "cursor", "dot"}
+DATA = {"stats": {"streak_current": 3}}
+
+SANS = c.e(c.SANS_STACK)
+MONO = c.e(c.MONO_STACK)
 
 
 def height_of(svg):
@@ -29,161 +32,238 @@ def desc_of(svg):
     return re.search(r"<desc[^>]*>(.*?)</desc>", svg, re.S).group(1)
 
 
+def elements(svg, tag):
+    """Every `tag` element's attributes, as dicts, in draw order."""
+    return [dict(re.findall(r'([\w-]+)="([^"]*)"', attrs))
+            for attrs in re.findall(rf"<{tag}\s([^>]*?)/?>", svg)]
+
+
 def texts(svg):
-    """(class list, content) of every text element, in draw order."""
-    return re.findall(r'<text[^>]*class="([^"]*)"[^>]*>(.*?)</text>', svg, re.S)
+    """(attributes, content) of every <text>, in draw order."""
+    return [(dict(re.findall(r'([\w-]+)="([^"]*)"', attrs)), body)
+            for attrs, body in re.findall(r"<text\s([^>]*)>(.*?)</text>", svg, re.S)]
 
 
-def classes(svg):
-    """Every class token the slice names anywhere."""
-    return {token for value in re.findall(r'class="([^"]*)"', svg)
-            for token in value.split()}
+def one(svg, needle):
+    """The single <text> whose content contains `needle`."""
+    found = [attrs for attrs, body in texts(svg) if needle in body]
+    assert len(found) == 1, f"{needle!r} drawn {len(found)} times"
+    return found[0]
+
+
+def render(cfg=CFG, data=DATA, theme=c.LIGHT):
+    return header.render(cfg, data, theme)
+
+
+def geometry(svg, theme):
+    """The slice with every theme colour replaced by the role that supplied it.
+
+    What is left is the drawing: coordinates, sizes, weights and anchors. Two
+    themes that agree on this differ in nothing but colour.
+    """
+    for role, value in zip(theme._fields, theme):
+        if role != "name":
+            svg = svg.replace(value, role)
+    return svg
 
 
 # --- frame -----------------------------------------------------------------
 
-def test_header_is_the_slice_that_closes_the_top():
-    """Only this panel draws the top edge; the rest continue the rails."""
-    svg = header.render(CFG, {}, c.LIGHT)
-    assert f"M{c.FRAME_L} {height_of(svg)}V{c.MARGIN + c.R_CARD}" in svg
-    assert f"H{c.FRAME_R - c.R_CARD}" in svg
-
-
-def test_header_draws_the_window_title_bar():
-    svg = header.render(CFG, {}, c.LIGHT)
-    assert re.search(rf'<text x="{c.W // 2}"[^>]*>ozzycodes2</text>', svg)
-    assert svg.count("<circle") == 3       # three hairline rings, no traffic lights
+def test_header_caps_the_top_of_the_frame():
+    """Only this panel passes top=True; the rest continue the rails."""
+    svg = render()
+    assert f"M{c.FRAME_L + c.R_CARD} {c.MARGIN}H{c.FRAME_R - c.R_CARD}" in svg
+    assert f"V{height_of(svg)}H{c.FRAME_L}" in svg
 
 
 def test_header_height_is_on_the_grid():
-    assert height_of(header.render(CFG, {}, c.LIGHT)) % c.ROW == 0
+    """slice_svg refuses an off-grid height, so the stack cannot step."""
+    assert height_of(render()) % c.ROW == 0
 
 
-def test_header_grows_with_the_tagline():
-    short = dict(identity={**CFG["identity"], "tagline": ["one"]})
-    long = dict(identity={**CFG["identity"], "tagline": ["one"] * 6})
-    assert height_of(header.render(long, {}, c.LIGHT)) > \
-        height_of(header.render(short, {}, c.LIGHT))
+def test_header_is_the_reference_280_tall_for_a_four_line_tagline():
+    """The shipped tagline is four lines; the reference slice is 280px."""
+    assert height_of(render()) == 280
 
 
-def test_header_sets_every_line_from_the_text_column():
-    """The one exception is the window title, centred in its own chrome."""
-    svg = header.render(CFG, {}, c.LIGHT)
-    xs = {int(v) for v in re.findall(r'<text x="(\d+)"', svg)}
-    assert xs == {c.TEXT_X, c.W // 2}
-    assert max(xs) <= c.CONTENT_R
+def test_header_draws_the_chrome_once_titled_for_the_handle():
+    """title_bar supplies the band, the three rings and the rule together."""
+    svg = render()
+    attrs = one(svg, "zsh")
+    assert attrs["x"] == str(c.W // 2)
+    assert attrs["text-anchor"] == "middle"
+    assert attrs["font-family"] == MONO
+    assert attrs["font-size"] == "12"
+    assert attrs["fill"] == c.LIGHT.faint
+    assert [e["r"] for e in elements(svg, "circle")[:3]] == ["5"] * 3
 
 
-def test_header_renders_every_tagline_line():
-    svg = header.render(CFG, {}, c.LIGHT)
-    for line in CFG["identity"]["tagline"]:
-        assert line in svg
+# --- type --------------------------------------------------------------------
 
-
-# --- type ------------------------------------------------------------------
-
-def test_the_name_is_one_text_at_the_shared_display_step():
-    """It used to be a glow and a fill drawn over each other at 38px."""
-    svg = header.render(CFG, {}, c.LIGHT)
-    drawn = [(cls, body) for cls, body in texts(svg) if "Osniel Quintana" in body]
-    assert drawn == [("display ink", "Osniel Quintana")]
-    assert f"font-size:{c.DISPLAY.size}px" in svg
+def test_the_name_is_the_one_display_size_element():
+    """30/600 sans with -0.5 tracking: the only element off the label scale."""
+    attrs = one(render(), "Osniel Quintana")
+    assert attrs["x"] == str(c.TEXT_X)
+    assert attrs["y"] == "104"
+    assert attrs["font-family"] == SANS
+    assert attrs["font-size"] == "30"
+    assert attrs["font-weight"] == "600"
+    assert attrs["letter-spacing"] == "-0.5"
+    assert attrs["fill"] == c.LIGHT.ink
 
 
 def test_the_handle_and_role_share_one_mono_line():
-    svg = header.render(CFG, {}, c.LIGHT)
-    cls, body = next((cls, body) for cls, body in texts(svg)
-                     if "ozzycodes2" in body and "·" in body)
-    assert cls == "mono"
-    assert "platform engineer" in body
+    """One <text>, not three tspans: the whole run is the same tier."""
+    attrs, body = next((a, b) for a, b in texts(render()) if "@ozzycodes2" in b)
+    assert body == "@ozzycodes2 · platform engineer"
+    assert attrs["x"] == str(c.TEXT_X)
+    assert attrs["y"] == "130"
+    assert attrs["font-family"] == MONO
+    assert attrs["font-size"] == "13"
+    assert attrs["fill"] == c.LIGHT.dim
+    assert "font-weight" not in attrs
 
 
-def test_the_tagline_is_set_at_the_body_step():
-    svg = header.render(CFG, {}, c.LIGHT)
-    for line in CFG["identity"]["tagline"]:
-        assert f'class="body dim">{line}</text>' in svg
+def test_the_streak_label_is_end_anchored_mono_in_the_ink():
+    """It is a fact, not a caption, so it sits in the ink opposite the handle."""
+    attrs = one(render(), "3-day streak")
+    assert attrs["x"] == str(c.CONTENT_R)
+    assert attrs["y"] == "130"
+    assert attrs["text-anchor"] == "end"
+    assert attrs["font-family"] == MONO
+    assert attrs["font-size"] == "13"
+    assert attrs["fill"] == c.LIGHT.ink
 
 
-def test_the_prompt_is_dim_and_the_cursor_is_a_half_block():
-    svg = header.render(CFG, {}, c.LIGHT)
-    assert f'<text x="{c.TEXT_X}" y="96" class="mono dim"><tspan>❯</tspan>' in svg
-    assert "▌" in svg and "█" not in svg
+def test_the_tagline_steps_22px_in_the_sans_body_size():
+    """Four lines at 15px from y=176, tighter than the 26px the old rows used."""
+    drawn = [(a, b) for a, b in texts(render()) if b.endswith(" line")]
+    assert [b for _, b in drawn] == CFG["identity"]["tagline"]
+    for i, (attrs, _) in enumerate(drawn):
+        assert attrs["x"] == str(c.TEXT_X)
+        assert attrs["y"] == str(176 + i * 22)
+        assert attrs["font-family"] == SANS
+        assert attrs["font-size"] == "15"
+        assert attrs["fill"] == c.LIGHT.dim
+        assert "font-weight" not in attrs
 
 
-# --- motion ----------------------------------------------------------------
+def test_every_run_stays_inside_the_content_column():
+    """TEXT_X for body copy, CONTENT_R for the one end-anchored run, W/2 for chrome."""
+    xs = {int(a["x"]) for a, _ in texts(render())}
+    assert xs == {c.TEXT_X, c.W // 2, c.CONTENT_R}
 
-def test_header_blinks_a_cursor_via_the_shared_class():
+
+def test_header_caps_the_tagline_at_four_lines():
+    """A fifth line would push past the reference slice's own height."""
+    cfg = {"identity": {**CFG["identity"], "tagline": [f"line {i}" for i in range(7)]}}
+    svg = header.render(cfg, DATA, c.LIGHT)
+    assert len([b for _, b in texts(svg) if b.startswith("line ")]) == 4
+    assert "line 4" not in svg
+
+
+# --- the live dot ------------------------------------------------------------
+
+def test_the_live_dot_sits_one_label_width_in_from_the_right():
+    """Mono advances 0.6em, so the end-anchored label's own left edge is known."""
+    svg = render()
+    dot = elements(svg, "circle")[-1]
+    width = round(len("3-day streak") * 13 * c.MONO_ADVANCE)
+    assert dot["cx"] == str(c.CONTENT_R - width - 12)
+    assert dot["cy"] == "125"
+    assert dot["r"] == "4"
+    assert dot["class"] == "live"
+
+
+@pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
+def test_the_accent_is_spent_once_and_only_on_the_live_dot(theme):
+    """It is state, not decoration — one dot in the whole console."""
+    svg = header.render(CFG, DATA, theme)
+    assert svg.count(theme.accent) == 1
+    assert f'class="live" cx="722" cy="125" r="4" fill="{theme.accent}"' in svg
+
+
+def test_the_dot_pulses_through_the_shared_class():
     """Inline animation shorthand would escape the reduced-motion override."""
-    svg = header.render(CFG, {}, c.LIGHT)
-    assert 'class="ink cursor" dx="10">▌<' in svg
+    svg = render()
+    assert ".live{animation:pulse" in svg
     assert "prefers-reduced-motion" in svg
+    assert "animation:" not in re.sub(r"<style>.*?</style>", "", svg, flags=re.S)
 
 
-def test_header_staggers_its_rows_so_they_arrive_one_after_another():
+def test_header_without_a_streak_drops_the_dot_and_the_label():
+    """data/ may be empty on a first run; the headline still has to render."""
     svg = header.render(CFG, {}, c.LIGHT)
-    delays = [float(d) for d in
-              re.findall(r'class="ln" style="animation-delay:([\d.]+)s"', svg)]
-    # prompt, name, handle/role, one per tagline line, then the live cursor.
-    assert len(delays) == 3 + len(CFG["identity"]["tagline"]) + 1
-    assert delays == sorted(delays)
-    assert len(set(delays)) == len(delays)
+    assert svg.count("<circle") == 3          # the chrome rings only
+    assert "streak" not in svg
+    assert c.LIGHT.accent not in svg
+    assert "Osniel Quintana" in svg
 
 
-# --- colour ----------------------------------------------------------------
+# --- what the reference does not draw ----------------------------------------
+
+def test_header_draws_no_prompt_and_no_cursor():
+    """The whoami prompt and trailing block were this port's only inventions."""
+    svg = render()
+    assert "❯" not in svg
+    assert "▌" not in svg
+
+
+def test_header_has_no_fade_in_stagger():
+    """GitHub paints a rendered SVG at frame zero, so a fade-in never arrives."""
+    svg = render()
+    assert "animation-delay" not in svg
+    assert 'class="ln"' not in svg
+
+
+# --- colour ------------------------------------------------------------------
 
 @pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
-def test_header_takes_every_fill_from_the_theme(theme):
-    svg = header.render(CFG, {}, theme)
-    assert f".ink{{fill:{theme.ink}}}.dim{{fill:{theme.dim}}}" in svg
-    assert f'fill="{theme.canvas}"' in svg
-    assert f'fill="{theme.surface}"' in svg
-    assert f'stroke="{theme.hairline}"' in svg
-    assert f'fill="{theme.accent}"' not in svg   # accent is state, not chrome
-
-
-@pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
-def test_header_names_only_classes_the_new_systems_keep(theme):
-    svg = header.render(CFG, {}, theme)
-    assert classes(svg) <= LIVE, classes(svg) - LIVE
-    for gone in ("glow", "soft", "grid"):
-        assert f"url(#{gone})" not in svg
+def test_header_takes_every_paint_from_the_theme(theme):
+    svg = header.render(CFG, DATA, theme)
+    assert f'fill="{theme.canvas}"' in svg                 # slice body
+    assert f'fill="{theme.surface}"' in svg                # chrome band
+    assert f'stroke="{theme.hairline}"' in svg             # rails and rule
+    assert f'stroke="{theme.faint}"' in svg                # chrome rings
+    assert not re.search(r'(fill|stroke)="#(?!'
+                         + "|".join(v.lstrip("#") for v in theme[1:]) + r')',
+                         svg)
 
 
 def test_the_two_themes_differ_in_nothing_but_colour():
     """readme.py pairs them in one <picture> under a single alt text."""
-    light, dark = (header.render(CFG, {}, theme) for theme in c.THEMES)
-    assert height_of(light) == height_of(dark)
-    assert desc_of(light) == desc_of(dark)
+    light, dark = (header.render(CFG, DATA, theme) for theme in c.THEMES)
     assert light != dark
+    assert geometry(light, c.LIGHT) == geometry(dark, c.DARK)
 
 
-# --- accessibility and degrading -------------------------------------------
+# --- accessibility and degrading ----------------------------------------------
 
-def test_header_description_carries_name_role_and_tagline():
-    desc = desc_of(header.render(CFG, {}, c.LIGHT))
-    assert "Osniel Quintana" in desc
-    assert "platform engineer" in desc
-    assert "third line" in desc
+def test_the_description_names_the_values_it_draws():
+    """It is the README's alt text, so it carries the facts, not the layout."""
+    desc = desc_of(render())
+    assert desc == ("Osniel Quintana (@ozzycodes2), platform engineer. "
+                    "4 tagline lines. Current streak 3 days.")
+
+
+def test_the_description_drops_the_streak_sentence_when_there_is_no_streak():
+    assert desc_of(header.render(CFG, {}, c.LIGHT)).endswith("4 tagline lines.")
 
 
 def test_header_escapes_markup_in_the_name():
     cfg = {"identity": {**CFG["identity"], "name": 'A <b>& "B"'}}
-    svg = header.render(cfg, {}, c.LIGHT)
+    svg = header.render(cfg, DATA, c.LIGHT)
     assert "<b>" not in svg
     assert "&lt;b&gt;" in svg
 
 
-def test_header_with_an_empty_tagline():
+def test_header_with_an_empty_tagline_still_lands_on_the_grid():
     cfg = {"identity": {**CFG["identity"], "tagline": []}}
-    svg = header.render(cfg, {}, c.LIGHT)
+    svg = header.render(cfg, DATA, c.LIGHT)
     assert height_of(svg) % c.ROW == 0
+    assert "0 tagline lines" in desc_of(svg)
 
 
 def test_header_is_deterministic():
-    assert header.render(CFG, {}, c.LIGHT) == header.render(CFG, {}, c.LIGHT)
-
-
-def test_header_ignores_fetched_data():
-    """The headline is hand-written; nothing in data/ should reach it."""
-    assert header.render(CFG, {}, c.LIGHT) == \
-        header.render(CFG, {"stats": {"followers": 9000}}, c.LIGHT)
+    """The daily job commits only when a byte changed, so renders must repeat."""
+    assert render() == render()

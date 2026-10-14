@@ -28,18 +28,20 @@ def render(cfg, data, theme):
 | Name | Purpose |
 |---|---|
 | `slice_svg(theme, height, body, *, title, desc, text="", top=False, bottom=False, css="", defs="", width=W, rails="both")` | Wraps body markup in the frame. `height` **must** be a multiple of `ROW` (40). `title`/`desc` are the accessible name and description. `text` lists glyphs the body needs but does not literally contain. `width`/`rails` cut one row into side-by-side files — see rule 10. |
-| `ago(when, now=None)` | `"3 days ago"` for an ISO-8601 instant; `""` for a missing or unparseable one. Coarse by design; use it rather than formatting dates in a panel. |
+| `tx(x, y, text, *, fill, family, size, weight=None, ls=None, anchor=None)` | One `<text>` element, escaped, typed by presentation attribute. The way a panel draws a label. `family` is `MONO_STACK` or `SANS_STACK`. |
+| `ago(when, now=None)` | `"today"`, `"9d ago"`, `"14mo ago"`, `"3y ago"` for an ISO-8601 instant; `""` for a missing or unparseable one. Fits a card corner; use it rather than formatting dates in a panel. |
+| `num(value)` | Thousands-separated integer, for counters set in mono. |
 | `mix(a, b, t)` | `t` of colour `a` over `b`, as a literal hex. The way to get a shade between the theme's ink and its canvas. |
 | `Slice(file, markup, href=None)` | One output file, and the URL the README should wrap it in. `file` is a path *within* a theme directory. See rule 10. |
-| `title_bar(theme)` | Window chrome and title. Header panel only. Takes no y: the band caps the frame, so it shares the frame's top edge and radius. Its content ends at `MARGIN + TITLE_H`. |
-| `heading(theme, y, name, counter="")` | `~/section` header over a hairline rule; `counter` is right-aligned mono. Full-width slices only — it positions against `CONTENT_R`, so on a partial slice the counter lands outside the viewBox. Give a split row its own full-width heading slice. |
-| `stagger(rows, y0, line_height, delay=0.15, step=0.12)` | Wraps rows (markup containing `{y}`, or `None` for a spacer) in sequential fade-ins. Returns `(markup, next_y)`. |
+| `title_bar(theme, label)` | Window chrome, with `label` centred in mono 12. Header panel only. Takes no y: the band caps the frame, so it shares the frame's top edge and radius. Its content ends at `MARGIN + TITLE_H`. |
+| `foot_bar(theme, height)` | The mirror of it at the bottom, same depth and surface, no text. Footer panel only. |
+| `heading(theme, y, name, counter="")` | `~/section` header over a hairline rule; `counter` is right-aligned mono 12. Full-width slices only — it positions against `CONTENT_R`, so on a partial slice the counter lands outside the viewBox. Give a split row its own full-width heading slice. |
 | `to_grid(value)` | Rounds a height up to the next multiple of 40. |
-| `e(s)` | `html.escape`. Use on every interpolated string. |
+| `e(s)` | `html.escape`. `tx` applies it; use it directly on anything you interpolate by hand. |
 
 Geometry: `W` (880), `MARGIN` (16), `ROW` (40), `TEXT_X` (52), `FRAME_L` (16),
-`FRAME_R` (864), `CONTENT_R` (828), `TITLE_H` (44), and the shared radius ladder
-`R_INLINE` (5), `R_CONTROL` (11), `R_CARD` (18).
+`FRAME_R` (864), `CONTENT_R` (828), `TITLE_H` (44), and two radii — `R_CHIP` (5)
+and `R_CARD` (18).
 
 Two stroke weights: `EDGE_W` (1) for anything a panel draws, `RAIL_W` (2) for the
 frame rails only. The rails are heavier because they are the one stroke that
@@ -48,13 +50,20 @@ column width, and a 1px rail lands on one device column in a tall slice and
 spreads across two in a short one, so the frame steps at that seam. Panels do
 not draw rails — `slice_svg` does — so `EDGE_W` is the only one you need.
 
-Theme roles: `canvas` `surface` `sunken` `ink` `dim` `hairline` `accent`
-`on_accent`. `LIGHT` and `DARK` are the two instances, `THEMES` is both.
+Theme roles: `canvas` `surface` `ink` `dim` `faint` `hairline` `accent`. Three
+text tiers, not two — `ink` carries meaning, `dim` is supporting prose, `faint`
+is the label above a value and the counter beside a heading. `surface` is the one
+step above the canvas and the whole of this system's depth; there are no shadows.
+`LIGHT` and `DARK` are the two instances, `THEMES` is both.
 
-Type steps, as CSS classes and as `Step(size, weight, tracking)` constants:
-`display` (40/600), `heading` (24/600), `body` (16/400), `caption` (13/400),
-`mono` (14/400). Fill classes: `.ink .dim .accent`. Motion classes: `.ln`
-(fade-in), `.cursor` (blink), `.dot` (pulse).
+Type is set per element, as a presentation attribute through `tx`, not as a
+class. Two families — `MONO_STACK` and `SANS_STACK` — and the sizes a terminal
+needs: mono at 11/12/13/15/20/30 for everything structural, sans at 13/15/30 for
+the two runs of prose. These are not the token type scale, deliberately: the
+console speaks in its own voice. What the tokens supply is the families and the
+two radii.
+
+`.live` is the only class, and the only animation.
 
 ## Rules
 
@@ -65,19 +74,18 @@ Type steps, as CSS classes and as `Step(size, weight, tracking)` constants:
 3. **Body text starts at `x=TEXT_X`** (52) and the right edge of content is
    `CONTENT_R` (828). Stay inside that. Vertically: first baseline 38–44px
    below the slice top, ~28px of padding below the last element.
-4. **Use the five type steps, nothing else.** A panel that needs a size the
-   scale does not have is asking the wrong question — the console shares its
-   scale with the rest of the system, and a sixth step here puts it off that
-   scale. Only the mono face can be measured by character count: it advances
+4. **Set type through `tx`, at a size the console already uses.** The list above
+   is short on purpose; a size that is not on it should be one of the ones that
+   is. Only the mono face can be measured by character count: it advances
    `MONO_ADVANCE` (0.6em) per glyph, so anything whose width must be known
-   before it is drawn goes in `mono`. Truncate with `…` rather than overflow.
+   before it is drawn goes in mono. Truncate with `…` rather than overflow.
 5. **Never name a colour.** Every fill and stroke comes off `theme`. A
    hardcoded hex renders identically in both schemes and is therefore wrong in
    one of them. Shade with `mix(theme.ink, theme.canvas, t)`, not with
    `fill-opacity`, wherever the shapes overlap.
 6. **The accent is state, not decoration.** It is spent exactly once in the
-   whole console, on the live dot in `~/stats`. A panel that wants a second
-   colour wants a different design.
+   whole console, on the live dot beside the handle in the header. A panel that
+   wants a second colour wants a different design.
 7. **Never reference an external font, image, or stylesheet.** GitHub strips
    them. Everything inlines; `slice_svg` handles the font subset.
 8. **Escape all interpolated content** with `c.e(...)`.
@@ -86,9 +94,12 @@ Type steps, as CSS classes and as `Step(size, weight, tracking)` constants:
    README's `alt` attributes.
 10. **Degrade, don't crash.** Empty `data` or a missing key renders a short
     panel saying nothing is available, not a traceback.
-11. Respect `prefers-reduced-motion`: use the existing `.ln`/`.cursor`/`.dot`
-    classes rather than inline `animation:` shorthand, so the global override in
-    `slice_svg` disables them.
+11. **Nothing animates in.** GitHub paints a rendered SVG as a still at frame
+    zero, so an element that fades up from `opacity:0` is simply invisible. The
+    live dot is the sole exception and it works the other way round: it starts
+    opaque and `.live` only ever dims it. Use that class rather than an inline
+    `animation:`, so the `prefers-reduced-motion` override in `slice_svg`
+    reaches it.
 12. **Never emit `<a>`.** GitHub strips anchors from a rendered SVG, so a
     clickable region has to be its own file for the README to wrap. A panel
     needing that returns `Slice`s instead of markup, one per file, and splits
@@ -110,6 +121,9 @@ open assets/preview.html
 ```
 
 Both themes, side by side, each column stacked the way the README stacks it.
-A screenshot needs `--force-prefers-reduced-motion`: a CSS animation inside an
-`<img>` paints its first frame and stops, and `.ln` starts at `opacity:0`, so
-without it the panels come out blank.
+
+The panels are a port of the `Panels` tab in the `design-preview` site, whose
+`site/assets/panels.js` is the reference drawing. `tests/test_console.py`
+pins the seven theme roles against what that site's `panelTheme()` derives, and
+each panel's tests pin its geometry; a change here that is not also made there
+puts the two renderers out of agreement.

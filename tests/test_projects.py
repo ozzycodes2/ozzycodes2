@@ -1,10 +1,18 @@
 """Tests for the project cards, which are the only panel emitting many files."""
+import datetime
 import re
 
 import pytest
 
 from tools.profile import console as c
 from tools.profile.panels import projects
+
+NOW = datetime.datetime.now(datetime.timezone.utc)
+
+
+def days_ago(n):
+    return (NOW - datetime.timedelta(days=n)).isoformat().replace("+00:00", "Z")
+
 
 CFG = {"projects": [
     {"repo": "me/one", "name": "one", "blurb": "Short one.", "tags": ["Go", "CLI"]},
@@ -14,17 +22,13 @@ CFG = {"projects": [
     {"repo": "me/four", "name": "four", "blurb": "Fourth.", "tags": ["C"]},
 ]}
 DATA = {"projects": [
-    {"repo": "me/one", "language": "Go", "stars": 0, "pushed_at": "2026-08-01T00:00:00Z"},
-    {"repo": "me/two", "language": "Rust", "stars": 0, "pushed_at": "2019-01-01T00:00:00Z"},
+    {"repo": "me/one", "language": "Go", "stars": 0, "pushed_at": days_ago(9)},
+    {"repo": "me/two", "language": "Rust", "stars": 0, "pushed_at": days_ago(2000)},
     {"repo": "me/three", "language": "Zig", "stars": 0, "pushed_at": None},
 ]}
 
-# `.ink .dim .accent` for fill, the five type steps, `.ln .cursor .dot` for
-# motion. Everything else went with the two retired palettes.
-LIVE = {"ink", "dim", "accent", "display", "heading", "body", "caption", "mono",
-        "ln", "cursor", "dot"}
-
-INNER = projects.CARD_W - 2 * projects.PAD
+MONO = c.e(c.MONO_STACK)
+SANS = c.e(c.SANS_STACK)
 
 
 def by_file(cfg, data, theme=c.LIGHT):
@@ -45,10 +49,50 @@ def attr(markup, name):
     return re.search(rf'{name}="(-?\d+)"', markup).group(1)
 
 
+def paint(markup):
+    """The markup without its <style> block, for assertions about colour.
+
+    The inlined woff2 payloads are long enough that a bare `in` test against
+    the whole file could match a hex string inside the base64.
+    """
+    return re.sub(r"<style>.*?</style>", "", markup, flags=re.S)
+
+
+def rects(markup):
+    """Every <rect>, in draw order, as attribute dicts. The card is the first."""
+    return [dict(re.findall(r'([\w-]+)="([^"]*)"', m))
+            for m in re.findall(r"<rect ([^>]*)/>", markup)]
+
+
 def card_box(markup):
     """(x, y, width, height) of the card itself, in its own slice's coordinates."""
-    m = re.search(r'<rect x="(-?\d+)" y="(\d+)" width="(\d+)" height="(\d+)"', markup)
-    return tuple(int(v) for v in m.groups())
+    box = rects(markup)[0]
+    return tuple(int(box[k]) for k in ("x", "y", "width", "height"))
+
+
+def texts(markup):
+    """Every <text> as (attributes, content), in draw order."""
+    return [(dict(re.findall(r'([\w-]+)="([^"]*)"', head)), body)
+            for head, body in re.findall(r"<text ([^>]*)>([^<]*)</text>", markup)]
+
+
+def typeset(markup, family, size):
+    """(x, y, content) for every label set in one face and size."""
+    return [(int(a["x"]), int(a["y"]), body) for a, body in texts(markup)
+            if a["font-family"] == family and a["font-size"] == str(size)]
+
+
+def blurb_lines(markup):
+    """The wrapped blurb, in draw order. It is the only sans run on a card."""
+    return [body for _, _, body in typeset(markup, SANS, 13)]
+
+
+def chips(markup):
+    """(rect attributes, label attributes, label) per tag chip, in draw order."""
+    labels = [(a, body) for a, body in texts(markup)
+              if a["font-family"] == MONO and a["font-size"] == "11"
+              and "text-anchor" not in a]
+    return [(box, *label) for box, label in zip(rects(markup)[1:], labels)]
 
 
 def rail(markup):
@@ -68,21 +112,8 @@ def canvas(markup, theme=c.LIGHT):
     return int(m.group(1)), int(m.group(2))
 
 
-def blurb_lines(markup):
-    """The wrapped blurb, in draw order.
-
-    The tag line is set at the same step, so the two are told apart by where
-    they sit inside the card rather than by their class.
-    """
-    _, cy, _, _ = card_box(markup)
-    return [body for y, body in re.findall(
-        r'<text x="-?\d+" y="(\d+)" class="caption dim">([^<]*)</text>', markup)
-        if int(y) >= cy + projects.BLURB_DY]
-
-
-def classes(markup):
-    return {token for value in re.findall(r'class="([^"]*)"', markup)
-            for token in value.split()}
+def desc(markup):
+    return re.search(r'<desc id="d">([^<]*)</desc>', markup).group(1)
 
 
 # --- file set --------------------------------------------------------------
@@ -129,12 +160,15 @@ def test_every_card_is_the_same_height(out):
     assert int(heights.pop()) % c.ROW == 0
 
 
-def test_card_height_is_driven_by_the_longest_blurb():
-    """Entry two wraps to many lines, so it sets the height of all four."""
+def test_card_height_is_fixed_whatever_the_blurb_does():
+    """Height is the reference's 164 regardless of content: the two halves of a
+    row are separate files and cannot negotiate a height between them, and the
+    blurb is capped rather than allowed to grow the box."""
     short = by_file({"projects": CFG["projects"][:1]}, DATA)
     tall = by_file(CFG, DATA)
-    assert int(attr(tall["projects-1.svg"].markup, "height")) > \
-        int(attr(short["projects-1.svg"].markup, "height"))
+    assert attr(tall["projects-1.svg"].markup, "height") == \
+        attr(short["projects-1.svg"].markup, "height")
+    assert {card_box(m)[3] for m in cards(tall)} == {projects.CARD_H}
 
 
 def test_each_card_carries_the_repo_url_so_the_readme_can_anchor_it(out):
@@ -145,44 +179,145 @@ def test_each_card_carries_the_repo_url_so_the_readme_can_anchor_it(out):
 # --- card contents ---------------------------------------------------------
 
 def test_a_card_is_a_plain_rounded_rect_with_one_hairline_edge(out):
-    """The corner brackets are gone; the card is its own stroke now."""
+    """The card draws its own stroke at EDGE_W; only the frame rail is heavier."""
     for markup in cards(out):
-        assert markup.count("<rect") == 1
-        assert (f'rx="{c.R_CARD}" fill="{c.LIGHT.surface}" '
+        assert (f'width="{projects.CARD_W}" height="{projects.CARD_H}" '
+                f'rx="{c.R_CARD}" fill="{c.LIGHT.surface}" '
                 f'stroke="{c.LIGHT.hairline}" stroke-width="{c.EDGE_W}"') in markup
 
 
-def test_the_repo_name_is_set_at_the_body_step(out):
+def test_the_repo_name_is_mono_fifteen_bold_in_the_ink(out):
     one = out["projects-1.svg"].markup
-    x, cy, _, _ = card_box(one)
-    assert (f'<text x="{x + projects.PAD}" y="{cy + projects.NAME_DY}" '
-            f'class="body ink">one</text>') in one
+    x, y, _, _ = card_box(one)
+    assert (f'<text x="{x + projects.PAD}" y="{y + projects.NAME_DY}" '
+            f'fill="{c.LIGHT.ink}" font-family="{MONO}" font-size="15" '
+            f'font-weight="700">one</text>') in one
 
 
-def test_the_live_language_wins_over_the_hand_written_tag(out):
-    """profile.toml tags are prose; `language` is what GitHub actually reports."""
-    assert ">Zig<" in out["projects-3.svg"].markup
-    assert "ZIG" not in out["projects-3.svg"].markup    # the tag list is unaffected
+def test_the_age_is_end_anchored_at_the_cards_far_padding(out):
+    """It shares the name's baseline and is set a tier down, in faint mono 11,
+    so the corner reads as one line with the repo name leading it."""
+    one = out["projects-1.svg"].markup
+    x, y, _, _ = card_box(one)
+    assert (f'<text x="{x + projects.CARD_W - projects.PAD}" '
+            f'y="{y + projects.NAME_DY}" fill="{c.LIGHT.faint}" '
+            f'font-family="{MONO}" font-size="11" text-anchor="end">'
+            f'{c.ago(DATA["projects"][0]["pushed_at"])}</text>') in one
+
+
+def test_the_age_reads_as_an_abbreviated_span(out):
+    """`ago()` is console's, not the panel's: days under 45, then months, then
+    years, so the label always fits the card corner."""
+    assert ">9d ago<" in out["projects-1.svg"].markup
+    assert re.search(r">\d+(d|mo|y) ago<", out["projects-2.svg"].markup)
+
+
+def test_the_blurb_is_sans_thirteen_dim_on_a_nineteen_pixel_step(out):
+    one = out["projects-1.svg"].markup
+    x, y, _, _ = card_box(one)
+    assert typeset(one, SANS, 13) == [
+        (x + projects.PAD, y + projects.BLURB_DY, "Short one.")]
+    assert f'fill="{c.LIGHT.dim}" font-family="{SANS}" font-size="13"' in one
+
+    two = out["projects-2.svg"].markup
+    ys = [ly for _, ly, _ in typeset(two, SANS, 13)]
+    assert [b - a for a, b in zip(ys, ys[1:])] == [projects.LINE_H] * (len(ys) - 1)
+
+
+def test_the_blurb_is_capped_at_three_lines(out):
+    """A fourth line would print over the chips, which hang off the card's
+    bottom edge rather than following the text."""
+    lines = blurb_lines(out["projects-2.svg"].markup)
+    assert len(lines) == projects.BLURB_MAX
+    assert " ".join(lines) != " ".join(["word"] * 60)
+
+
+def test_blurb_is_wrapped_to_the_card_width(out):
+    lines = blurb_lines(out["projects-2.svg"].markup)
+    assert projects.BLURB_COLS == int((projects.CARD_W - 2 * projects.PAD) / 6.6)
+    assert max(len(line) for line in lines) <= projects.BLURB_COLS
+
+
+def test_an_unbreakable_blurb_overhangs_rather_than_being_cut_mid_token():
+    """The reference's wrap() breaks on whitespace only. A single word wider
+    than the card is left whole: a clipped repo name is worse than a long one."""
+    lines = blurb_lines(
+        by_file({"projects": [{"repo": "me/one", "blurb": "x" * 200}]},
+                DATA)["projects-1.svg"].markup)
+    assert lines == ["x" * 200]
+
+
+def test_a_blurb_is_wrapped_on_spaces_and_not_on_hyphens():
+    lines = blurb_lines(by_file(
+        {"projects": [{"repo": "me/one", "blurb": "hand-written " + "word " * 20}]},
+        DATA)["projects-1.svg"].markup)
+    assert lines[0].startswith("hand-written word")
+
+
+# --- tag chips -------------------------------------------------------------
+
+def test_a_chip_is_a_tinted_rect_sized_to_its_label(out):
+    """Width is the label measured at the mono advance plus the two paddings,
+    which is the only reason the chips can be laid out without a text metric."""
+    one = out["projects-1.svg"].markup
+    x, y, _, _ = card_box(one)
+    box, label, body = chips(one)[0]
+    assert body == "Go"
+    assert int(box["width"]) == round(2 * projects.GLYPH) + 2 * projects.CHIP_PAD
+    assert (int(box["x"]), int(box["y"])) == (x + projects.PAD, y + projects.CHIP_DY)
+    assert (box["height"], box["rx"]) == (str(projects.CHIP_H), str(c.R_CHIP))
+    assert (box["fill"], box["opacity"]) == (c.LIGHT.ink, str(projects.CHIP_TINT))
+    assert (int(label["x"]), int(label["y"])) == \
+        (x + projects.PAD + projects.CHIP_PAD, y + projects.CHIP_BASE)
+    assert (label["fill"], label["font-size"]) == (c.LIGHT.dim, "11")
+
+
+def test_chips_run_along_a_row_with_a_fixed_gap_between_them(out):
+    one = out["projects-1.svg"].markup
+    first, second = chips(one)
+    assert int(second[0]["x"]) - (int(first[0]["x"]) + int(first[0]["width"])) \
+        == projects.CHIP_GAP
+    assert first[0]["y"] == second[0]["y"]
+
+
+def test_the_chip_row_stays_inside_the_cards_padding(out):
+    for markup in cards(out):
+        x, _, width, _ = card_box(markup)
+        for box, _, _ in chips(markup):
+            assert x + projects.PAD <= int(box["x"])
+            assert int(box["x"]) + int(box["width"]) <= x + width - projects.PAD
+
+
+def test_the_live_language_leads_the_chips(out):
+    """profile.toml names tags as prose; `language` is what GitHub reports, and
+    a repo with no hand-written tags still gets that one chip."""
+    assert [body for _, _, body in chips(out["projects-3.svg"].markup)] == ["Zig"]
+
+
+def test_the_language_is_not_repeated_as_its_own_chip(out):
+    """Entry one is tagged Go and reported as Go; that is one chip, not two."""
+    assert [body for _, _, body in chips(out["projects-1.svg"].markup)] == ["Go", "CLI"]
+
+
+def test_tags_are_drawn_as_written_rather_than_upper_cased(out):
+    assert ">Go<" in out["projects-1.svg"].markup
+    assert ">GO<" not in out["projects-1.svg"].markup
+
+
+def test_a_card_without_tags_or_a_language_draws_no_chips():
+    markup = by_file({"projects": [{"repo": "me/unfetched", "blurb": "x"}]},
+                     DATA)["projects-1.svg"].markup
+    assert rects(markup) == rects(markup)[:1]
 
 
 def test_a_repo_absent_from_the_fetched_data_still_renders(out):
+    """Its card loses the age and the language chip and keeps everything else;
+    a hand-written entry is not contingent on the fetch having reached it."""
     four = out["projects-4.svg"].markup
-    assert "four" in four
-    assert "—" in four                            # language placeholder
-    assert "updated" not in four
-
-
-def test_relative_update_line_is_rendered(out):
-    assert "updated" in out["projects-1.svg"].markup
-    assert re.search(r"updated \d+ (month|year)s? ago", out["projects-2.svg"].markup)
-
-
-def test_the_footer_is_a_mono_language_and_a_caption_stamp(out):
-    """The accent square that used to sit before the language is gone."""
-    one = out["projects-1.svg"].markup
-    assert 'class="mono ink">Go</text>' in one
-    assert 'text-anchor="end" class="caption dim">updated 2 months ago</text>' in one
-    assert f'fill="{c.LIGHT.accent}"' not in one
+    assert "four" in four and "Fourth." in four
+    assert [body for _, _, body in chips(four)] == ["C"]
+    assert "text-anchor=\"end\"" not in four
+    assert "ago" not in c.visible(four)
 
 
 def test_star_count_is_never_drawn(out):
@@ -192,56 +327,20 @@ def test_star_count_is_never_drawn(out):
         assert not re.search(r"★|\b0 \b", c.visible(markup))
 
 
-def test_tags_are_one_caption_line_joined_with_a_middot(out):
-    assert 'class="caption dim">GO · CLI</text>' in out["projects-1.svg"].markup
+# --- restraint -------------------------------------------------------------
 
-
-def test_a_card_without_tags_leaves_no_empty_line_behind(out):
-    three = out["projects-3.svg"].markup
-    _, cy, _, _ = card_box(three)
-    assert f'y="{cy + projects.TAGS_DY}"' not in three
-
-
-# --- blurb wrapping --------------------------------------------------------
-
-def test_blurb_is_wrapped_to_the_card_width(out):
-    lines = blurb_lines(out["projects-2.svg"].markup)
-    assert len(lines) > 1
-    assert max(len(line) for line in lines) <= projects.BLURB_COLS
-
-
-def test_wrap_width_fits_inside_the_card():
-    """The blurb is proportional sans and cannot be measured by character
-    count, so the column figure is deliberately pessimistic: 0.62em a glyph is
-    more than Inter's average lowercase advance, which wraps a line short of
-    the card rather than past it."""
-    assert projects.BLURB_COLS * projects.BLURB_PX * 0.62 <= INNER
-
-
-def test_no_blurb_line_runs_past_the_cards_inner_width(out):
-    """Checked line by line, not just as a column count: wrap() breaks on
-    spaces, so a line of short words is the one that comes closest."""
+def test_the_panel_spends_no_accent(out):
+    """The accent is state, and the only state on the page is the header's dot."""
     for markup in cards(out):
-        for line in blurb_lines(markup):
-            assert len(line) * projects.BLURB_PX * 0.62 <= INNER, line
+        assert c.LIGHT.accent not in paint(markup)
 
 
-def test_an_unbreakable_blurb_is_hard_wrapped_rather_than_overhanging():
-    lines = blurb_lines(
-        by_file({"projects": [{"repo": "me/one", "blurb": "x" * 200}]},
-                DATA)["projects-1.svg"].markup)
-    assert len(lines) > 1
-    for line in lines:
-        assert len(line) * projects.BLURB_PX * 0.62 <= INNER, line
-
-
-def test_the_blurb_stops_above_the_footer_rule(out):
-    """The footer hangs off the card's bottom rather than off the blurb, so a
-    blurb that grew into it would print over the rule instead of moving it."""
+def test_nothing_on_a_card_animates(out):
+    """A rendered SVG is painted at frame zero, so a staggered fade-in is simply
+    an invisible card on GitHub."""
     for markup in cards(out):
-        _, cy, _, height = card_box(markup)
-        last = cy + projects.BLURB_DY + (len(blurb_lines(markup)) - 1) * projects.LINE_H
-        assert last + projects.BLURB_TAIL <= cy + height - projects.FOOT_H
+        assert "animation-delay" not in markup
+        assert 'class="ln"' not in markup and 'class="live"' not in markup
 
 
 # --- geometry --------------------------------------------------------------
@@ -264,6 +363,17 @@ def test_the_gap_between_a_pair_straddles_the_seam(out):
     assert (c.W // 2 + rx) - (lx + lw) == projects.GAP
 
 
+def test_the_card_is_centred_in_its_slice(out):
+    """A slice height must be a multiple of ROW and 164 is not, so the card sits
+    inside the row with the remainder split evenly above and below it — which is
+    the one place this panel's rhythm differs from the single-slice reference."""
+    assert projects.SLICE_H % c.ROW == 0
+    for markup in cards(out):
+        _, y, _, height = card_box(markup)
+        assert y == projects.TOP
+        assert projects.SLICE_H - (y + height) == y
+
+
 def test_every_line_of_text_sits_within_its_own_cards_padding(out):
     for markup in cards(out):
         x, _, width, _ = card_box(markup)
@@ -282,30 +392,28 @@ def test_both_themes_render_a_complete_card(out, theme):
     assert blurb_lines(markup) == blurb_lines(out["projects-1.svg"].markup)
     assert f'fill="{theme.surface}" stroke="{theme.hairline}"' in markup
     assert f'fill="{theme.canvas}"' in markup
-    assert f".ink{{fill:{theme.ink}}}.dim{{fill:{theme.dim}}}" in markup
-    for part in ("one", "GO · CLI", "Short one.", "Go", "updated 2 months ago"):
+    assert f'fill="{theme.ink}" font-family="{MONO}" font-size="15"' in markup
+    assert f'fill="{theme.dim}" font-family="{SANS}" font-size="13"' in markup
+    assert f'fill="{theme.faint}" font-family="{MONO}" font-size="11"' in markup
+    for part in ("one", "Go", "CLI", "Short one.", "9d ago"):
         assert part in markup
-
-
-@pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
-def test_cards_name_only_classes_the_new_systems_keep(theme):
-    for entry in projects.render(CFG, DATA, theme):
-        assert classes(entry.markup) <= LIVE, classes(entry.markup) - LIVE
-        for gone in ("glow", "soft", "grid"):
-            assert f"url(#{gone})" not in entry.markup
 
 
 # --- accessibility ---------------------------------------------------------
 
 def test_desc_spells_out_the_values_it_draws(out):
-    desc = re.search(r"<desc id=\"d\">([^<]*)</desc>", out["projects-1.svg"].markup).group(1)
-    assert "one" in desc and "Go" in desc and "updated" in desc
-    assert "Short one." in desc and "CLI" in desc
+    d = desc(out["projects-1.svg"].markup)
+    assert "one" in d and "Go" in d and "updated" in d
+    assert "Short one." in d and "CLI" in d
+
+
+def test_desc_carries_the_whole_blurb_even_though_the_card_truncates_it(out):
+    """A screen reader has the room three lines of 13px sans do not."""
+    assert desc(out["projects-2.svg"].markup).endswith(" ".join(["word"] * 60))
 
 
 def test_the_heading_desc_counts_the_repos_it_announces(out):
-    desc = re.search(r"<desc id=\"d\">([^<]*)</desc>", out["projects.svg"].markup).group(1)
-    assert "4 public repositories" in desc
+    assert "4 public repositories" in desc(out["projects.svg"].markup)
 
 
 # --- degrading -------------------------------------------------------------
@@ -315,6 +423,7 @@ def test_the_heading_desc_counts_the_repos_it_announces(out):
     ({"projects": []}, DATA),
     (CFG, {}),
     (CFG, {"projects": []}),
+    (CFG, {"projects": ["not a record"]}),
 ])
 def test_missing_inputs_render_one_short_panel_instead_of_raising(cfg, data):
     out = by_file(cfg, data)

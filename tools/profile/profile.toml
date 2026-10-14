@@ -14,17 +14,12 @@ tagline = [
 ]
 
 [city]
-# Days of contribution history the skyline draws. Shorter windows mean fewer
-# weeks, so the buildings get bigger and the strip still fills the frame — the
-# panel height does not change.
+# Days of contribution history the skyline draws. A tile is a fixed 44x22, so a
+# longer window does not shrink the blocks — it widens the plane, and the plane
+# is centred for 26 weeks. Much past 182 days it runs off the right rail.
 #
-# 180, which is where two constraints cross. Tiles have to be small for a
-# building to stand taller than its own footprint and read as a tower at all —
-# at 120 days they are 65px across and the plane looks like paving slabs with
-# lids. But this profile's activity is concentrated in the last four months, so
-# a full year is two thirds bare ground. 180 days puts 48px across a tile for a
-# tower 2.7 times its width, keeps 1,301 of the year's 1,303 contributions, and
-# leaves only the far third of the plane undeveloped.
+# 180 keeps 1,301 of the year's 1,303 contributions and sits 11px left of
+# centre. A full year would be two thirds bare ground and half of it off-frame.
 window_days = 180
 
 [stack]

@@ -1,46 +1,55 @@
-"""Top slice: window chrome, name, role, tagline."""
+"""Top slice: window chrome, name, handle, role, tagline, live streak."""
 from .. import console as c
 
+NAME_Y = 104      # the one display-size baseline; everything hangs off it
+META_Y = 130      # handle · role, and the streak opposite it
+TAGLINE_Y = 176
+LINE_H = 22
+MAX_LINES = 4     # beyond four the slice stops reading as a headline
 
-def render(cfg, _data, theme):
+STREAK_SIZE = 13
+
+
+def render(cfg, data, theme):
     ident = cfg["identity"]
     name, handle = ident["name"], ident["handle"]
-    role, tagline = ident["role"], ident["tagline"]
+    role = ident["role"]
+    lines = list(ident["tagline"])[:MAX_LINES]
+    streak = (data.get("stats") or {}).get("streak_current")
 
-    y = 96
-    body = [c.title_bar(theme)]
+    body = [
+        c.title_bar(theme, f"{handle} — zsh"),
+        c.tx(c.TEXT_X, NAME_Y, name, fill=theme.ink, family=c.SANS_STACK,
+             size=30, weight=600, ls="-0.5"),
+        c.tx(c.TEXT_X, META_Y, f"@{handle} · {role}", fill=theme.dim,
+             family=c.MONO_STACK, size=13),
+    ]
 
-    prompt = (f'<text x="{c.TEXT_X}" y="{{y}}" class="mono dim">'
-              f'<tspan>❯</tspan><tspan dx="8">whoami</tspan></text>')
-    rows = [prompt, None]
-    markup, y = c.stagger(rows, y, 26)
-    body.append(markup)
+    if streak is None:
+        tail = ""
+    else:
+        label = f"{streak}-day streak"
+        # Mono advances 0.6em, so an end-anchored run of n characters starts
+        # 0.6·n·size back from the right edge — which is where the dot goes.
+        dot_x = c.CONTENT_R - round(len(label) * STREAK_SIZE * c.MONO_ADVANCE) - 12
+        body += [
+            # The one live fact on the page, and the only thing wearing the accent.
+            f'<circle class="live" cx="{dot_x}" cy="{META_Y - 5}" r="4" '
+            f'fill="{theme.accent}"/>',
+            c.tx(c.CONTENT_R, META_Y, label, fill=theme.ink,
+                 family=c.MONO_STACK, size=13, anchor="end"),
+        ]
+        tail = f" Current streak {streak} days."
 
-    # The name is the one element at display size; everything else hangs off
-    # its baseline.
-    body.append(f'''<g class="ln" style="animation-delay:0.40s">
-<text x="{c.TEXT_X}" y="{y + 28}" class="display ink">{c.e(name)}</text>
-</g>''')
-    y += 28 + 30
+    last_y = META_Y
+    for i, line in enumerate(lines):
+        last_y = TAGLINE_Y + i * LINE_H
+        body.append(c.tx(c.TEXT_X, last_y, line, fill=theme.dim,
+                         family=c.SANS_STACK, size=15))
 
-    body.append(f'''<g class="ln" style="animation-delay:0.52s">
-<text x="{c.TEXT_X}" y="{y}" class="mono"><tspan class="dim">{c.e(handle)}</tspan><tspan class="dim" dx="10">·</tspan><tspan class="ink" dx="10">{c.e(role)}</tspan></text>
-</g>''')
-    y += 36
-
-    lines = [f'<text x="{c.TEXT_X}" y="{{y}}" class="body dim">{c.e(line)}</text>'
-             for line in tagline]
-    markup, y = c.stagger(lines, y, 26, delay=0.56)
-    body.append(markup)
-
-    body.append(f'''<g class="ln" style="animation-delay:{0.56 + (len(tagline) + 1) * 0.12:.2f}s">
-<text x="{c.TEXT_X}" y="{y + 14}" class="mono dim"><tspan>❯</tspan><tspan class="ink cursor" dx="10">▌</tspan></text>
-</g>''')
-
-    height = c.to_grid(y + 44)
-    desc = f"{name} — {role}. " + " ".join(tagline)
     return c.slice_svg(
-        theme, height, "\n".join(body),
-        title=f"{name} ({handle})", desc=desc,
-        text="❯▌·—", top=True,
+        theme, c.to_grid(last_y + 28), "\n".join(body),
+        title="Profile header",
+        desc=f"{name} (@{handle}), {role}. {len(lines)} tagline lines.{tail}",
+        top=True,
     )
