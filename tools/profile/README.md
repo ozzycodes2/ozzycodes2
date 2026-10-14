@@ -8,7 +8,7 @@ a GitHub Action regenerates once a day and commits.
 
 ```
 profile.toml ─┐
-              ├─> render.py ─> assets/*.svg ─> readme.py ─> README.md
+              ├─> render.py ─> assets/{light,dark}/*.svg ─> readme.py ─> README.md
 fetch.py ─────┘                 + manifest.json
    │
    └─> data/*.json
@@ -17,7 +17,8 @@ fetch.py ─────┘                 + manifest.json
 | Step | Reads | Writes |
 |---|---|---|
 | `fetch.py` | the public profile page, GitHub GraphQL API | `data/stats.json`, `calendar.json`, `projects.json` |
-| `render.py` | `profile.toml`, `data/*.json` | `assets/**.svg`, `data/manifest.json` |
+| `render.py` | `profile.toml`, `data/*.json` | `assets/<theme>/**.svg`, `data/manifest.json` |
+| `preview.py` | `data/manifest.json` | `assets/preview.html` — both themes side by side |
 | `readme.py` | `data/manifest.json` | the block between the markers in `README.md` |
 
 Each step is independently runnable, and only the step that owns a file ever
@@ -35,18 +36,35 @@ right trade.
 GitHub sanitises SVG it renders in markdown. It strips `<script>`, external
 `<link>`, and `url()` pointing off-origin, and it does not run SMIL. It *does*
 keep inline `<style>`, CSS animations, filters, and `data:` URLs. That is why
-every slice embeds its own base64 woff2 subset of JetBrains Mono: a webfont
-reference would simply be dropped and the panels would fall back to whatever
-monospace the viewer has.
+every slice embeds its own base64 woff2 subset of the faces it uses: a webfont
+reference would simply be dropped and the panels would fall back to whatever the
+viewer happens to have.
+
+Inter is embedded for that reason. SF Mono is not, because it is not
+redistributable — the mono stack asks for it first, which resolves on macOS, and
+falls back to an embedded JetBrains Mono subset everywhere else.
 
 ## Why the window is sliced
 
 A single tall SVG could not be partly clickable — one image, one link. Slicing
 the frame into consecutive images lets the README wrap individual slices in
 their own `<a>`, which is how the project cards work. Each slice
-redraws the side rails and the background grid, and because every height is a
-multiple of 40px the grid lines up across the seams; only the first slice draws
-the top edge, only the last closes the frame.
+redraws the side rails, and because every height is a multiple of 40px the seams
+land on the grid; only the first slice caps the top and draws the title bar,
+only the last closes the frame.
+
+## Why there are two of everything
+
+The console is drawn from two design systems: the light theme is the Mine v2
+token set, the dark theme is Mine's. Panels name roles, never colours, so one
+renderer produces both — `render.py` runs every panel once per theme and
+`readme.py` pairs the output in a `<picture>` with a
+`prefers-color-scheme: dark` source, which GitHub honours. Light is the `<img>`
+fallback, so a client that ignores `<picture>` still gets a readable console.
+
+Type is Mine v2's five steps in both themes. The systems differ in palette and
+depth, not in how they name type, and a console that changed size with the
+colour scheme would be two designs rather than one in two finishes.
 
 ## Adding or changing a panel
 
@@ -54,8 +72,10 @@ Content that is prose lives in `profile.toml` — headline, the stack table,
 project blurbs. Editing it and pushing is enough; the workflow re-renders
 on any change under `tools/profile/`.
 
-A new panel is a module in `panels/` exposing `render(cfg, data)`, registered in
-`render.py`'s `PANELS` list. `panels/CONTRACT.md` is the API and the rules about
+A new panel is a module in `panels/` exposing `render(cfg, data, theme)`,
+registered in `render.py`'s `PANELS` list. It must read every colour off the
+theme it is handed; a hardcoded hex renders the same in both schemes and will be
+wrong in one of them. `panels/CONTRACT.md` is the API and the rules about
 heights, rails, escaping, and accessible descriptions.
 
 ## Running it locally
@@ -64,12 +84,18 @@ heights, rails, escaping, and accessible descriptions.
 python -m venv .venv && .venv/bin/pip install fonttools==4.62.1 brotli==1.2.0
 GITHUB_TOKEN=$(gh auth token) .venv/bin/python tools/profile/fetch.py
 .venv/bin/python tools/profile/render.py
+.venv/bin/python tools/profile/preview.py   # assets/preview.html, both themes
 .venv/bin/python tools/profile/readme.py
 ```
 
-`render.py` and `readme.py` need no token. To preview without pushing, open the
-SVGs directly — but note the fade-in animations mean a screenshot taken at t=0
-shows an empty frame. Force reduced motion to see the final state.
+`render.py`, `preview.py` and `readme.py` need no token. The README cannot be
+previewed as the README — GitHub picks one theme and the other stays hidden — so
+`preview.py` writes a page carrying both.
+
+A slice is rendered into an `<img>`, where a CSS animation paints its first
+frame and stops. Since `.ln` starts at `opacity:0`, a screenshot taken without
+forcing reduced motion shows an empty frame; Chrome needs
+`--force-prefers-reduced-motion` to show the final state.
 
 ## Why the contribution counts come from a web page
 
@@ -130,8 +156,9 @@ two things would otherwise break:
 
 - `fontTools` stamps a build timestamp into the font tables, so the subsetter is
   called with `recalcTimestamp=False`.
-- The city's starfield comes from a fixed linear congruential sequence rather
-  than `random`, which would reshuffle the sky on every run.
+- Every value the city derives comes from the calendar itself, never from
+  `random` or from the order in which blocks were emitted, so one extra
+  contribution does not reshuffle the plan and rewrite every file.
 
 `fonttools` and `brotli` are pinned in the workflow for the same reason: a minor
 upgrade can change how a subset is packed and rewrite every file.

@@ -12,30 +12,31 @@ from .. import console as c
 
 HALF = c.W // 2
 GAP = 24                                    # between the cards, straddling the seam
-CONTENT_R = c.FRAME_R - 36                  # right edge of body content, per the contract
-CARD_W = ((CONTENT_R - c.TEXT_X) - GAP) // 2
-PAD = 16                                    # card border to its own text
+CARD_W = ((c.CONTENT_R - c.TEXT_X) - GAP) // 2
+PAD = 18                                    # card edge to its own text
 
-# Blurbs run at 13px; monospace advances 0.6em, so the wrap width is a
-# character count, not a pixel one. textwrap is the only thing deciding how
-# tall a card gets, which is why every card is measured before any is drawn.
-BLURB_PX = 13
-BLURB_COLS = int((CARD_W - 2 * PAD) // (BLURB_PX * 0.6))
-LINE_H = 18
+# Blurbs are prose, so they are set in the sans face — which cannot be measured
+# by character count the way the mono face can. textwrap still needs a column
+# count, so this assumes 0.62em per glyph: more than Inter's average lowercase
+# advance and less than its widest, which wraps a line or two short of the
+# available width rather than past it.
+BLURB_PX = c.CAPTION.size
+BLURB_COLS = int((CARD_W - 2 * PAD) // (BLURB_PX * 0.62))
+LINE_H = 19
 
-NAME_DY = 30                                # card top to repo-name baseline
-TAGS_DY = 52
-BLURB_DY = 78
-BLURB_TAIL = 14                             # breathing room under the last blurb line
-FOOT_H = 40                                 # rule, footer line and bottom padding
+NAME_DY = 32                                # card top to repo-name baseline
+TAGS_DY = 54
+BLURB_DY = 80
+BLURB_TAIL = 16                             # breathing room under the last blurb line
+FOOT_H = 42                                 # rule, footer line and bottom padding
 VPAD = 24                                   # slice edge to card, before centring
 
 
-def render(cfg, data):
+def render(cfg, data, theme):
     entries = cfg.get("projects") or []
     live = {r.get("repo"): r for r in data.get("projects") or [] if isinstance(r, dict)}
     if not entries or not live:
-        return [c.Slice("projects.svg", _unavailable(len(entries)))]
+        return [c.Slice("projects.svg", _unavailable(theme, len(entries)))]
 
     cards = [_measure(entry, live.get(entry.get("repo"), {})) for entry in entries]
 
@@ -46,7 +47,7 @@ def render(cfg, data):
     slice_h = c.to_grid(card_h + 2 * VPAD)
     top = (slice_h - card_h) // 2
 
-    out = [c.Slice("projects.svg", _heading_slice(len(cards)))]
+    out = [c.Slice("projects.svg", _heading_slice(theme, len(cards)))]
     for i, (card, entry) in enumerate(zip(cards, entries)):
         # Even index sits left of the seam and owns the left rail; odd sits
         # right. The right card's own origin is the seam, hence the shifted x.
@@ -55,7 +56,7 @@ def render(cfg, data):
         out.append(c.Slice(
             f"projects-{i + 1}.svg",
             c.slice_svg(
-                slice_h, _card(card, x, top, card_h),
+                theme, slice_h, _card(theme, card, x, top, card_h),
                 title=f"{card['name']} — {card['language']}",
                 desc=card["desc"], text="·",
                 width=HALF, rails="left" if left else "right",
@@ -90,62 +91,50 @@ def _measure(entry, record):
             "blurb": blurb, "desc": f"{desc}. {entry.get('blurb') or ''}".strip()}
 
 
-def _card(card, x, y, height):
+def _card(theme, card, x, y, height):
     tx, inner = x + PAD, CARD_W - 2 * PAD
-    right = x + CARD_W
     bottom = y + height
 
-    # Brackets on opposing corners instead of a closed bevel — the box reads as
-    # a terminal selection rather than as a UI card.
-    ticks = (f'<path d="M{x} {y + 16}V{y}H{x + 16}"/>'
-             f'<path d="M{right - 16} {bottom}H{right}V{bottom - 16}"/>')
-    box = (f'<rect x="{x}" y="{y}" width="{CARD_W}" height="{height}" fill="{c.ACCENT}" fill-opacity=".03" '
-           f'stroke="{c.ACCENT}" stroke-opacity=".22"/>'
-           f'<g fill="none" stroke="{c.ACCENT}" stroke-width="2" opacity=".75">{ticks}</g>'
-           f'<g fill="none" stroke="{c.ACCENT}" stroke-width="2" opacity=".5" filter="url(#soft)">{ticks}</g>')
+    box = (f'<rect x="{x}" y="{y}" width="{CARD_W}" height="{height}" rx="{c.R_CARD}" '
+           f'fill="{theme.surface}" stroke="{theme.hairline}" stroke-width="{c.EDGE_W}"/>')
 
-    name = (f'<text x="{tx}" y="{y + NAME_DY}" font-weight="700" fill="{c.ACCENT}" filter="url(#soft)" opacity=".55" style="font-size:16px">{c.e(card["name"])}</text>'
-            f'<text x="{tx}" y="{y + NAME_DY}" font-weight="700" class="wh" style="font-size:16px">{c.e(card["name"])}</text>')
+    name = f'<text x="{tx}" y="{y + NAME_DY}" class="body ink">{c.e(card["name"])}</text>'
 
-    spans = []
-    for i, tag in enumerate(card["tags"]):
-        if i:
-            spans.append('<tspan class="faint" dx="7">·</tspan>')
-        spans.append(f'<tspan class="alt" dx="{7 if i else 0}" opacity=".85">{c.e(tag.upper())}</tspan>')
-    tags = (f'<text x="{tx}" y="{y + TAGS_DY}" style="font-size:11px" letter-spacing=".8">{"".join(spans)}</text>'
-            if spans else "")
+    tags = (f'<text x="{tx}" y="{y + TAGS_DY}" class="caption dim">'
+            f'{c.e(" · ".join(t.upper() for t in card["tags"]))}</text>'
+            if card["tags"] else "")
 
     blurb = "\n".join(
-        f'<text x="{tx}" y="{y + BLURB_DY + i * LINE_H}" class="dim" style="font-size:{BLURB_PX}px">{c.e(line)}</text>'
+        f'<text x="{tx}" y="{y + BLURB_DY + i * LINE_H}" class="caption dim">{c.e(line)}</text>'
         for i, line in enumerate(card["blurb"])
     )
 
     # The footer hangs off the card's bottom, not off the blurb, so it lands on
     # the same baseline in all four cards however short the blurb wrapped.
     fy = bottom - 18
-    foot = (f'<line x1="{tx}" y1="{bottom - 40}" x2="{tx + inner}" y2="{bottom - 40}" stroke="{c.ACCENT}" stroke-opacity=".16"/>'
-            f'<rect x="{tx}" y="{fy - 8}" width="7" height="7" fill="{c.ACCENT}" opacity=".8"/>'
-            f'<text x="{tx + 15}" y="{fy}" class="ac" style="font-size:12px">{c.e(card["language"])}</text>')
+    foot = (f'<line x1="{tx}" y1="{bottom - 42}" x2="{tx + inner}" y2="{bottom - 42}" '
+            f'stroke="{theme.hairline}" stroke-width="{c.EDGE_W}" shape-rendering="crispEdges"/>'
+            f'<text x="{tx}" y="{fy}" class="mono ink">{c.e(card["language"])}</text>')
     if card["updated"]:
-        foot += (f'<text x="{tx + inner}" y="{fy}" text-anchor="end" class="faint" '
-                 f'style="font-size:12px">{c.e(card["updated"])}</text>')
+        foot += (f'<text x="{tx + inner}" y="{fy}" text-anchor="end" class="caption dim">'
+                 f'{c.e(card["updated"])}</text>')
 
     return f'<g class="ln" style="animation-delay:0.20s">{box}\n{name}\n{tags}\n{blurb}\n{foot}</g>'
 
 
-def _heading_slice(n):
+def _heading_slice(theme, n):
     """`~/projects` on its own full-width row, so the title is not inside a link."""
-    body = c.heading(52, "projects", f"[ {n} REPOS ]")
+    body = c.heading(theme, 52, "projects", f"{n} repos")
     return c.slice_svg(
-        c.to_grid(72), body,
+        theme, c.to_grid(72), body,
         title="~/projects", desc=f"Section heading: projects, {n} public repositories.",
     )
 
 
-def _unavailable(n):
-    body = c.heading(52, "projects", f"[ {n} REPOS ]") + (
-        f'<text x="{c.TEXT_X}" y="96" class="dim">No repository data available.</text>')
+def _unavailable(theme, n):
+    body = c.heading(theme, 52, "projects", f"{n} repos") + (
+        f'<text x="{c.TEXT_X}" y="96" class="body dim">No repository data available.</text>')
     return c.slice_svg(
-        c.to_grid(128), body,
+        theme, c.to_grid(128), body,
         title="~/projects", desc="Projects section: no repository data available.",
     )

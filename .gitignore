@@ -2,3 +2,7 @@
 __pycache__/
 .pytest_cache/
 .coverage
+
+# Local side-by-side theme preview. The workflow's `git add assets` would
+# otherwise commit it on every run.
+assets/preview.html

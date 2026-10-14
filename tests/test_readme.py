@@ -49,26 +49,48 @@ def test_rows_of_empty_manifest():
 
 # --- img markup ------------------------------------------------------------
 
-def test_img_without_href_is_a_bare_tag():
+def test_img_without_href_is_a_bare_picture():
     out = readme.img(entry("a.svg"))
-    assert out.startswith("<img") and "<a " not in out
+    assert out.startswith("<picture>") and out.endswith("</picture>")
+    assert "<a " not in out
 
 
-def test_img_with_href_is_wrapped_in_an_anchor():
+def test_img_with_href_wraps_the_whole_picture_in_an_anchor():
+    """An SVG sits inside one anchor, so the link has to contain both themes."""
     out = readme.img(entry("a.svg", href="https://example.com/x"))
-    assert out.startswith('<a href="https://example.com/x">')
-    assert out.endswith("</a>")
+    assert out.startswith('<a href="https://example.com/x"><picture>')
+    assert out.endswith("</picture></a>")
+
+
+def test_img_offers_a_dark_source_before_the_light_fallback():
+    """GitHub honours prefers-color-scheme on a <source>; <img> covers the rest."""
+    out = readme.img(entry("a.svg"))
+    assert '<source media="(prefers-color-scheme: dark)" ' \
+           'srcset="./assets/dark/a.svg">' in out
+    assert out.index("<source") < out.index("<img")
+    assert 'src="./assets/light/a.svg"' in out
+
+
+def test_img_keeps_the_width_and_the_top_alignment_on_the_img():
+    """The <img> is the element that is laid out, so the row aligns on it."""
+    out = readme.img(entry("a.svg", "50%"))
+    assert re.search(r'<img src="[^"]*" width="50%" align="top" alt="[^"]*">', out)
+    assert "align" not in out.split("<img")[0]
 
 
 def test_img_escapes_quotes_in_the_description():
     out = readme.img(entry("a.svg", desc='He said "hi" & left'))
     assert "&quot;hi&quot;" in out and "&amp;" in out
     # A raw quote inside alt="" would terminate the attribute early.
-    assert re.fullmatch(r'<img src="[^"]*" width="[^"]*" align="top" alt="[^"]*">', out)
+    assert re.fullmatch(
+        r'<picture><source media="[^"]*" srcset="[^"]*">'
+        r'<img src="[^"]*" width="[^"]*" align="top" alt="[^"]*"></picture>', out)
 
 
-def test_img_points_into_the_assets_directory():
-    assert 'src="./assets/links/mail.svg"' in readme.img(entry("links/mail.svg"))
+def test_img_points_into_both_themed_asset_directories():
+    out = readme.img(entry("links/mail.svg"))
+    assert 'srcset="./assets/dark/links/mail.svg"' in out
+    assert 'src="./assets/light/links/mail.svg"' in out
 
 
 # --- the generated block ---------------------------------------------------
@@ -162,16 +184,21 @@ def test_slices_of_accepts_plain_tuples():
     assert out[0].href == "https://e/1"
 
 
-def test_render_main_writes_every_slice_and_the_manifest(tmp_path, monkeypatch):
-    class Panel:
-        @staticmethod
-        def render(_cfg, _data):
-            return [c.Slice("one.svg", c.slice_svg(
-                40, "", title="One", desc="first half", width=c.W // 2, rails="left"),
-                "https://example.com/1"),
-                c.Slice("two.svg", c.slice_svg(
-                    40, "", title="Two", desc="second half", width=c.W // 2, rails="right"))]
+class Panel:
+    """A two-piece panel, rendered the way a real one is: once per theme."""
 
+    @staticmethod
+    def render(_cfg, _data, theme):
+        return [c.Slice("one.svg", c.slice_svg(
+            theme, 40, "", title="One", desc="first half",
+            width=c.W // 2, rails="left"), "https://example.com/1"),
+            c.Slice("two.svg", c.slice_svg(
+                theme, 40, "", title="Two", desc="second half",
+                width=c.W // 2, rails="right"))]
+
+
+def test_render_main_writes_every_slice_and_the_manifest(tmp_path, monkeypatch):
+    """The manifest is keyed by slice; readme.py pairs the two themes by name."""
     monkeypatch.setattr(render.c, "OUT", tmp_path / "assets")
     monkeypatch.setattr(render, "MANIFEST", tmp_path / "manifest.json")
     monkeypatch.setattr(render, "PANELS", [("p.svg", Panel)])
@@ -185,7 +212,8 @@ def test_render_main_writes_every_slice_and_the_manifest(tmp_path, monkeypatch):
     assert manifest[0]["href"] == "https://example.com/1"
     assert "href" not in manifest[1]
     assert manifest[0]["desc"] == "first half"
-    assert (tmp_path / "assets/one.svg").exists()
+    for theme in c.THEMES:
+        assert (tmp_path / "assets" / theme.name / "one.svg").exists()
 
 
 def test_committed_manifest_rows_each_total_full_width():
@@ -199,12 +227,13 @@ def test_committed_manifest_rows_each_total_full_width():
 # --- describe --------------------------------------------------------------
 
 def test_describe_reads_back_desc_and_width():
-    svg = c.slice_svg(40, "", title="T", desc="the real numbers", width=440, rails="left")
+    svg = c.slice_svg(c.LIGHT, 40, "", title="T", desc="the real numbers",
+                      width=440, rails="left")
     assert c.describe(svg) == ("the real numbers", 440.0)
 
 
 def test_describe_unescapes_entities():
-    svg = c.slice_svg(40, "", title="T", desc='a "quoted" & escaped desc')
+    svg = c.slice_svg(c.LIGHT, 40, "", title="T", desc='a "quoted" & escaped desc')
     assert c.describe(svg)[0] == 'a "quoted" & escaped desc'
 
 

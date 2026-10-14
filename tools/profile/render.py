@@ -3,6 +3,11 @@
 Reads hand-written content from profile.toml and fetched numbers from
 data/*.json. Makes no network calls, so it can be re-run offline against the
 committed JSON while iterating on a panel.
+
+Every panel is rendered once per theme, into assets/<theme>/. The manifest is
+keyed by slice, not by theme: one entry carries both files, because the README
+pairs them in a single <picture> and their geometry and alt text are identical
+by construction.
 """
 import json
 import pathlib
@@ -56,15 +61,14 @@ def slices_of(name, result):
     return [s if isinstance(s, c.Slice) else c.Slice(*s) for s in result]
 
 
-def main():
-    cfg, data = load_config(), load_data()
-
-    manifest = []
+def render_theme(cfg, data, theme):
+    """Write one theme's slices. Returns the manifest rows they imply."""
+    rows = []
     for name, panel in PANELS:
-        for entry in slices_of(name, panel.render(cfg, data)):
-            c.write(entry.file, entry.markup)
+        for entry in slices_of(name, panel.render(cfg, data, theme)):
+            c.write(theme, entry.file, entry.markup)
             desc, width = c.describe(entry.markup)
-            manifest.append({
+            rows.append({
                 "file": entry.file,
                 "desc": desc,
                 # Percentages rather than pixels so the console scales with the
@@ -72,10 +76,25 @@ def main():
                 "width": f"{100 * width / c.W:.4f}".rstrip("0").rstrip(".") + "%",
                 **({"href": entry.href} if entry.href else {}),
             })
-            print(f"wrote assets/{entry.file}")
+            print(f"wrote assets/{theme.name}/{entry.file}")
+    return rows
+
+
+def main():
+    cfg, data = load_config(), load_data()
+
+    manifest = None
+    for theme in c.THEMES:
+        rows = render_theme(cfg, data, theme)
+        if manifest is None:
+            manifest = rows
+        elif [r["file"] for r in rows] != [r["file"] for r in manifest]:
+            # The README pairs the two themes file by file, so a panel that
+            # emitted different slices for each would silently mismatch them.
+            sys.exit(f"error: {theme.name} produced a different slice list")
 
     MANIFEST.write_text(json.dumps(manifest, indent=2) + "\n")
-    print(f"wrote data/manifest.json ({len(manifest)} slices)")
+    print(f"wrote data/manifest.json ({len(manifest)} slices × {len(c.THEMES)} themes)")
 
 
 if __name__ == "__main__":

@@ -13,23 +13,18 @@ import datetime
 from .. import console as c
 
 COL_L = c.TEXT_X
-COL_R = c.FRAME_R - 36
+COL_R = c.CONTENT_R
 COLS = 3
 TOP_N = 6
 
 HEAD_Y = 38
-LABEL_FS = 11.5
-VALUE_FS = 30
 
-NAME_W = 104      # language-name column, 13 chars at 13px
+# The language name is set in mono so its width is a character count: 13 glyphs
+# at the mono step, plus the gap to the bar.
+NAME_W = 118
 BAR_X = COL_L + NAME_W + 8
 BAR_R = 744       # stops short of the right-aligned percentage
 BAR_H = 10
-
-DEFS = (f'<linearGradient id="lang" gradientUnits="userSpaceOnUse" '
-        f'x1="{BAR_X}" y1="0" x2="{BAR_R}" y2="0">'
-        f'<stop offset="0" stop-color="{c.ACCENT}"/>'
-        f'<stop offset="1" stop-color="{c.ALT}"/></linearGradient>')
 
 
 def _counters(s):
@@ -54,12 +49,14 @@ def _counters(s):
 
 
 def _cell(x, label_y, label, value, suffix):
-    tail = (f'<tspan class="dim" dx="6" style="font-size:15px">{c.e(suffix)}</tspan>'
+    """Label above value. The value takes the heading step: the scale has one
+    emphatic size below display, and inventing a counter-sized step for this
+    panel alone would put the console off the type scale it shares with the
+    rest of the system."""
+    tail = (f'<tspan class="caption dim" dx="6">{c.e(suffix)}</tspan>'
             if suffix else "")
-    value_y = label_y + 32
-    return f'''<text x="{x}" y="{label_y}" class="faint" letter-spacing="1" style="font-size:{LABEL_FS}px">{c.e(label)}</text>
-<text x="{x}" y="{value_y}" font-weight="700" fill="{c.ACCENT}" filter="url(#soft)" opacity=".55" style="font-size:{VALUE_FS}px">{c.e(value)}</text>
-<text x="{x}" y="{value_y}" font-weight="700" style="font-size:{VALUE_FS}px"><tspan class="ac">{c.e(value)}</tspan>{tail}</text>'''
+    return f'''<text x="{x}" y="{label_y}" class="caption dim">{c.e(label)}</text>
+<text x="{x}" y="{label_y + 32}" class="heading ink">{c.e(value)}{tail}</text>'''
 
 
 # Spelled out rather than taken from strftime("%B"), which is locale-sensitive
@@ -76,38 +73,42 @@ def _member_since(raw):
     return f"member since {MONTHS[when.month - 1]} {when.year}"
 
 
-def _lang_rows(langs, y0, pitch):
+def _lang_rows(theme, langs, y0, pitch):
     """Top-N languages as name / proportional bar / share of the top-N total."""
     top = sorted(langs.items(), key=lambda kv: -kv[1])[:TOP_N]
     total = sum(size for _, size in top) or 1
     biggest = top[0][1] or 1
+    fill = c.mix(theme.ink, theme.canvas, 0.55)
     rows, shares = [], []
     for i, (name, size) in enumerate(top):
         y = y0 + i * pitch
         pct = 100 * size / total
         shares.append((name, pct))
-        width = max(3, round((BAR_R - BAR_X) * size / biggest, 1))
+        width = max(BAR_H, round((BAR_R - BAR_X) * size / biggest, 1))
         shown = name if len(name) <= 13 else name[:12] + "…"
         rows.append(f'''<g class="ln" style="animation-delay:{0.40 + i * 0.08:.2f}s">
-<text x="{COL_L}" y="{y}" class="fg" style="font-size:13px">{c.e(shown)}</text>
-<rect x="{BAR_X}" y="{y - 9}" width="{BAR_R - BAR_X}" height="{BAR_H}" fill="{c.ACCENT}" fill-opacity=".07"/>
-<rect x="{BAR_X}" y="{y - 9}" width="{width}" height="{BAR_H}" fill="url(#lang)" opacity=".5" filter="url(#soft)"/>
-<rect x="{BAR_X}" y="{y - 9}" width="{width}" height="{BAR_H}" fill="url(#lang)"/>
-<rect x="{round(BAR_X + width - 2, 1)}" y="{y - 9}" width="2" height="{BAR_H}" fill="{c.WHITE}" opacity=".75"/>
-<text x="{COL_R}" y="{y}" text-anchor="end" class="dim" style="font-size:12px">{pct:.1f}%</text>
+<text x="{COL_L}" y="{y}" class="mono ink">{c.e(shown)}</text>
+<rect x="{BAR_X}" y="{y - 9}" width="{BAR_R - BAR_X}" height="{BAR_H}" rx="{BAR_H // 2}" fill="{theme.sunken}"/>
+<rect x="{BAR_X}" y="{y - 9}" width="{width}" height="{BAR_H}" rx="{BAR_H // 2}" fill="{fill}"/>
+<text x="{COL_R}" y="{y}" text-anchor="end" class="mono dim">{pct:.1f}%</text>
 </g>''')
     return "\n".join(rows), shares
 
 
-def render(_cfg, data):
+def render(_cfg, data, theme):
     s = data.get("stats")
     if not s:
-        body = (c.heading(HEAD_Y, "stats")
-                + f'<text x="{COL_L}" y="{HEAD_Y + 46}" class="dim">no stats available</text>')
-        return c.slice_svg(c.to_grid(HEAD_Y + 66), body, title="GitHub stats",
+        body = (c.heading(theme, HEAD_Y, "stats")
+                + f'<text x="{COL_L}" y="{HEAD_Y + 46}" class="body dim">no stats available</text>')
+        return c.slice_svg(theme, c.to_grid(HEAD_Y + 66), body, title="GitHub stats",
                            desc="No GitHub statistics are available.")
 
-    body = [c.heading(HEAD_Y, "stats", counter=f"[ UPDATED {s.get('updated', '?')} ]")]
+    stamp = str(s.get("updated", "?"))
+    body = [c.heading(theme, HEAD_Y, "stats", counter=stamp)]
+    # The console's one accent, spent here: the only fact on the page that is
+    # about right now rather than about the record.
+    body.append(f'<circle class="dot" cx="{COL_R - round(len(stamp) * c.MONO.size * c.MONO_ADVANCE) - 14}" '
+                f'cy="{HEAD_Y - 5}" r="4" fill="{theme.accent}"/>')
 
     cells = _counters(s)
     step = (COL_R - COL_L) // COLS        # integral, so the columns stay even
@@ -126,22 +127,21 @@ def render(_cfg, data):
     ) if p]
     meta = " · ".join(parts)
     body.append(f'<g class="ln" style="animation-delay:0.60s">'
-                f'<text x="{COL_L}" y="234" class="faint" style="font-size:13px">{c.e(meta)}</text></g>')
+                f'<text x="{COL_L}" y="234" class="caption dim">{c.e(meta)}</text></g>')
 
     body.append(f'<line x1="{COL_L}" y1="258" x2="{COL_R}" y2="258" '
-                f'stroke="{c.ACCENT}" stroke-opacity=".15"/>')
-    body.append(f'<text x="{COL_L}" y="288" class="faint" letter-spacing="1" '
-                f'style="font-size:{LABEL_FS}px">TOP LANGUAGES BY BYTES</text>')
+                f'stroke="{theme.hairline}" stroke-width="{c.EDGE_W}" shape-rendering="crispEdges"/>')
+    body.append(f'<text x="{COL_L}" y="288" class="caption dim">TOP LANGUAGES BY BYTES</text>')
 
     langs = s.get("languages") or {}
     if langs:
-        rows, shares = _lang_rows(langs, 318, 26)
+        rows, shares = _lang_rows(theme, langs, 320, 28)
         body.append(rows)
-        last_y = 318 + (len(shares) - 1) * 26
+        last_y = 320 + (len(shares) - 1) * 28
         chart = ", ".join(f"{name} {pct:.1f}%" for name, pct in shares)
     else:
-        body.append(f'<text x="{COL_L}" y="318" class="dim" style="font-size:13px">no language data</text>')
-        last_y, chart = 318, "none recorded"
+        body.append(f'<text x="{COL_L}" y="320" class="body dim">no language data</text>')
+        last_y, chart = 320, "none recorded"
 
     desc = (
         f"GitHub stats updated {s.get('updated', 'unknown')}: "
@@ -158,6 +158,6 @@ def render(_cfg, data):
         f"{s.get('repos_contributed', 0):,} repositories: {chart}."
     )
     return c.slice_svg(
-        c.to_grid(last_y + 28), "\n".join(body),
-        title="GitHub stats", desc=desc, text="…·%", defs=DEFS,
+        theme, c.to_grid(last_y + 28), "\n".join(body),
+        title="GitHub stats", desc=desc, text="…·%",
     )
