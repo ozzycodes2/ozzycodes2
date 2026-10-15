@@ -90,7 +90,10 @@ two radii.
    it is identical in every panel. Beyond that a panel may mark the single
    highest value in one set — the live streak, the leading language, the
    tallest day, the one layer of the stack the author writes in — at most once,
-   plus a legend swatch keying it. A set of equals gets nothing: `~/projects`
+   plus a legend swatch keying it. `~/stack` is the one slice carrying two
+   figures and so two literals: the leading language's ray, and the dot on the
+   focal slab, which keys that slab's tint and is therefore the swatch rather
+   than a second datum. A set of equals gets nothing: `~/projects`
    carries only the rule. Where the accent paints a surface rather than a mark
    it goes in as a mix over the canvas, not as the literal: six logos on a field
    of chroma are six logos nobody can read. The accent never sets type. It is

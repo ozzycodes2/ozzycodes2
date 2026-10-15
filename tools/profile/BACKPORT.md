@@ -167,9 +167,10 @@ for f in assets/dark/*.svg; do printf "%-26s %s\n" "$(basename $f)" "$(grep -o '
 ```
 
 Expected, and worth re-deriving rather than trusting this table if the doctrine
-changes: header 1 (the live dot — the header draws no section heading), stats 2
-(rule + top language bar), contribution-city 3 (rule + legend circle + the peak
-block's saturated wall), stack 1, projects 1, projects-N 0, footer 0.
+changes: header 1 (the live dot — the header draws no section heading), stats 1
+(the rule; six counters are a set of equals), contribution-city 3 (rule + legend
+circle + the peak block's saturated wall), stack 3 (rule + the focal slab's dot +
+the leading language's ray), projects 1, projects-N 0, footer 0.
 
 Finally, look at it. `preview.py` writes both themes side by side, which is the
 only way to see a seam or a contrast failure without pushing:

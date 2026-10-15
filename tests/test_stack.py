@@ -96,14 +96,18 @@ def test_a_level_never_moves_the_slice_height():
 
 
 def test_a_longer_roster_densifies_the_lattice_rather_than_the_slice():
-    """Up to the point the cells hit their 10-unit floor, which is where the
-    lattice starts to outgrow the footprint and the height does move."""
+    """The footprint is fixed, so a roster the lattice cannot hold at one
+    density is held at a tighter one and the cells shrink. The slice never grows
+    for it: the gap is cut for the clearance the back-most cell needs, and a
+    denser lattice never needs more of it than a sparse one. It can need less —
+    three tools on a near border sit closer to the front than five do — which is
+    why this is a ceiling and not an equality."""
     base = height_of(stack.render(CFG, {}, c.LIGHT))
-    for n in (6, 7, 8):
+    for n in range(2, 10):
         cfg = {"stack": {k: {f"tool-{i}": 3 for i in range(n)} for k in CFG["stack"]}}
-        assert height_of(stack.render(cfg, {}, c.LIGHT)) == base, n
+        assert height_of(stack.render(cfg, {}, c.LIGHT)) <= base, n
         assert stack.tile_size(stack.FOOT_W, stack.FOOT_D,
-                               stack.tile_side(n, False)) > 10
+                               stack.tile_side(n, False)) >= 10
 
 
 def test_height_grows_with_the_number_of_layers():
@@ -221,8 +225,9 @@ def test_an_even_border_run_leaves_the_front_corner_empty():
 # --- pedestal heights ------------------------------------------------------
 
 def test_the_ladder_is_five_even_steps():
-    assert [stack.rise_of(i) for i in range(1, 6)] == [5, 9, 13, 17, 21]
-    assert stack.RISE_MAX == 21
+    assert [stack.rise_of(i) for i in range(1, 6)] == [
+        stack.TILE_RISE + i * stack.TILE_STEP for i in range(5)]
+    assert stack.RISE_MAX == stack.TILE_RISE + 4 * stack.TILE_STEP
 
 
 @pytest.mark.parametrize("level", [0, -3, 9, 5.4, None, "four"])
@@ -277,8 +282,9 @@ def test_the_tooling_cells_are_cylinders_and_nothing_else_is(markup):
         widths.append(round(max(xs) - min(xs), 2))
     # A circle of diameter g projects to an ellipse of width g*sqrt(2); a
     # rounded square is wider, because its straight edges are not all
-    # foreshortened.
-    assert widths[0] == round(g * math.sqrt(2), 2)
+    # foreshortened. The tolerance is the two-decimal rounding on each extreme,
+    # which an odd g leaves a hundredth short of the closed form.
+    assert widths[0] == pytest.approx(g * math.sqrt(2), abs=0.02)
     assert len(set(widths[1:])) == 1 and widths[1] > widths[0]
 
 
@@ -449,6 +455,182 @@ def test_a_category_with_no_tools_still_takes_a_slab():
     assert [len(cells) for _, cells in drawn] == [1, 0]
     assert [t[-1] for t in text_of(markup) if t[3] == str(stack.LABEL_FS)] \
         == ["tooling", "cloud"]
+
+
+# --- the languages ring ----------------------------------------------------
+
+# Nine languages, so one sector folds and the names left to label are short
+# enough that only the ceiling can hold the ring to the figure.
+LANGS = {"Swift": 1213553, "Python": 683170, "TypeScript": 644000,
+         "Shell": 25279, "CSS": 8129, "HTML": 5000, "Dockerfile": 2364,
+         "JavaScript": 1949, "Mermaid": 1178}
+BYTES = sum(LANGS.values())
+
+CIRCLE = re.compile(r'<circle cx="([-\d.]+)" cy="([-\d.]+)" r="([\d.]+)" '
+                    r'fill="([^"]*)"([^>]*)/>')
+
+
+@pytest.fixture(scope="module")
+def ring():
+    return stack.render(CFG, {"stats": {"languages": LANGS}}, c.LIGHT)
+
+
+def circles_of(markup, kind):
+    """The ring's grid circles, its endpoint heads, or the layers' label dots.
+
+    All three are circles and only their paints tell them apart: a grid ring is
+    unfilled, an endpoint carries a stroke over its fill, a dot is a bare fill.
+    """
+    out = []
+    for x, y, r, fill, rest in CIRCLE.findall(body_of(markup)):
+        if {"ring": fill == "none",
+            "head": fill != "none" and rest.strip(),
+            "dot": not rest.strip()}[kind]:
+            out.append((float(x), float(y), float(r)))
+    return out
+
+
+def layout_of(markup, cats=stack.POLAR_CATS):
+    """The layout behind the ring that shipped, at the radius it was drawn at."""
+    return stack.polar_layout(LANGS, cats, max(r for *_, r in circles_of(markup, "ring")))
+
+
+@pytest.mark.parametrize("cats, want", [(1, 4), (4, 4), (6, 6), (8, 8), (99, 8)])
+def test_the_cut_is_clamped_to_the_types_four_to_eight(cats, want):
+    assert len(stack.polar_fit(LANGS, cats)["items"]) == want
+
+
+@pytest.mark.parametrize("languages", [None, {}, {"Only": 0}])
+def test_a_ring_with_no_bytes_to_draw_is_not_drawn(languages):
+    assert stack.polar_fit(languages, stack.POLAR_CATS) is None
+
+
+def test_the_figures_width_is_the_rings_ceiling(ring):
+    """Two figures under one heading read as one subject only if neither is the
+    other's inset. The ring may come in under the ceiling — a cut whose labels do
+    not fit the span is stepped down — but never over it, whatever the language
+    mix folds away."""
+    xs = [x for raw, _ in SIL.findall(body_of(ring)) for x, _ in points(raw)]
+    obj_w = max(xs) - min(xs)
+    diameter = 2 * max(r for *_, r in circles_of(ring, "ring"))
+    assert diameter <= obj_w + 1
+    assert obj_w - diameter <= 2
+
+
+@pytest.mark.parametrize("ceiling, want", [
+    (70, 70), (101, 100), (300, stack.POLAR_R_MAX), (10, stack.POLAR_R_MIN)])
+def test_the_ceiling_rounds_down_to_an_even_radius_and_clamps(ceiling, want):
+    """Even, so the five rings land off the sub-pixel grid; clamped, so a figure
+    wider or narrower than the ring's own range cannot drive it out of it."""
+    assert stack.polar_fit(LANGS, 4, None, ceiling)["r"] == want
+
+
+def test_a_span_too_tight_for_the_labels_steps_the_radius_down():
+    """A ten-character name reaches further than the ring it labels, and by a
+    distance that does not shrink when the radius does — so the radius cannot be
+    picked from the span by arithmetic."""
+    assert stack.polar_fit(LANGS, 8, 80)["r"] == stack.POLAR_R_MIN
+    wide = stack.polar_fit(LANGS, 8, 400)["r"]
+    assert stack.POLAR_R_MIN < wide <= stack.POLAR_R_MAX
+
+
+def test_the_grid_is_five_distinct_rings(ring):
+    rings = {r for *_, r in circles_of(ring, "ring")}
+    assert len(rings) == stack.POLAR_RINGS
+    assert sorted(rings) == [max(rings) * (i + 1) / stack.POLAR_RINGS
+                             for i in range(stack.POLAR_RINGS)]
+
+
+def test_every_byte_takes_a_sector_whether_or_not_it_is_named(ring):
+    """Nine languages into eight sectors, so the tail folds — and the fold is
+    what keeps the shares summing to the whole."""
+    items = layout_of(ring)["items"]
+    assert sum(it["share"] for it in items) == pytest.approx(1)
+    assert [it["name"] for it in items].count("other") == 1
+    assert layout_of(ring, 9)["items"][-1]["name"] != "other"
+
+
+def test_the_fold_takes_its_own_rank_rather_than_the_end_of_the_ring(ring):
+    """Radius falling clockwise is the one thing the angle is carrying. Folded,
+    a tail can outweigh the smallest language named above it."""
+    shares = [it["share"] for it in layout_of(ring)["items"]]
+    assert shares == sorted(shares, reverse=True)
+    assert layout_of(ring)["lead"] == 0
+
+
+def test_a_ray_is_its_share_of_the_scale_and_never_leaves_the_grid(ring):
+    """The scale tops at the leader's own tenth rather than at the leader, so
+    every ring is a tenth of the whole and the leader terminates inside the
+    outermost one."""
+    lay = layout_of(ring)
+    for it in lay["items"]:
+        reach = math.hypot(*it["ray"])
+        assert reach == pytest.approx(lay["r"] * it["share"] / lay["max"], abs=0.02)
+        assert reach <= lay["r"]
+    assert 0 <= lay["max"] - lay["items"][0]["share"] < 0.1
+
+
+def test_the_ring_stays_left_of_the_figure_and_inside_the_rails(ring):
+    """The only thing keeping the two readable in one 776px span. Mono advances
+    0.6em, so a label's extent is known before it is drawn — and on this ring it
+    is the labels, not the radius, that reach furthest."""
+    slabs = [x for raw, _ in SIL.findall(body_of(ring)) for x, _ in points(raw)]
+    reach = [x + r for x, _, r in circles_of(ring, "ring") + circles_of(ring, "head")]
+    assert max(reach) < min(slabs)
+    lay = layout_of(ring)
+    shift = c.TEXT_X - lay["left"]
+    for it in lay["items"]:
+        assert c.TEXT_X <= it["left"] + shift and it["right"] + shift <= c.CONTENT_R
+
+
+@pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
+def test_the_leading_language_is_the_rings_one_mark(theme):
+    """The slice's whole accent budget: the section rule, the dot keying the
+    focal slab's tint, and the leading ray. The ray's endpoint stays in ink —
+    the accent on both would spend the mark twice on one ray."""
+    body = body_of(stack.render(CFG, {"stats": {"languages": LANGS}}, theme))
+    assert body.count(theme.accent) == 3
+    heavy = f'stroke="{theme.accent}" stroke-width="{stack.POLAR_RAY_W + 0.4}"'
+    assert body.count(heavy) == 1
+    assert f'stroke="{theme.ink}" stroke-width="1.2"' in body
+
+
+def test_the_ring_is_centred_against_the_figures_own_span(ring):
+    """Hung off the heading instead, the ring's mass sits at the top of its block
+    and the figure's at the bottom of the slice, which leaves the whole lower
+    left of the panel empty."""
+    cy = {y for _, y, _ in circles_of(ring, "ring")}
+    assert len(cy) == 1
+    span = [y for raw, _ in SIL.findall(body_of(ring)) for _, y in points(raw)]
+    lay = layout_of(ring)
+    assert cy.pop() == pytest.approx(
+        (stack.TOP_Y + max(span) - lay["top"] - lay["bottom"]) / 2, abs=1)
+
+
+def test_desc_names_the_measure_the_drawing_leaves_out(ring):
+    """Nothing in the ring says bytes: it carries no caption, and the heading it
+    shares with the figure says `stack`."""
+    desc = re.search(r'<desc id="d">(.*?)</desc>', ring, re.S).group(1)
+    assert "Languages by bytes: Swift 47.0%" in desc
+    assert f"of {c.num(BYTES)}." in desc
+    # JavaScript and Mermaid together outweigh Dockerfile, so the fold is named
+    # ahead of a language the cut had room for.
+    assert "other 0.1%, Dockerfile 0.1%" in desc
+
+
+def test_a_share_too_small_to_print_is_floored_rather_than_zeroed():
+    """0.0% beside a ray the chart has drawn reads as nothing rather than as
+    very little."""
+    lay = stack.polar_fit({"Big": 10 ** 6, "Mid": 10 ** 5, "Small": 400, "Trace": 1}, 4)
+    assert [it["pct"] for it in lay["items"]] == ["90.9%", "9.1%", "<0.1%", "<0.1%"]
+
+
+def test_a_snapshot_with_no_languages_renders_the_figure_alone(markup, ring):
+    """Rule 10, and the figure is the half that does not depend on the fetch."""
+    assert not circles_of(markup, "ring")
+    assert "Languages by bytes" not in markup
+    assert height_of(markup) == height_of(ring)
+    assert len(circles_of(markup, "dot")) == len(circles_of(ring, "dot"))
 
 
 # --- projection ------------------------------------------------------------

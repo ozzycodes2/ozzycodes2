@@ -1,4 +1,4 @@
-"""Tests for the counter grid and the language chart."""
+"""Tests for the counter grid."""
 import re
 
 import pytest
@@ -18,15 +18,9 @@ STATS = {
                   "CSS": 80999, "Shell": 39980},
 }
 
-TOTAL = sum(STATS["languages"].values())
-TOP = sorted(STATS["languages"].items(), key=lambda kv: -kv[1])[:stats.TOP_N]
-
 TEXT = re.compile(
     r'<text x="(-?[\d.]+)" y="(-?[\d.]+)" fill="([^"]+)" font-family="[^"]*"'
     r' font-size="(\d+)"([^>]*)>([^<]*)</text>')
-RECT = re.compile(
-    rf'<rect x="(\d+)" y="(\d+)" width="(\d+)" height="{stats.BAR_H}"'
-    rf' rx="{c.R_CHIP}" fill="([^"]+)"(?: opacity="([\d.]+)")?/>')
 
 
 @pytest.fixture(scope="module")
@@ -65,16 +59,6 @@ def said(svg, content):
     return found[0]
 
 
-def rects(svg):
-    """(x, y, width, fill, opacity) of every bar rect, in draw order.
-
-    Opacity comes back as None for a rect that carries no such attribute, which
-    is how the one bar painted at full strength is told from the rest.
-    """
-    return [(int(x), int(y), int(w), fill, float(o) if o else None)
-            for x, y, w, fill, o in RECT.findall(svg)]
-
-
 # --- frame -----------------------------------------------------------------
 
 def test_the_slice_height_lands_on_the_grid_with_the_frame_left_open(markup):
@@ -85,16 +69,17 @@ def test_the_slice_height_lands_on_the_grid_with_the_frame_left_open(markup):
     assert rails == f"M{c.FRAME_L} {height_of(markup)}V0M{c.FRAME_R} 0V{height_of(markup)}"
 
 
-def test_the_slice_ends_one_bar_pitch_below_the_last_language(markup):
+def test_the_slice_ends_a_padding_below_the_second_row_of_cells(markup):
+    """The grid is now the whole panel, so the last rule sets the height."""
     assert height_of(markup) == c.to_grid(
-        stats.BAR_Y0 + stats.TOP_N * stats.BAR_PITCH + 20)
+        stats.GRID_Y + 2 * stats.GRID_PITCH + stats.PAD_BELOW)
 
 
 def test_nothing_is_drawn_outside_the_content_column(markup):
     for x in re.findall(r'<(?:text|rect|line) x1?="([\d.]+)"', markup):
         assert c.MARGIN <= float(x) <= c.CONTENT_R
-    for x, _, width, _, _ in rects(markup):
-        assert x + width <= c.CONTENT_R
+    for x2 in re.findall(r'<line [^>]*x2="([\d.]+)"', markup):
+        assert float(x2) <= c.CONTENT_R
 
 
 def test_the_heading_counter_carries_the_capture_stamp(markup):
@@ -178,96 +163,19 @@ def test_an_unusable_join_date_keeps_the_cell_and_drops_the_year(raw):
     assert "years" not in c.visible(markup)
 
 
-# --- the language chart ----------------------------------------------------
-
-def test_only_the_top_six_languages_are_charted(markup):
-    shown = c.visible(markup)
-    assert "C++" in shown                        # sixth by bytes
-    assert "CSS" not in shown and "Shell" not in shown
-    assert said(markup, "languages by bytes")[3] == 11
-
-
-def test_language_rows_run_on_a_fixed_pitch_below_the_grid(markup):
-    ys = [said(markup, name)[1] for name, _ in TOP]
-    assert ys == [stats.BAR_Y0 + 10 + i * stats.BAR_PITCH
-                  for i in range(stats.TOP_N)]
-    assert ys[0] > said(markup, "languages by bytes")[1]
-
-
-def test_every_bar_sits_in_a_track_running_the_full_span(markup):
-    tracks = [r for r in rects(markup) if r[4] == 0.06]
-    assert len(tracks) == stats.TOP_N
-    for x, _, width, fill, _ in tracks:
-        assert (x, width, fill) == (stats.BAR_X, stats.BAR_W, c.LIGHT.ink)
-
-
-def test_bar_widths_are_shares_of_every_languages_bytes(markup):
-    """The chart measures the codebases worked in, so the denominator is all
-    the bytes — not just the six that fit, which would inflate every bar."""
-    drawn = [r[2] for r in rects(markup) if r[4] != 0.06]
-    assert drawn == [max(2, int(stats.BAR_W * size / TOTAL + 0.5))
-                     for _, size in TOP]
-    assert sum(drawn) < stats.BAR_W * stats.TOP_N
-    assert drawn == sorted(drawn, reverse=True)
-
-
-def test_percentages_are_the_same_shares_the_bars_draw(markup):
-    pcts = [float(p) for p in re.findall(r'text-anchor="end">([\d.]+)%', markup)]
-    assert pcts == [round(100 * size / TOTAL, 1) for _, size in TOP]
-    assert sum(pcts) < 100                       # CSS and Shell are off-chart
-    for _, _, fill, size, _, _, anchor, body in texts(markup):
-        if body.endswith("%") and anchor == "end":
-            assert (fill, size) == (c.LIGHT.faint, 12)
-
-
-def test_the_bar_fill_steps_back_a_tenth_of_its_opacity_per_row(markup):
-    """Rank below the leader is carried by tone, since the bottom bars are too
-    short to compare by length and there is no legend to read them against. The
-    accent is not part of that ramp: it answers "which one won", which is a
-    different question from "in what order", and so it takes no opacity."""
-    tracks, fills = rects(markup)[::2], rects(markup)[1::2]
-    assert [r[4] for r in tracks] == [0.06] * stats.TOP_N
-    assert fills[0][4] is None
-    assert [r[4] for r in fills[1:]] == [round(0.82 - i * 0.1, 2)
-                                         for i in range(1, stats.TOP_N)]
-
-
-def test_the_leading_bar_is_the_one_the_accent_marks(markup):
-    """The chart exists to deliver one fact, and the hue delivers it without
-    the reader having to compare six lengths to find the longest."""
-    fills = rects(markup)[1::2]
-    assert fills[0][3] == c.LIGHT.accent
-    assert [r[3] for r in fills[1:]] == [c.LIGHT.ink] * (stats.TOP_N - 1)
-
-
-def test_only_the_leading_language_is_named_in_the_ink(markup):
-    """The name has to sit in the same tier as the bar beside it, or the row
-    the accent picks out reads as a louder bar under an ordinary label."""
-    assert [said(markup, name)[2] for name, _ in TOP] == (
-        [c.LIGHT.ink] + [c.LIGHT.dim] * (stats.TOP_N - 1))
-
-
-def test_a_language_name_too_wide_for_its_column_is_truncated():
-    markup = stats.render({}, {"stats": {**STATS, "languages": {"A" * 40: 10}}},
-                          c.LIGHT)
-    name = [t[-1] for t in texts(markup) if t[0] == c.TEXT_X
-            and t[1] == stats.BAR_Y0 + 10][0]
-    assert name.endswith("…") and len(name) <= stats.MAX_NAME
-
-
 # --- colour and motion -----------------------------------------------------
 
 @pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
-def test_the_accent_is_spent_twice_and_never_on_a_word(theme):
-    """It is corrected to 3:1, the threshold for an object rather than type, so
-    a word wearing it would be the one illegible thing on the page. Twice: the
-    stroke that indexes the section, and the single highest value in the set."""
+def test_the_accent_is_spent_once_and_never_on_a_word(theme):
+    """Six counters are a set of equals and none of them is the panel's answer,
+    so the accent is left on the stroke that indexes the section. The one value
+    worth marking here was the leading language, and it marks a ray in
+    `~/stack` now."""
     body = stats.render({}, {"stats": STATS}, theme).split("</style>")[1]
-    assert body.count(theme.accent) == 2
+    assert body.count(theme.accent) == 1
     assert (f'<line x1="{c.TEXT_X}" y1="{stats.HEAD_Y + 14}" '
             f'x2="{c.TEXT_X + 120}" y2="{stats.HEAD_Y + 14}" '
             f'stroke="{theme.accent}" stroke-width="2"') in body
-    assert f'rx="{c.R_CHIP}" fill="{theme.accent}"/>' in body
     assert theme.accent not in [t[2] for t in texts(body)]
 
 
@@ -306,9 +214,9 @@ def test_desc_spells_out_every_number_it_draws(markup):
     for fragment in ("1,174 contributions in 2026",
                      "372 of 423 pull requests merged",
                      "29 repositories touched",
-                     f"Top language TypeScript at {100 * TOP[0][1] / TOTAL:.1f}%",
-                     f"of {c.num(TOTAL)} bytes"):
+                     "longest streak 6 days"):
         assert fragment in desc, fragment
+    assert "language" not in desc              # `~/stack` carries the mix now
 
 
 @pytest.mark.parametrize("data", [{}, {"stats": None}, {"stats": {}}])
@@ -328,28 +236,12 @@ def test_an_entirely_empty_stats_payload_still_counts_from_zero():
     assert height_of(markup) % c.ROW == 0
 
 
-def test_the_chart_is_optional():
-    without = stats.render({}, {"stats": {**STATS, "languages": {}}}, c.LIGHT)
-    assert said(without, "no language data")[1] == stats.BAR_Y0 + 10
-    assert "No language data was recorded." in desc_of(without)
-    assert height_of(without) % c.ROW == 0
-    assert height_of(without) < height_of(stats.render({}, {"stats": STATS},
-                                                       c.LIGHT))
-
-
-def test_a_language_with_no_bytes_is_not_charted():
-    """GitHub occasionally reports a zero-byte language; it would divide the
-    chart by nothing and draw a bar nobody can see."""
-    markup = stats.render({}, {"stats": {**STATS, "languages": {"Nim": 0}}},
-                          c.LIGHT)
-    assert "Nim" not in c.visible(markup)
-    assert said(markup, "no language data")
-
-
-def test_markup_in_a_language_name_is_escaped():
-    markup = stats.render({}, {"stats": {**STATS, "languages": {"<b>": 10}}},
-                          c.LIGHT)
-    assert "<b>" not in markup and "&lt;b&gt;" in markup
+def test_the_language_payload_no_longer_reaches_this_panel(markup):
+    """It is drawn in `~/stack`. A language left in the markup here would be the
+    old chart half-ported, which renders as a stray label over the grid."""
+    for mix in ({}, {"Nim": 0}, {"<b>": 10}):
+        other = stats.render({}, {"stats": {**STATS, "languages": mix}}, c.LIGHT)
+        assert other == markup
 
 
 def test_the_panel_is_deterministic(markup):

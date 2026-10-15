@@ -150,7 +150,7 @@ is reported as zero and the panel drops the counter rather than guess.
 read only for repository and pull request metadata: set it to a classic PAT
 with `repo` and `read:user` and the repo tally and language byte totals include
 private repositories it can reach; leave it unset and the job falls back to
-`GITHUB_TOKEN` and reports public repositories only. Because the language chart
+`GITHUB_TOKEN` and reports public repositories only. Because the languages ring
 is built from whatever that credential can see, it shifts when the credential
 does — a local run through `gh` reaches more repositories than the PAT in CI.
 

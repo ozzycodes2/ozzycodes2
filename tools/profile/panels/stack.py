@@ -21,6 +21,13 @@ the figure surviving the README's light/dark pairing.
 What the figure costs: the twenty tool names. A logo and its name on one face is
 a fourth level of detail and the type caps at three, so the names live in `desc`
 — the README's alt text, and the only place a screen reader finds them.
+
+Left of the figure and the same size as it, a polar ring gives languages by
+bytes: angle is rank, radius is share. The two are one subject at two scales —
+which layer the author writes in, and which language inside it — so they share
+this slice's heading rather than taking a section each. This is the one panel
+spending two literal accents: the leading language's ray, and the dot keying the
+focal slab's tint, which rule 6 counts as a swatch.
 """
 import json
 import math
@@ -37,16 +44,21 @@ HEAD_Y = 44
 TOP_Y = 88                # the top slab's highest vertex, clear of the rule at 58
 PAD_BELOW = 28
 
-FOOT_W = FOOT_D = 140     # model units; every slab shares one footprint
-FOOT_R = 28
-SLAB_H = 12
+# Model units are screen units — `project` carries no scale — so these are one
+# proportional set. Resizing the figure means scaling all of them: holding the
+# lattice while the footprint shrinks puts the marks on a face that no longer
+# has room for them. The size itself is set by the ring beside the figure, which
+# is drawn at the same width.
+FOOT_W = FOOT_D = 114     # model units; every slab shares one footprint
+FOOT_R = 23
+SLAB_H = 10
 FOCAL = "Languages"       # the one layer that has earned the accent
 
-TILE_PAD = 14             # model units of bare face outside the lattice
+TILE_PAD = 11             # model units of bare face outside the lattice
 TILE_SIDE = 3             # fewest cells a side
-TILE_CLEAR = 14           # between cells, which also clears the rise
-TILE_RISE = 5             # a level-1 pedestal
-TILE_STEP = 4             # and each level above it
+TILE_CLEAR = 11           # between cells, which also clears the rise
+TILE_RISE = 4             # a level-1 pedestal
+TILE_STEP = 3             # and each level above it
 TILE_LEVELS = 5
 
 ARC_SEG = 8               # samples per corner arc
@@ -55,6 +67,18 @@ CELL_EDGE = 0.8           # a cell's silhouette, against EDGE_W for a slab
 LEADER = 72               # from the object's right extreme to the label column
 LABEL_FS = 15
 DOT_R = 3
+
+POLAR_R_MIN = 56          # the ring is fitted to the span the figure leaves,
+POLAR_R_MAX = 120         # between these two
+POLAR_RINGS = 5
+POLAR_NAME = 20           # a name's gap outside the outer ring
+POLAR_LINE = 13           # and its share, one mono line further out
+POLAR_CATS = 8            # sectors the ring is cut into, every language here
+POLAR_HEAD = 3            # endpoint marker radius, 4 on the leader
+POLAR_NAME_FS = 12
+POLAR_PCT_FS = 11
+POLAR_RAY_W = 2           # and 2.4 on the leader
+CHART_GAP = 32            # between the ring's label extent and the figure
 
 
 def _round(value):
@@ -381,6 +405,170 @@ def face_tiles(pr, ox, oy, zt, items, cells, paint, *, g, round_cells, corner, t
     return "\n".join(out)
 
 
+def polar_layout(languages, cats, r):
+    """Languages by bytes as a polar ring: angle is rank, radius is share.
+
+    Rank is not a cycle, which is the one thing this type asks of its
+    categories. What the ring buys in exchange is the shape of the fall — three
+    languages carry the whole stack and everything else is rounding error, which
+    a row of bars states one bar at a time.
+
+    `cats` is how many sectors the ring is cut into, 4 to 8; whatever the head
+    does not name folds into a single `other`, so the tail is accounted for
+    without spending a sector on each member of it. The scale runs 0 to the
+    leading share rounded up to the next tenth, so every ring is a tenth of the
+    whole and the leader terminates inside the outermost one.
+
+    Per-ring numerals are dropped against the type's layout conventions: five of
+    them up the twelve o'clock axis at this console's smallest mono would sit
+    under the twelve o'clock ray, and every category already carries its own
+    number. The ring carries no caption either — it shares the slice's heading
+    with the figure, and `desc` is where the measure is named.
+
+    Returns the layout only. The caller places the chart off `left`/`right`,
+    which are measured from the real label extents rather than from the radius,
+    because a ten-character name reaches further than the ring does.
+    """
+    rank = sorted((languages or {}).items(), key=lambda kv: -kv[1])
+    total = sum(v for _, v in rank)
+    if not rank or not total:
+        return None
+
+    n = min(max(cats, 4), 8)
+    head = rank if len(rank) <= n else rank[:n - 1]
+    tail = rank[len(head):]
+    # `other` takes its own rank rather than the end of the ring: folded, the
+    # tail can outweigh the smallest language named above it, and a ring whose
+    # radius stops falling clockwise is the one thing the angle was carrying.
+    rows = sorted(head + ([("other", sum(v for _, v in tail))] if tail else []),
+                  key=lambda kv: -kv[1])
+    top = math.ceil(rows[0][1] / total * 10) / 10
+
+    items = []
+    for i, (name, byts) in enumerate(rows):
+        a = math.radians(-90 + 360 * i / len(rows))
+        ux, uy = math.cos(a), math.sin(a)
+        share = byts / total
+        # A language under a twentieth of a percent would print 0.0% beside a
+        # ray the chart has drawn, which reads as nothing rather than as very
+        # little.
+        pct = f"{share * 100:.1f}%" if share >= 0.0005 else "<0.1%"
+        anchor = "middle" if abs(ux) < 0.26 else "start" if ux > 0 else "end"
+        lx, ly = _n(ux * (r + POLAR_NAME)), _n(uy * (r + POLAR_NAME))
+        # Both lines read away from the centre, so the share never closes the
+        # gap the name opened over the ring.
+        dy = -POLAR_LINE if uy < 0 else POLAR_LINE
+        w = max(len(name) * POLAR_NAME_FS, len(pct) * POLAR_PCT_FS) * c.MONO_ADVANCE
+        off = -w / 2 if anchor == "middle" else 0 if anchor == "start" else -w
+        items.append({
+            "name": name, "share": share, "pct": pct, "anchor": anchor,
+            "u": (_n(ux * r), _n(uy * r)),
+            "lx": lx, "ly": ly, "dy": dy,
+            "ray": (_n(ux * r * share / top), _n(uy * r * share / top)),
+            "left": lx + off, "right": lx + off + w,
+            "top": min(ly, ly + dy) - 9, "bottom": max(ly, ly + dy) + 4,
+        })
+
+    # The ring is its own floor on all four sides: a short label on one axis must
+    # not pull the bounds inside the circle it sits outside of.
+    def bound(key, fn, sign):
+        return fn([sign * r] + [it[key] for it in items])
+
+    return {
+        "r": r, "max": top, "total": total, "items": items,
+        "lead": max(range(len(items)), key=lambda i: items[i]["share"]),
+        "left": bound("left", min, -1), "right": bound("right", max, 1),
+        "top": bound("top", min, -1), "bottom": bound("bottom", max, 1),
+    }
+
+
+def polar_fit(languages, cats=POLAR_CATS, budget=None, ceiling=POLAR_R_MAX):
+    """The widest ring that fits `budget` px of span, capped at `ceiling`.
+
+    The caller's ceiling is the figure's own half-width, which is what holds the
+    two at one size whatever the language mix does — fold a ninth language and
+    the labels shorten, and without the cap the ring would simply grow past the
+    slabs beside it.
+
+    Under the cap the radius cannot be picked from the span by arithmetic: a
+    ten-character name reaches further than the ring it labels does, and by a
+    distance that does not shrink when the radius does. So it is stepped down
+    from the ceiling instead, 2px at a time, which also keeps the five rings off
+    the sub-pixel grid.
+    """
+    r0 = max(POLAR_R_MIN, min(POLAR_R_MAX, int(ceiling // 2) * 2))
+    out = polar_layout(languages, cats, r0)
+    if out is None or budget is None:
+        return out
+    r = r0 - 2
+    while r >= POLAR_R_MIN and out["right"] - out["left"] > budget:
+        out = polar_layout(languages, cats, r)
+        r -= 2
+    return out
+
+
+def polar_body(theme, layout, cx, cy):
+    """The ring centred on `(cx, cy)`.
+
+    Drawing order is the type's: rings, spokes, every ray but the leader's, the
+    leader, then the endpoints and labels over all of them.
+
+    The leading language is the one datum this chart exists to deliver, so it is
+    the ray that takes the accent — the slice's other use of it is the dot keying
+    the focal slab, which rule 6 counts as a swatch rather than a second mark.
+    The endpoint stays in ink: it is the structural head every ray carries, and
+    the accent on both would spend the mark twice on one ray. Weight carries the
+    leader as well — 2.4px against 2px, and a wider head — so the chart is still
+    true where the hue is not.
+    """
+    lead = layout["lead"]
+    grid = c.mix(theme.ink, theme.canvas, 0.1)
+
+    def at(p):
+        return _n(cx + p[0]), _n(cy + p[1])
+
+    rings = []
+    for i in range(POLAR_RINGS):
+        # The outer ring is the terminus a ray is read against, so it is traced
+        # like the spokes rather than dropped to gridline weight.
+        paint = theme.faint if i == POLAR_RINGS - 1 else grid
+        rings.append(f'<circle cx="{cx}" cy="{cy}" '
+                     f'r="{_n(layout["r"] * (i + 1) / POLAR_RINGS)}" fill="none" '
+                     f'stroke="{paint}" stroke-width="{CELL_EDGE}"/>')
+
+    spokes, rays, heads, labels = [], [], [], []
+    for i, it in enumerate(layout["items"]):
+        focal = i == lead
+        ux, uy = at(it["u"])
+        spokes.append(f'<line x1="{cx}" y1="{cy}" x2="{ux}" y2="{uy}" '
+                      f'stroke="{theme.faint}" stroke-width="{CELL_EDGE}"/>')
+
+        rx, ry = at(it["ray"])
+        # Round caps, so a language the stack rounds to a tenth of a percent
+        # still leaves a visible dot at the centre instead of nothing at all.
+        rays.append(
+            f'<line x1="{cx}" y1="{cy}" x2="{rx}" y2="{ry}" '
+            f'stroke="{theme.accent if focal else theme.dim}" '
+            f'stroke-width="{POLAR_RAY_W + 0.4 if focal else POLAR_RAY_W}" '
+            f'stroke-linecap="round"/>')
+        heads.append(
+            f'<circle cx="{rx}" cy="{ry}" r="{POLAR_HEAD + 1 if focal else POLAR_HEAD}" '
+            f'fill="{theme.canvas}" stroke="{theme.ink if focal else theme.dim}" '
+            f'stroke-width="1.2"/>')
+
+        labels += [
+            c.tx(_n(cx + it["lx"]), _n(cy + it["ly"]), it["name"],
+                 fill=theme.ink if focal else theme.dim, family=c.MONO_STACK,
+                 size=POLAR_NAME_FS, anchor=it["anchor"]),
+            c.tx(_n(cx + it["lx"]), _n(cy + it["ly"] + it["dy"]), it["pct"],
+                 fill=theme.faint, family=c.MONO_STACK, size=POLAR_PCT_FS,
+                 anchor=it["anchor"]),
+        ]
+
+    ordered = [r for i, r in enumerate(rays) if i != lead] + [rays[lead]]
+    return "\n".join(rings + spokes + ordered + heads + labels)
+
+
 def _empty(theme):
     """A short slice when no roster is configured. Rule 10: degrade, don't crash."""
     body = "\n".join([
@@ -392,7 +580,7 @@ def _empty(theme):
                        title="Tools in rotation", desc="No stack is configured.")
 
 
-def render(cfg, _data, theme):
+def render(cfg, data, theme):
     stack = cfg.get("stack") or {}
     if not stack:
         return _empty(theme)
@@ -436,15 +624,31 @@ def render(cfg, _data, theme):
                          for cells in grids[:-1]])
     gap = math.ceil(max((FOOT_W + FOOT_D) / 4, 3 * SLAB_H, clear) / 4) * 4
 
-    # The object and its label column are centred together between the rails, so
-    # the margins balance instead of the object hugging the left rail. A category
-    # name is the widest thing in the column; mono advances 0.6em, so 15px type
-    # measures 9px a character. Rounding pulls the screen extremes in off the
-    # corners, so the object's width is measured rather than assumed.
+    # A category name is the widest thing in the label column; mono advances
+    # 0.6em, so 15px type measures 9px a character. Rounding pulls the screen
+    # extremes in off the corners, so the object's width is measured rather than
+    # assumed.
     col_w = max(len(name) for name, _ in layers) * _round(LABEL_FS * c.MONO_ADVANCE)
     obj_l = out[bounds["left"]][0] - out[bounds["left"]][1]
     obj_r = out[bounds["right"]][0] - out[bounds["right"]][1]
-    left = c.TEXT_X + max(0, (c.CONTENT_R - c.TEXT_X - (obj_r - obj_l + LEADER + col_w)) / 2)
+    fig_w = obj_r - obj_l + LEADER + col_w
+
+    # The languages ring takes the left of the slice and the figure what is left
+    # of it. The two are the same subject at two scales — which layer the author
+    # writes in, and which language inside it — so they share a heading rather
+    # than a section each, and they are drawn at one size: the figure's own width
+    # is the ring's ceiling, and the span left over only ever shrinks it from
+    # there. The figure is the one held fixed, because a slab that resized with
+    # the language mix would make two unrelated things move together.
+    lang = polar_fit((data.get("stats") or {}).get("languages"), POLAR_CATS,
+                     c.CONTENT_R - c.TEXT_X - CHART_GAP - fig_w,
+                     (obj_r - obj_l) / 2)
+    chart_x = c.TEXT_X - lang["left"] if lang else c.TEXT_X
+    fig_x = c.TEXT_X + (lang["right"] - lang["left"]) + CHART_GAP if lang else c.TEXT_X
+
+    # The object and its column are centred together in what the ring left, so
+    # the margins balance instead of the object hugging a rail.
+    left = fig_x + max(0, (c.CONTENT_R - fig_x - fig_w) / 2)
     column = left + (obj_r - obj_l) + LEADER
 
     ox = left - obj_l
@@ -491,17 +695,30 @@ def render(cfg, _data, theme):
                  family=c.MONO_STACK, size=LABEL_FS, weight=700),
         ]))
 
+    # The ring is centred against the figure's own span rather than hung off the
+    # heading: the figure's mass is at the bottom of the slice and the ring's is
+    # in the middle of its block, so aligning their tops leaves the whole lower
+    # left of the panel empty.
+    floor_y = max(pr(x, y, 0)[1] for x, y in out)
+    chart = ""
+    if lang:
+        chart_y = _round((TOP_Y + floor_y - lang["top"] - lang["bottom"]) / 2)
+        chart = polar_body(theme, lang, chart_x, chart_y)
+
     count = sum(len(items) for _, items in layers)
     roster = "; ".join(f"{name.lower()} ({len(items)}) " + ", ".join(t for t, _ in items)
                        for name, items in layers)
     body = "\n".join([
         c.heading(theme, HEAD_Y, "stack", counter=f"{count} tools"),
-        *traces, *parts, *labels,
+        *([chart] if chart else []), *traces, *parts, *labels,
     ])
+    mix = ""
+    if lang:
+        shares = ", ".join(f"{it['name']} {it['pct']}" for it in lang["items"])
+        mix = f" Languages by bytes: {shares} of {c.num(lang['total'])}."
     desc = (f"{count} tools on {n} layers of one stack, pulled apart along a "
             f"single axis and standing on their layers as brand marks. "
-            f"Bottom to top: {roster}.")
+            f"Bottom to top: {roster}.{mix}")
 
-    floor_y = max(pr(x, y, 0)[1] for x, y in out)
     return c.slice_svg(theme, c.to_grid(floor_y + PAD_BELOW), body,
                        title="Tools in rotation", desc=desc)
