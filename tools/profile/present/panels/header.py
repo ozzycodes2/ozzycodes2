@@ -1,11 +1,18 @@
 """Top slice: window chrome, name, handle, role, tagline, live streak."""
 from .. import console as c
 
-NAME_Y = 104      # the one display-size baseline; everything hangs off it
-META_Y = 130      # handle · role, and the streak opposite it
-TAGLINE_Y = 176
+CMD_Y = 84        # `$ whoami`, the command the rest of the slice answers
+NAME_Y = 120      # the one display-size baseline; everything hangs off it
+META_Y = 146      # handle · role, and the streak opposite it
+TAGLINE_Y = 184
 LINE_H = 22
 MAX_LINES = 4     # beyond four the slice stops reading as a headline
+
+# The tagline is a list, not a paragraph. Each line is one claim and reads as
+# output of the command above it. `»` rather than a bullet or `❯`: both vendored
+# monospaces carry it, so it needs no fallback face.
+BULLET = "»"
+BULLET_X = c.TEXT_X + 18
 
 STREAK_SIZE = 13
 
@@ -19,6 +26,11 @@ def render(cfg, data, theme):
 
     body = [
         c.title_bar(theme, f"{handle} — zsh"),
+        # The window opens on the same transcript voice every section below it
+        # keeps: a command, then what it printed.
+        c.tx(c.TEXT_X, CMD_Y, "$", fill=theme.faint, family=c.MONO_STACK, size=12),
+        c.tx(c.TEXT_X + 14, CMD_Y, "whoami", fill=theme.dim,
+             family=c.MONO_STACK, size=12),
         c.tx(c.TEXT_X, NAME_Y, name, fill=theme.ink, family=c.SANS_STACK,
              size=30, weight=600, ls="-0.5"),
         c.tx(c.TEXT_X, META_Y, f"@{handle} · {role}", fill=theme.dim,
@@ -44,11 +56,15 @@ def render(cfg, data, theme):
     last_y = META_Y
     for i, line in enumerate(lines):
         last_y = TAGLINE_Y + i * LINE_H
-        body.append(c.tx(c.TEXT_X, last_y, line, fill=theme.dim,
-                         family=c.SANS_STACK, size=15))
+        body += [
+            c.tx(c.TEXT_X, last_y, BULLET, fill=theme.faint,
+                 family=c.MONO_STACK, size=13),
+            c.tx(BULLET_X, last_y, line, fill=theme.dim,
+                 family=c.SANS_STACK, size=15),
+        ]
 
     return c.slice_svg(
-        theme, c.to_grid(last_y + 28), "\n".join(body),
+        theme, c.to_grid(last_y + 26), "\n".join(body),
         title="Profile header",
         desc=f"{name} (@{handle}), {role}. {len(lines)} tagline lines.{tail}",
         top=True,

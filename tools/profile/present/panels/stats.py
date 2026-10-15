@@ -16,18 +16,18 @@ import datetime
 
 from .. import console as c
 
-HEAD_Y = 44
+HEAD_Y = c.HEAD_Y
 
 COLS = 3
 COL_W = (c.CONTENT_R - c.TEXT_X) // COLS   # integral, so the columns stay even
-GRID_Y = 92                                # first label baseline
+GRID_Y = HEAD_Y + c.BODY_DY                # first label baseline
 GRID_PITCH = 84                            # label to label, row to row
 VALUE_DY = 34
 NOTE_DY = 54
 RULE_DY = 66
 RULE_INSET = 24                            # gap between a rule and the next column
 
-PAD_BELOW = 28
+PAD_BELOW = 24
 
 
 def _year(raw):
@@ -94,7 +94,7 @@ def _grid(theme, cells):
     return out
 
 
-def render(_cfg, data, theme):
+def render(cfg, data, theme):
     stats = data.get("stats")
     if not stats:
         body = (c.heading(theme, HEAD_Y, "stats") + "\n"
@@ -104,10 +104,12 @@ def render(_cfg, data, theme):
                            title="Counters",
                            desc="No GitHub statistics are available.")
 
+    handle = (cfg.get("identity") or {}).get("handle", "")
     cells = _counters(stats)
     body = "\n".join([
         c.heading(theme, HEAD_Y, "stats",
-                  counter=f"captured {stats.get('updated', '?')}"),
+                  counter=f"captured {stats.get('updated', '?')}",
+                  cmd=f"gh api graphql -f login={handle}"),
         *_grid(theme, cells),
     ])
     desc = (f"{c.num(stats.get('contributions_year'))} contributions in "
@@ -116,8 +118,11 @@ def render(_cfg, data, theme):
             f"{c.num(stats.get('repos_contributed'))} repositories touched, "
             f"longest streak {stats.get('streak_longest', 0)} days.")
 
+    # Measured off the last row's closing rule, not off where a row after it
+    # would have begun: that phantom row left a dead 40px above the next seam.
     rows = -(-len(cells) // COLS)
     return c.slice_svg(
-        theme, c.to_grid(GRID_Y + rows * GRID_PITCH + PAD_BELOW),
+        theme,
+        c.to_grid(GRID_Y + (rows - 1) * GRID_PITCH + RULE_DY + PAD_BELOW),
         body, title="Counters", desc=desc,
     )

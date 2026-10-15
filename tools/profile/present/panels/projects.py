@@ -45,7 +45,7 @@ CHIP_TINT = 0.06                            # ink over surface, a tint not a fil
 SLICE_H = c.to_grid(CARD_H + 24)
 TOP = (SLICE_H - CARD_H) // 2
 
-HEAD_Y = 44
+HEAD_Y = c.HEAD_Y
 
 
 def render(cfg, data, theme):
@@ -154,7 +154,9 @@ def _card(theme, card, x, y):
 def _heading_slice(theme, n):
     """`~/projects` on its own full-width row, so the title is not inside a link."""
     return c.slice_svg(
-        theme, c.to_grid(HEAD_Y + 28), c.heading(theme, HEAD_Y, "projects", f"{n} repos"),
+        theme, c.to_grid(HEAD_Y + c.CMD_DY + 14),
+        c.heading(theme, HEAD_Y, "projects", f"{n} repos",
+                  cmd="gh repo view --json stars,forks,pushedAt"),
         title="~/projects", desc=f"Section heading: projects, {n} public repositories.",
     )
 

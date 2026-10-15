@@ -50,6 +50,17 @@ def body_of(markup):
     return markup.split("</style>")[1]
 
 
+def test_the_heading_quotes_the_two_files_the_figure_is_drawn_from(markup):
+    """Both are curated and reviewed in a diff, which is the point of saying so:
+    nothing in this panel was fetched."""
+    assert "cat stack.json languages.json" in markup
+
+
+def test_the_figure_starts_below_the_quoted_command(markup):
+    """A slab crossing the command line would read as part of the transcript."""
+    assert stack.TOP_Y > c.HEAD_Y + c.CMD_DY
+
+
 def height_of(markup):
     return int(re.search(r'<svg[^>]*height="(\d+)"', markup).group(1))
 

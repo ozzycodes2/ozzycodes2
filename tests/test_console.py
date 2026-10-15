@@ -588,6 +588,41 @@ def test_a_heading_escapes_its_name_and_counter():
     assert "&lt;b&gt;" in markup and "&quot;x&quot; &amp; y" in markup
 
 
+# --- the command under the rule --------------------------------------------
+
+@pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
+def test_a_heading_quotes_its_command_under_the_rule(theme):
+    """The section names its own source: a prompt, then what produced it."""
+    markup = c.heading(theme, 100, "stats", cmd="gh api graphql")
+    mono = c.e(c.MONO_STACK)
+    y = 100 + c.CMD_DY
+    assert f'<text x="{c.TEXT_X}" y="{y}" fill="{theme.faint}" ' \
+           f'font-family="{mono}" font-size="12">$</text>' in markup
+    assert f'<text x="{c.TEXT_X + 14}" y="{y}" fill="{theme.dim}" ' \
+           f'font-family="{mono}" font-size="12">gh api graphql</text>' in markup
+
+
+def test_the_command_clears_the_rule_and_leaves_the_body_room():
+    """It sits between the rule and the first body element, touching neither."""
+    assert c.CMD_DY > 14          # the rule's own offset
+    assert c.CMD_DY + 12 < c.BODY_DY
+
+
+def test_a_heading_quotes_its_command_in_a_glyph_the_subset_carries():
+    """`$` rather than `❯`: a prompt repeated in five panels needs no fallback."""
+    markup = c.heading(c.LIGHT, 100, "stats", cmd="ls")
+    assert "$" in c.visible(markup)
+    assert "❯" not in markup
+
+
+def test_a_heading_without_a_command_draws_no_prompt():
+    assert "$" not in c.heading(c.LIGHT, 100, "stack", "12 repos")
+
+
+def test_a_heading_escapes_its_command():
+    assert "&lt;b&gt;" in c.heading(c.LIGHT, 100, "x", cmd="<b>")
+
+
 def test_headings_stay_inside_the_content_width():
     assert c.TEXT_X < c.CONTENT_R < c.FRAME_R
 

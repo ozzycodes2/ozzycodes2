@@ -128,6 +128,14 @@ def test_the_heading_is_full_width_so_the_title_is_not_inside_a_card_link(out):
     assert "~/" in out["projects.svg"].markup and "4 repos" in out["projects.svg"].markup
 
 
+def test_the_heading_slice_carries_the_command_and_still_fits_one_row(out):
+    """The quoted command goes in the heading slice, not over a card: adding a
+    row there would push the first pair of cards off the grid."""
+    markup = out["projects.svg"].markup
+    assert "gh repo view --json stars,forks,pushedAt" in markup
+    assert f'height="{2 * c.ROW}"' in markup
+
+
 def test_no_card_contains_an_anchor(out):
     """GitHub strips <a> from a rendered SVG; the README wraps the <img>."""
     for markup in (s.markup for s in out.values()):

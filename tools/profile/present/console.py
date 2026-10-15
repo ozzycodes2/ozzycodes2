@@ -97,6 +97,13 @@ MARGIN = 16      # gutter outside the frame, so the corner radius has room
 ROW = 40         # grid pitch; every slice height must be a multiple
 TEXT_X = 52      # left edge of body text
 
+# The section block. A panel hangs its heading, its command transcript and its
+# first body element off these three rather than spelling its own, so every
+# section opens at the same rhythm and the seams between them stay even.
+HEAD_Y = 36      # heading baseline, measured from the slice top
+CMD_DY = 30      # heading baseline to the command under its rule
+BODY_DY = 62     # heading baseline to the first body element
+
 FRAME_L = MARGIN
 FRAME_R = W - MARGIN
 CONTENT_R = FRAME_R - 36
@@ -384,8 +391,8 @@ def foot_bar(theme, height):
 <path d="{_fill(FRAME_L, FRAME_R, y0, y1, R_CARD, tl=False, tr=False, br=True, bl=True)}" fill="{theme.surface}"/>'''
 
 
-def heading(theme, y, name, counter=""):
-    """A `~/section` header over a hairline rule.
+def heading(theme, y, name, counter="", cmd=""):
+    """A `~/section` header over a hairline rule, and the command behind it.
 
     Set in mono at 20/700 rather than at a display step: the section markers are
     part of the shell's own voice, not the document's, and `~/` only reads as a
@@ -395,6 +402,12 @@ def heading(theme, y, name, counter=""):
     its first 120px in the accent at 2px. That stroke is identical in every
     section, which is what makes it structure rather than emphasis: it indexes
     the window without ranking the panels against each other.
+
+    `cmd` goes under the rule as a transcript of what produced the section, so
+    the numbers below it name their own source. Its prompt is `$` rather than
+    the `❯` the footer closes on: that one is the live prompt, this is quoted
+    shell. `$` is also in the subset both vendored monospaces carry, which `❯`
+    is not — a glyph repeated in five panels should not depend on a fallback.
     """
     rule = (f'<line x1="{TEXT_X}" y1="{y + 14}" x2="{CONTENT_R}" y2="{y + 14}" '
             f'stroke="{theme.hairline}" stroke-width="{EDGE_W}" shape-rendering="crispEdges"/>'
@@ -402,10 +415,14 @@ def heading(theme, y, name, counter=""):
             f'stroke="{theme.accent}" stroke-width="2" shape-rendering="crispEdges"/>')
     right = (tx(CONTENT_R, y, counter, fill=theme.faint, family=MONO_STACK,
                 size=12, ls=1, anchor="end") if counter else "")
+    command = (f'{tx(TEXT_X, y + CMD_DY, "$", fill=theme.faint, family=MONO_STACK, size=12)}\n'
+               f'{tx(TEXT_X + 14, y + CMD_DY, cmd, fill=theme.dim, family=MONO_STACK, size=12)}'
+               if cmd else "")
     return f'''{tx(TEXT_X, y, "~/", fill=theme.faint, family=MONO_STACK, size=20, weight=700)}
 {tx(TEXT_X + 24, y, name, fill=theme.ink, family=MONO_STACK, size=20, weight=700)}
 {right}
-{rule}'''
+{rule}
+{command}'''
 
 
 def to_grid(value):

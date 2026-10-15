@@ -36,9 +36,9 @@ import math
 
 from .. import console as c
 
-HEAD_Y = 44
-TOP_Y = 88                # the top slab's highest vertex, clear of the rule at 58
-PAD_BELOW = 28
+HEAD_Y = c.HEAD_Y
+TOP_Y = HEAD_Y + c.BODY_DY   # the top slab's highest vertex, clear of the command
+PAD_BELOW = 20
 
 # Model units are screen units — `project` carries no scale — so these are one
 # proportional set. Resizing the figure means scaling all of them: holding the
@@ -711,7 +711,8 @@ def render(cfg, _data, theme):
     roster = "; ".join(f"{name.lower()} ({len(items)}) " + ", ".join(t for t, _ in items)
                        for name, items in layers)
     body = "\n".join([
-        c.heading(theme, HEAD_Y, "stack", counter=f"{count} tools"),
+        c.heading(theme, HEAD_Y, "stack", counter=f"{count} tools",
+                  cmd="cat stack.json languages.json"),
         *([chart] if chart else []), *traces, *parts, *labels,
     ])
     mix = ""

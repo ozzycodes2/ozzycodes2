@@ -7,8 +7,10 @@ import pytest
 from tools.profile.present import console as c
 from tools.profile.present.panels import city
 
-# The section rule `heading` draws, which no roof may cross.
-RULE_Y = 44 + 14
+# The section rule `heading` draws, and the command quoted under it. No roof
+# may cross either.
+RULE_Y = c.HEAD_Y + 14
+CMD_Y = c.HEAD_Y + c.CMD_DY
 
 
 def calendar(counts, start="2026-04-15"):
@@ -35,7 +37,9 @@ def theme(request):
 
 @pytest.fixture(scope="module")
 def panel(theme):
-    return city.render({"city": {"window_days": 182}}, {"calendar": YEAR}, theme)
+    return city.render(
+        {"city": {"window_days": 182}, "identity": {"handle": "ozzycodes2"}},
+        {"calendar": YEAR}, theme)
 
 
 def layers(markup):
@@ -364,6 +368,7 @@ def test_render_keeps_the_tallest_roof_below_the_section_rule():
     _, blocks = layers(svg)
     assert min(y for _, y in coords(blocks)) == city.OY
     assert city.OY > RULE_Y
+    assert city.OY > CMD_Y
 
 
 # --- render ----------------------------------------------------------------
@@ -442,6 +447,20 @@ def test_render_keeps_its_text_inside_the_content_column(panel):
 
 def test_render_counts_the_window_beside_the_heading(panel):
     assert f"{len(YEAR)} days" in panel
+
+
+def test_render_quotes_the_page_the_calendar_was_read_from(panel):
+    """The grid comes off the public contributions fragment with no credential
+    attached, and the line under the heading says exactly that URL."""
+    assert "curl -s github.com/users/ozzycodes2/contributions" in panel
+
+
+def test_the_quoted_url_carries_no_credential_and_no_api_host(panel):
+    """Naming `api.github.com` here would describe the one route that cannot
+    report private totals. See the README on why this is a web page."""
+    cmd = next(t for x, t in texts(panel) if t.startswith("curl"))
+    assert "api.github.com" not in cmd
+    assert "token" not in cmd and "Authorization" not in cmd
 
 
 def test_render_window_falls_back_to_the_width_the_plane_is_cut_for():

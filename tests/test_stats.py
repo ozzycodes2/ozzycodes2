@@ -23,9 +23,12 @@ TEXT = re.compile(
     r' font-size="(\d+)"([^>]*)>([^<]*)</text>')
 
 
+CFG = {"identity": {"handle": "ozzycodes2"}}
+
+
 @pytest.fixture(scope="module")
 def markup():
-    return stats.render({}, {"stats": STATS}, c.LIGHT)
+    return stats.render(CFG, {"stats": STATS}, c.LIGHT)
 
 
 def height_of(svg):
@@ -69,10 +72,15 @@ def test_the_slice_height_lands_on_the_grid_with_the_frame_left_open(markup):
     assert rails == f"M{c.FRAME_L} {height_of(markup)}V0M{c.FRAME_R} 0V{height_of(markup)}"
 
 
-def test_the_slice_ends_a_padding_below_the_second_row_of_cells(markup):
-    """The grid is now the whole panel, so the last rule sets the height."""
+def test_the_slice_ends_a_padding_below_the_last_row_of_cells(markup):
+    """The last row's closing rule sets the height.
+
+    Measuring from where a third row would have started instead left a dead
+    40px above the next section — which is the gap this panel is read across.
+    """
     assert height_of(markup) == c.to_grid(
-        stats.GRID_Y + 2 * stats.GRID_PITCH + stats.PAD_BELOW)
+        stats.GRID_Y + stats.GRID_PITCH + stats.RULE_DY + stats.PAD_BELOW)
+    assert height_of(markup) == 280
 
 
 def test_nothing_is_drawn_outside_the_content_column(markup):
@@ -80,6 +88,26 @@ def test_nothing_is_drawn_outside_the_content_column(markup):
         assert c.MARGIN <= float(x) <= c.CONTENT_R
     for x2 in re.findall(r'<line [^>]*x2="([\d.]+)"', markup):
         assert float(x2) <= c.CONTENT_R
+
+
+def test_the_heading_quotes_the_query_the_counters_came_from(markup):
+    """Every number here is one GraphQL call's answer; the line names it."""
+    x, y, fill, size, _, _, _, _ = said(
+        markup, "gh api graphql -f login=ozzycodes2")
+    assert (x, y) == (c.TEXT_X + 14, stats.HEAD_Y + c.CMD_DY)
+    assert (fill, size) == (c.LIGHT.dim, 12)
+
+
+def test_the_quoted_login_is_the_configured_handle():
+    """A hardcoded login would be wrong for anyone who forked this."""
+    svg = stats.render({"identity": {"handle": "someone-else"}},
+                       {"stats": STATS}, c.LIGHT)
+    assert "login=someone-else" in svg
+
+
+def test_the_command_degrades_with_no_identity_configured():
+    """Rule 10: a missing cfg key shortens the line, it does not raise."""
+    assert "gh api graphql -f login=" in stats.render({}, {"stats": STATS}, c.LIGHT)
 
 
 def test_the_heading_counter_carries_the_capture_stamp(markup):
@@ -157,7 +185,7 @@ def test_the_account_age_is_the_span_between_opening_and_the_stamp(markup):
 def test_an_unusable_join_date_keeps_the_cell_and_drops_the_year(raw):
     """The grid is the panel's structure; a hole in it would read as a broken
     renderer rather than as a date nobody recorded."""
-    markup = stats.render({}, {"stats": {**STATS, "created_at": raw}}, c.LIGHT)
+    markup = stats.render(CFG, {"stats": {**STATS, "created_at": raw}}, c.LIGHT)
     assert said(markup, "account opened")
     assert said(markup, "—")
     assert "years" not in c.visible(markup)
@@ -171,7 +199,7 @@ def test_the_accent_is_spent_once_and_never_on_a_word(theme):
     so the accent is left on the stroke that indexes the section. The one value
     worth marking here was the leading language, and it marks a ray in
     `~/stack` now."""
-    body = stats.render({}, {"stats": STATS}, theme).split("</style>")[1]
+    body = stats.render(CFG, {"stats": STATS}, theme).split("</style>")[1]
     assert body.count(theme.accent) == 1
     assert (f'<line x1="{c.TEXT_X}" y1="{stats.HEAD_Y + 14}" '
             f'x2="{c.TEXT_X + 120}" y2="{stats.HEAD_Y + 14}" '
@@ -194,7 +222,7 @@ def test_the_two_themes_differ_in_nothing_but_their_polarised_roles():
     both polarities, so the two skeletons agreeing with the literal hex still
     in them is what proves the brand hue does not follow the system setting.
     """
-    light, dark = (stats.render({}, {"stats": STATS}, t) for t in c.THEMES)
+    light, dark = (stats.render(CFG, {"stats": STATS}, t) for t in c.THEMES)
 
     def skeleton(svg, theme):
         out = svg.split("</style>")[1]
@@ -221,7 +249,7 @@ def test_desc_spells_out_every_number_it_draws(markup):
 
 @pytest.mark.parametrize("data", [{}, {"stats": None}, {"stats": {}}])
 def test_missing_stats_render_one_short_panel_instead_of_raising(data):
-    markup = stats.render({}, data, c.LIGHT)
+    markup = stats.render(CFG, data, c.LIGHT)
     assert height_of(markup) % c.ROW == 0 and height_of(markup) <= 120
     assert "no stats available" in c.visible(markup)
     assert "No GitHub statistics are available." in markup
@@ -230,7 +258,7 @@ def test_missing_stats_render_one_short_panel_instead_of_raising(data):
 def test_an_entirely_empty_stats_payload_still_counts_from_zero():
     """A payload that parsed but carries nothing is a fetch that half failed;
     the grid still has to come out on the grid."""
-    markup = stats.render({}, {"stats": {"updated": "2026-01-01"}}, c.LIGHT)
+    markup = stats.render(CFG, {"stats": {"updated": "2026-01-01"}}, c.LIGHT)
     assert said(markup, "contributions")         # no year to name
     assert said(markup, "0%")                    # no divide by zero either
     assert height_of(markup) % c.ROW == 0
@@ -240,9 +268,9 @@ def test_the_language_payload_no_longer_reaches_this_panel(markup):
     """It is drawn in `~/stack`. A language left in the markup here would be the
     old chart half-ported, which renders as a stray label over the grid."""
     for mix in ({}, {"Nim": 0}, {"<b>": 10}):
-        other = stats.render({}, {"stats": {**STATS, "languages": mix}}, c.LIGHT)
+        other = stats.render(CFG, {"stats": {**STATS, "languages": mix}}, c.LIGHT)
         assert other == markup
 
 
 def test_the_panel_is_deterministic(markup):
-    assert stats.render({}, {"stats": STATS}, c.LIGHT) == markup
+    assert stats.render(CFG, {"stats": STATS}, c.LIGHT) == markup

@@ -7,8 +7,10 @@ there is no stylesheet left to check against.
 import re
 
 import pytest
+from fontTools.ttLib import TTFont
 
 from tools.profile.present import console as c
+from tools.profile.present import fonts
 from tools.profile.present.panels import header
 
 CFG = {"identity": {
@@ -104,7 +106,7 @@ def test_the_name_is_the_one_display_size_element():
     """30/600 sans with -0.5 tracking: the only element off the label scale."""
     attrs = one(render(), "Osniel Quintana")
     assert attrs["x"] == str(c.TEXT_X)
-    assert attrs["y"] == "104"
+    assert attrs["y"] == str(header.NAME_Y)
     assert attrs["font-family"] == SANS
     assert attrs["font-size"] == "30"
     assert attrs["font-weight"] == "600"
@@ -117,7 +119,7 @@ def test_the_handle_and_role_share_one_mono_line():
     attrs, body = next((a, b) for a, b in texts(render()) if "@ozzycodes2" in b)
     assert body == "@ozzycodes2 · platform engineer"
     assert attrs["x"] == str(c.TEXT_X)
-    assert attrs["y"] == "130"
+    assert attrs["y"] == str(header.META_Y)
     assert attrs["font-family"] == MONO
     assert attrs["font-size"] == "13"
     assert attrs["fill"] == c.LIGHT.dim
@@ -128,7 +130,7 @@ def test_the_streak_label_is_end_anchored_mono_in_the_ink():
     """It is a fact, not a caption, so it sits in the ink opposite the handle."""
     attrs = one(render(), "3-day streak")
     assert attrs["x"] == str(c.CONTENT_R)
-    assert attrs["y"] == "130"
+    assert attrs["y"] == str(header.META_Y)
     assert attrs["text-anchor"] == "end"
     assert attrs["font-family"] == MONO
     assert attrs["font-size"] == "13"
@@ -136,22 +138,52 @@ def test_the_streak_label_is_end_anchored_mono_in_the_ink():
 
 
 def test_the_tagline_steps_22px_in_the_sans_body_size():
-    """Four lines at 15px from y=176, tighter than the 26px the old rows used."""
+    """Four lines at 15px, indented past their markers."""
     drawn = [(a, b) for a, b in texts(render()) if b.endswith(" line")]
     assert [b for _, b in drawn] == CFG["identity"]["tagline"]
     for i, (attrs, _) in enumerate(drawn):
-        assert attrs["x"] == str(c.TEXT_X)
-        assert attrs["y"] == str(176 + i * 22)
+        assert attrs["x"] == str(header.BULLET_X)
+        assert attrs["y"] == str(header.TAGLINE_Y + i * header.LINE_H)
         assert attrs["font-family"] == SANS
         assert attrs["font-size"] == "15"
         assert attrs["fill"] == c.LIGHT.dim
         assert "font-weight" not in attrs
 
 
+def test_each_tagline_line_carries_its_own_marker():
+    """The list reads as output of the command above it, one claim per line."""
+    marks = [a for a, b in texts(render()) if b == header.BULLET]
+    assert len(marks) == len(CFG["identity"]["tagline"])
+    for i, attrs in enumerate(marks):
+        assert attrs["x"] == str(c.TEXT_X)
+        assert attrs["y"] == str(header.TAGLINE_Y + i * header.LINE_H)
+        assert attrs["font-family"] == MONO
+        assert attrs["fill"] == c.LIGHT.faint
+
+
+@pytest.mark.parametrize("stem", [s for _, s, _ in fonts.FACES if s.startswith("jet")])
+def test_the_marker_is_a_glyph_the_vendored_monospace_carries(stem):
+    """A marker on every line must not fall through to a substitute face."""
+    assert header.BULLET in c.visible(render())
+    cmap = TTFont(fonts.FONT_DIR / f"{stem}.woff2").getBestCmap()
+    assert ord(header.BULLET) in cmap
+
+
+def test_the_slice_opens_on_the_command_it_answers():
+    """Same transcript voice the sections below it keep: `$`, then the command."""
+    svg = render()
+    assert one(svg, "whoami")["x"] == str(c.TEXT_X + 14)
+    assert one(svg, "whoami")["y"] == str(header.CMD_Y)
+    assert one(svg, "whoami")["font-family"] == MONO
+    assert one(svg, "whoami")["font-size"] == "12"
+    assert one(svg, "$")["x"] == str(c.TEXT_X)
+    assert one(svg, "$")["fill"] == c.LIGHT.faint
+
+
 def test_every_run_stays_inside_the_content_column():
-    """TEXT_X for body copy, CONTENT_R for the one end-anchored run, W/2 for chrome."""
+    """TEXT_X for body copy and markers, CONTENT_R for the one end-anchored run."""
     xs = {int(a["x"]) for a, _ in texts(render())}
-    assert xs == {c.TEXT_X, c.W // 2, c.CONTENT_R}
+    assert xs == {c.TEXT_X, c.TEXT_X + 14, header.BULLET_X, c.W // 2, c.CONTENT_R}
 
 
 def test_header_caps_the_tagline_at_four_lines():
@@ -170,7 +202,7 @@ def test_the_live_dot_sits_one_label_width_in_from_the_right():
     dot = elements(svg, "circle")[-1]
     width = round(len("3-day streak") * 13 * c.MONO_ADVANCE)
     assert dot["cx"] == str(c.CONTENT_R - width - 12)
-    assert dot["cy"] == "125"
+    assert dot["cy"] == str(header.META_Y - 5)
     assert dot["r"] == "4"
     assert dot["class"] == "live"
 
@@ -181,7 +213,7 @@ def test_the_accent_marks_the_live_dot_and_nothing_else_here(theme):
     no section heading, so the dot is the only accent in the slice."""
     svg = header.render(CFG, DATA, theme)
     assert svg.count(theme.accent) == 1
-    assert f'class="live" cx="722" cy="125" r="4" fill="{theme.accent}"' in svg
+    assert f'class="live" cx="722" cy="141" r="4" fill="{theme.accent}"' in svg
 
 
 def test_the_dot_pulses_through_the_shared_class():
@@ -203,8 +235,12 @@ def test_header_without_a_streak_drops_the_dot_and_the_label():
 
 # --- what the reference does not draw ----------------------------------------
 
-def test_header_draws_no_prompt_and_no_cursor():
-    """The whoami prompt and trailing block were this port's only inventions."""
+def test_header_draws_no_live_prompt_and_no_cursor():
+    """`$` quotes a command; `❯ … ▌` is the live prompt and closes the window.
+
+    The footer draws that one, once. A second cursor in the header would make
+    the window look like two sessions.
+    """
     svg = render()
     assert "❯" not in svg
     assert "▌" not in svg

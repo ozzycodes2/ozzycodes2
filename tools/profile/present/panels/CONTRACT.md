@@ -45,13 +45,19 @@ def render(cfg, data, theme):
 | `Slice(file, markup, href=None)` | One output file, and the URL the README should wrap it in. `file` is a path *within* a theme directory. See rule 10. |
 | `title_bar(theme, label)` | Window chrome, with `label` centred in mono 12. Header panel only. Takes no y: the band caps the frame, so it shares the frame's top edge and radius. Its content ends at `MARGIN + TITLE_H`. |
 | `foot_bar(theme, height)` | The mirror of it at the bottom, same depth and surface, no text. Footer panel only. |
-| `heading(theme, y, name, counter="")` | `~/section` header over a hairline rule; `counter` is right-aligned mono 12. Full-width slices only — it positions against `CONTENT_R`, so on a partial slice the counter lands outside the viewBox. Give a split row its own full-width heading slice. |
+| `heading(theme, y, name, counter="", cmd="")` | `~/section` header over a hairline rule; `counter` is right-aligned mono 12, `cmd` is the command that produced the section, quoted under the rule behind a `$`. Full-width slices only — it positions against `CONTENT_R`, so on a partial slice the counter lands outside the viewBox. Give a split row its own full-width heading slice. |
 | `to_grid(value)` | Rounds a height up to the next multiple of 40. |
 | `e(s)` | `html.escape`. `tx` applies it; use it directly on anything you interpolate by hand. |
 
 Geometry: `W` (880), `MARGIN` (16), `ROW` (40), `TEXT_X` (52), `FRAME_L` (16),
 `FRAME_R` (864), `CONTENT_R` (828), `TITLE_H` (44), and two radii — `R_CHIP` (5)
 and `R_CARD` (18).
+
+The section block is three more: `HEAD_Y` (36) is the heading baseline, `CMD_DY`
+(30) the command's offset below it, `BODY_DY` (62) the first body element's.
+Hang a panel off those rather than spelling its own — they are what keeps the
+sections at one rhythm, and the gap between two sections is the previous
+panel's tail plus `HEAD_Y`.
 
 Two stroke weights: `EDGE_W` (1) for anything a panel draws, `RAIL_W` (2) for the
 frame rails only. The rails are heavier because they are the one stroke that
@@ -81,7 +87,9 @@ two radii.
 1. **Only the header passes `top=True`; only the footer passes `bottom=True`.**
    Everything else passes neither, so the side rails continue across seams.
 2. **Height must be a multiple of 40** — `slice_svg` raises otherwise. Derive it
-   with `c.to_grid(last_y + padding)`, never hardcode.
+   with `c.to_grid(last_y + padding)`, never hardcode, and let `last_y` be the
+   last thing actually drawn. Measuring from where a further row *would* have
+   started is how `~/stats` came to carry a dead 40px above the next section.
 3. **Body text starts at `x=TEXT_X`** (52) and the right edge of content is
    `CONTENT_R` (828). Stay inside that. Vertically: first baseline 38–44px
    below the slice top, ~28px of padding below the last element.
@@ -133,6 +141,13 @@ two radii.
 13. **Both themes must emit the same slice list.** `render.py` pairs them file
     by file and fails the run if they diverge, since the README would otherwise
     pair the wrong two images.
+14. **A section names its own source.** Pass `heading` the command that produced
+    the numbers below it — the real one: `~/skyline` quotes the public
+    contributions page because that is what it reads, and quoting
+    `api.github.com` there would name the one route that cannot report private
+    totals. A command that names no source is better left out. Keep it to
+    glyphs both vendored monospaces carry, which `❯` is not; `$` is the prompt
+    for a quoted command and the footer keeps `❯` for the live one.
 
 ## Preview
 

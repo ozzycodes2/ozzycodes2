@@ -31,8 +31,12 @@ MIN_H = 6             # a single contribution still has to be visible
 # `window_days` from above.
 OX = 231
 
-# The plane's own top edge, before the overhang a tall near block needs.
-OY = 84
+# The plane's own top edge, before the overhang a tall near block needs. Clear
+# of the section rule and of the command line under it.
+OY = c.HEAD_Y + 60
+
+LEGEND_GAP = 24       # the plane's lowest corner to the legend's baseline
+PAD_BELOW = 16
 
 LEVELS = 5            # ground, then four occupied quartiles
 WINDOW_DAYS = 182     # 26 weeks, the width OX is cut for
@@ -202,14 +206,15 @@ def _empty(theme, days=0):
     note = "no contribution data yet" if not days else "less than a week of history"
     desc = ("No contribution data available." if not days else
             f"Only {days} days of history, fewer than the seven a column needs.")
-    body = (c.heading(theme, 44, "skyline", f"{days} days") + "\n"
-            + c.tx(c.TEXT_X, 88, note,
+    body = (c.heading(theme, c.HEAD_Y, "skyline", f"{days} days") + "\n"
+            + c.tx(c.TEXT_X, c.HEAD_Y + c.BODY_DY, note,
                    fill=theme.dim, family=c.MONO_STACK, size=13))
     return c.slice_svg(theme, 160, body, title="Contribution skyline", desc=desc)
 
 
 def render(cfg, data, theme):
     window = (cfg.get("city") or {}).get("window_days") or WINDOW_DAYS
+    handle = (cfg.get("identity") or {}).get("handle", "")
     days = (data.get("calendar") or [])[-window:]
     # Whole weeks only, counted back from the newest day. A part-week draws as a
     # short column, and trimming it off the near end instead would drop the most
@@ -241,11 +246,12 @@ def render(cfg, data, theme):
             blocks.append((col + row, block(theme, x, y, h, lvl, is_peak)))
     blocks.sort(key=lambda b: b[0])
 
-    # 32px below the plane's lowest corner, which is the far end of the rhombus.
-    legend_y = oy + (weeks - 1 + ROWS - 1) * HALF_H + TILE_H + 32
+    # Below the plane's lowest corner, which is the far end of the rhombus.
+    legend_y = oy + (weeks - 1 + ROWS - 1) * HALF_H + TILE_H + LEGEND_GAP
 
     body = "\n".join([
-        c.heading(theme, 44, "skyline", f"{len(days)} days"),
+        c.heading(theme, c.HEAD_Y, "skyline", f"{len(days)} days",
+                  cmd=f"curl -s github.com/users/{handle}/contributions"),
         f'<g>{"".join(ground)}</g>',
         f'<g>{"".join(markup for _, markup in blocks)}</g>',
         legend(theme, legend_y),
@@ -257,5 +263,5 @@ def render(cfg, data, theme):
             f"{len(active)} built on, {c.num(sum(values))} contributions. "
             f"Tallest block is {peak} on {peak_day}.")
 
-    return c.slice_svg(theme, c.to_grid(legend_y + 24), body,
+    return c.slice_svg(theme, c.to_grid(legend_y + PAD_BELOW), body,
                        title="Contribution skyline", desc=desc)
