@@ -28,28 +28,16 @@ element in presentation attributes: mono at 11/12/13/15/20/30 for everything
 structural, sans at 13/15/30 for the two runs of prose. What the tokens supply
 is the two families and the two radii.
 
-Inter and JetBrains Mono are embedded because GitHub strips <link> and external
-url() from a rendered SVG. SF Mono cannot be — it is not redistributable — so
-the mono stack asks for it first and falls back to the embedded JBM subset
-everywhere it is absent.
+`slice_svg` inlines a woff2 subset of every face its body needs, because GitHub
+strips <link> and external url() from a rendered SVG; `fonts.py` is how.
 """
-import base64
 import datetime
 import html
-import io
 import math
-import pathlib
 import re
 from typing import NamedTuple
 
-from fontTools import subset
-from fontTools.ttLib import TTFont
-
-HERE = pathlib.Path(__file__).resolve().parent
-ROOT = HERE.parent.parent
-DATA = HERE / "data"
-OUT = ROOT / "assets"
-FONT_DIR = HERE / "fonts"
+from .fonts import face_css
 
 
 class Theme(NamedTuple):
@@ -234,43 +222,6 @@ def visible(markup):
     return html.unescape(re.sub(r"<[^>]+>", "", markup))
 
 
-# (family name the CSS asks for, file stem, weight). Both families carry a
-# regular and a bold: the panels set 700 on every value, repo name and section
-# heading, and 600 on the one display-size name. JBM is the fallback under SF
-# Mono, which cannot be embedded.
-FACES = (
-    ("Inter", "inter-latin-400-normal", 400),
-    ("Inter", "inter-latin-600-normal", 600),
-    ("JBM", "jetbrains-mono-latin-400-normal", 400),
-    ("JBM", "jetbrains-mono-latin-700-normal", 700),
-)
-
-
-def font_faces(text):
-    """@font-face rules carrying only the glyphs `text` needs, inlined as woff2."""
-    text += "0123456789"
-    rules = []
-    for family, stem, weight in FACES:
-        # recalcTimestamp=False keeps the bytes stable across runs, so an
-        # unchanged panel produces no diff and the daily job pushes nothing.
-        font = TTFont(FONT_DIR / f"{stem}.woff2", recalcTimestamp=False)
-        options = subset.Options()
-        options.flavor = "woff2"
-        options.layout_features = []
-        subsetter = subset.Subsetter(options)
-        subsetter.populate(text=text)
-        subsetter.subset(font)
-        buf = io.BytesIO()
-        font.flavor = "woff2"
-        font.save(buf)
-        payload = base64.b64encode(buf.getvalue()).decode()
-        rules.append(
-            f"@font-face{{font-family:'{family}';font-weight:{weight};"
-            f"src:url(data:font/woff2;base64,{payload}) format('woff2')}}"
-        )
-    return "".join(rules)
-
-
 def base_css(_theme):
     """The one animation in the system, and nothing else.
 
@@ -380,7 +331,7 @@ def slice_svg(theme, height, body, *, title, desc, text="", top=False,
 <title id="t">{e(title)}</title>
 <desc id="d">{e(desc)}</desc>
 <style>
-{font_faces(text + visible(body))}
+{face_css(text + visible(body))}
 {base_css(theme)}
 {css}
 @media (prefers-reduced-motion:reduce){{*{{animation:none!important}}}}
@@ -478,20 +429,12 @@ class Slice(NamedTuple):
     href: str | None = None
 
 
-def write(theme, name, markup):
-    """Write one slice under its theme. `name` may contain a subdirectory."""
-    path = OUT / theme.name / name
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(markup)
-    return path
-
-
 def describe(markup):
     """The slice's accessible description and pixel width, read back out of it.
 
-    render.py needs both for the manifest. Reading them from the finished file
-    rather than having panels report them separately removes the chance of the
-    README's alt text drifting from the image's own <desc>.
+    The manifest needs both. Reading them from the finished markup rather than
+    having panels report them separately removes the chance of the README's alt
+    text drifting from the image's own <desc>.
     """
     desc = re.search(r"<desc[^>]*>(.*?)</desc>", markup, re.S)
     width = re.search(r'<svg[^>]*\swidth="([\d.]+)"', markup)

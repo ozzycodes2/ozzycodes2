@@ -1,10 +1,12 @@
 """Tests for the shared frame primitives: relative dates, colour, sliced rails."""
 import datetime
+import pathlib
 import re
 
 import pytest
 
-from tools.profile import console as c
+from tools.profile.present import console as c
+from tools.profile.present import fonts
 
 NOW = datetime.datetime(2026, 10, 12, 12, 0, tzinfo=datetime.timezone.utc)
 
@@ -458,12 +460,18 @@ def test_a_slice_embeds_the_four_faces_the_css_asks_for():
 
 
 def test_the_subset_grows_with_the_glyphs_it_has_to_carry():
-    assert len(c.font_faces("ab")) < len(c.font_faces("abcdefghijklmnopqrstuvwxyz"))
+    assert len(fonts.face_css("ab")) < len(fonts.face_css("abcdefghijklmnopqrstuvwxyz"))
 
 
 def test_digits_are_embedded_even_when_nothing_prints_one():
     """Every panel counts something, and CSS content can inject one unseen."""
-    assert c.font_faces("") == c.font_faces("0123456789")
+    assert fonts.face_css("") == fonts.face_css("0123456789")
+
+
+def test_a_subset_carries_no_build_timestamp():
+    """Two runs must produce identical bytes, or the daily job commits noise."""
+    face = fonts.FONT_DIR / f"{fonts.FACES[0][1]}.woff2"
+    assert fonts.subset_face(face, "abc") == fonts.subset_face(face, "abc")
 
 
 def test_the_subset_ignores_glyphs_that_only_appear_in_markup():
@@ -591,13 +599,27 @@ def test_to_grid_rounds_up_to_the_next_row(value, expected):
     assert c.to_grid(value) == expected
 
 
-def test_write_puts_each_theme_in_its_own_directory(tmp_path, monkeypatch):
-    """readme.py pairs ./assets/light/x.svg with ./assets/dark/x.svg by name."""
-    monkeypatch.setattr(c, "OUT", tmp_path)
-    for theme in c.THEMES:
-        path = c.write(theme, "nested/x.svg", f"<svg>{theme.name}</svg>")
-        assert path == tmp_path / theme.name / "nested/x.svg"
-        assert path.read_text() == f"<svg>{theme.name}</svg>"
+def test_console_opens_no_file_but_its_own_typeface():
+    """Panels draw; they never reach for data. The faces are the one exception,
+    and they live in fonts.py rather than here."""
+    source = pathlib.Path(c.__file__).read_text()
+    for forbidden in ("read_text", "read_bytes", "write_text", "open("):
+        assert forbidden not in source, forbidden
+
+
+def test_describe_reads_back_desc_and_width():
+    svg = c.slice_svg(c.LIGHT, 40, "", title="T", desc="the real numbers",
+                      width=440, rails="left")
+    assert c.describe(svg) == ("the real numbers", 440.0)
+
+
+def test_describe_unescapes_entities():
+    svg = c.slice_svg(c.LIGHT, 40, "", title="T", desc='a "quoted" & escaped desc')
+    assert c.describe(svg)[0] == 'a "quoted" & escaped desc'
+
+
+def test_describe_defaults_width_when_absent():
+    assert c.describe("<svg></svg>") == ("", c.W)
 
 
 def test_visible_keeps_nested_text_and_drops_attributes():

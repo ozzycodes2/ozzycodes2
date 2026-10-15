@@ -4,8 +4,8 @@ import re
 
 import pytest
 
-from tools.profile import console as c
-from tools.profile.panels import projects
+from tools.profile.present import console as c
+from tools.profile.present.panels import projects
 
 NOW = datetime.datetime.now(datetime.timezone.utc)
 

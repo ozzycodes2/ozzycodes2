@@ -2,9 +2,10 @@
 
 The panels in this directory are a **port**. The drawing lives in the
 `design-preview` repo, at `site/assets/panels.js`, rendered on each system's
-`Panels` tab. That file is the reference; `console.py` and `panels/*.py` follow
-it. A change made here and not there leaves two renderers disagreeing about one
-drawing, and nothing will tell you which is right.
+`Panels` tab. That file is the reference; `present/console.py` and
+`present/panels/*.py` follow it. A change made here and not there leaves two
+renderers disagreeing about one drawing, and nothing will tell you which is
+right.
 
 Default path: **change the preview first, look at it, then port.** The preview
 is vanilla JS with no build step and no deps, so the loop is seconds long. Only
@@ -66,12 +67,12 @@ Two traps, both of which cost an hour once:
 
 | preview (`site/assets/panels.js`) | here |
 |---|---|
-| `panelTheme`, `legible` | the pinned `LIGHT`/`DARK` in `console.py` |
+| `panelTheme`, `legible` | the pinned `LIGHT`/`DARK` in `present/console.py` |
 | `mixHex` | `console.mix` |
 | `tx`, `heading`, `titleBar`, `slice`, `band` | `console.tx/heading/title_bar/slice_svg` |
 | `ago`, `toGrid`, `num` | `console.ago/to_grid/num` |
 | `wrap` | `projects._wrap` — panel-local here, not in `console` |
-| `panelHeader` … `panelFooter` | `panels/header.py` … `panels/footer.py` |
+| `panelHeader` … `panelFooter` | `present/panels/header.py` … `present/panels/footer.py` |
 
 `panelTheme` derives seven roles from the raw tokens, correcting `dim`/`faint`
 to 4.5:1 and `accent` to 3:1 against the canvas. Python does **not** re-derive
@@ -128,8 +129,9 @@ it starts opaque and `.live` only dims it. CONTRACT.md rule 11.
 
 ## 6. Port, test, publish
 
-Panel rules are in `panels/CONTRACT.md`. Read it before touching a panel; rule 6
-(what the accent may touch) and rule 11 (above) are the two that catch people.
+Panel rules are in `present/panels/CONTRACT.md`. Read it before touching a
+panel; rule 6 (what the accent may touch) and rule 11 (above) are the two that
+catch people.
 
 ```bash
 R=~/Documents/personal/ozzycodes2

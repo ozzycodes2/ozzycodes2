@@ -1,118 +1,44 @@
 """Renders every README slice into assets/, and the manifest readme.py reads.
 
-Reads hand-written content from profile.toml and fetched numbers from
-data/*.json. Makes no network calls, so it can be re-run offline against the
-committed JSON while iterating on a panel.
+Wiring only: `sources` supplies the content and the fetched numbers,
+`transform.config` assembles what panels read, `present.slices` draws, and
+`sources.assets` writes. Makes no network call, so it can be re-run offline
+against the committed JSON while iterating on a panel.
 
 Every panel is rendered once per theme, into assets/<theme>/. The manifest is
 keyed by slice, not by theme: one entry carries both files, because the README
 pairs them in a single <picture> and their geometry and alt text are identical
 by construction.
 """
-import json
 import pathlib
 import sys
-import tomllib
 
-HERE = pathlib.Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE.parent.parent))
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2]))
 
-from tools.profile import console as c
-from tools.profile.panels import city, footer, header, projects, stack, stats
-
-# Display order, and the order of the manifest. `top` and `bottom` are decided
-# from position here, so header stays first and footer last.
-PANELS = [
-    ("header.svg", header),
-    ("stats.svg", stats),
-    ("contribution-city.svg", city),
-    ("stack.svg", stack),
-    ("projects.svg", projects),
-    ("footer.svg", footer),
-]
-
-MANIFEST = c.DATA / "manifest.json"
-
-
-def load_config():
-    """profile.toml, with the two hand-kept rosters folded in.
-
-    Each is its own file because TOML cannot express it: a mapping from name to
-    number, where a table inside `[stack]` would put every category on four
-    lines of header. JSON holds them in the shape the panels read, and key order
-    is draw order.
-
-      stack      category -> tool -> pedestal level 1-5
-      languages  language -> bytes, the ring in `~/stack`
-
-    `languages` is curated rather than fetched. `data/stats.json` still carries
-    what the API reports, but whole-tree byte counts answer a question nobody
-    asked — which checkout is largest, not which languages the work is in — and
-    a single generated monorepo can be half the total. Edit the file to change
-    the chart.
-    """
-    cfg = tomllib.loads((HERE / "profile.toml").read_text())
-    cfg["stack"] = json.loads((HERE / "stack.json").read_text())
-    cfg["languages"] = json.loads((HERE / "languages.json").read_text())
-    return cfg
-
-
-def load_data():
-    """Fetched numbers, keyed by file stem. Missing files render as empty."""
-    out = {}
-    for path in sorted(c.DATA.glob("*.json")):
-        out[path.stem] = json.loads(path.read_text())
-    return out
-
-
-def slices_of(name, result):
-    """Normalise whatever a panel returned into a list of Slices.
-
-    A panel that is one full-width section returns bare markup and gets `name`.
-    A panel whose parts need separate links returns its own named slices —
-    either Slices, or a plain {filename: markup} mapping when none of them
-    link anywhere.
-    """
-    if isinstance(result, str):
-        return [c.Slice(name, result)]
-    if isinstance(result, dict):
-        return [c.Slice(f, m) for f, m in result.items()]
-    return [s if isinstance(s, c.Slice) else c.Slice(*s) for s in result]
-
-
-def render_theme(cfg, data, theme):
-    """Write one theme's slices. Returns the manifest rows they imply."""
-    rows = []
-    for name, panel in PANELS:
-        for entry in slices_of(name, panel.render(cfg, data, theme)):
-            c.write(theme, entry.file, entry.markup)
-            desc, width = c.describe(entry.markup)
-            rows.append({
-                "file": entry.file,
-                "desc": desc,
-                # Percentages rather than pixels so the console scales with the
-                # page. Widths within a row sum to W, so these sum to 100.
-                "width": f"{100 * width / c.W:.4f}".rstrip("0").rstrip(".") + "%",
-                **({"href": entry.href} if entry.href else {}),
-            })
-            print(f"wrote assets/{theme.name}/{entry.file}")
-    return rows
+from tools.profile.present import console as c
+from tools.profile.present import slices
+from tools.profile.sources import assets, files, store
+from tools.profile.transform import config, layout
 
 
 def main():
-    cfg, data = load_config(), load_data()
+    cfg = config.build(files.profile_config(), files.stack_roster(),
+                       files.languages(), files.stack_logos())
+    data = store.read_all()
 
     manifest = None
     for theme in c.THEMES:
-        rows = render_theme(cfg, data, theme)
+        rows = []
+        for file, markup, row in slices.render_theme(cfg, data, theme):
+            assets.write_slice(theme.name, file, markup)
+            rows.append(row)
+            print(f"wrote assets/{theme.name}/{file}")
         if manifest is None:
             manifest = rows
-        elif [r["file"] for r in rows] != [r["file"] for r in manifest]:
-            # The README pairs the two themes file by file, so a panel that
-            # emitted different slices for each would silently mismatch them.
+        elif not layout.same_slices(rows, manifest):
             sys.exit(f"error: {theme.name} produced a different slice list")
 
-    MANIFEST.write_text(json.dumps(manifest, indent=2) + "\n")
+    store.write_manifest(manifest)
     print(f"wrote data/manifest.json ({len(manifest)} slices × {len(c.THEMES)} themes)")
 
 

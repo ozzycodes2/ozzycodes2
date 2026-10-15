@@ -1,9 +1,15 @@
 # Panel contract
 
 Each panel is one module exposing `render(cfg, data, theme)`, returning a
-complete SVG document. `render.py` lists them in display order and writes each
-to `assets/<theme>/<name>.svg`, once per theme; the README stacks them with
-consecutive `<picture>` tags so they read as one continuous window.
+complete SVG document. `../slices.py` lists them in display order and the data
+layer writes each to `assets/<theme>/<name>.svg`, once per theme; the README
+stacks them with consecutive `<picture>` tags so they read as one continuous
+window.
+
+A panel is presentation and nothing else: it opens no file and makes no
+request. Everything it draws arrives in `cfg` and `data`, which `render.py`
+assembles before any panel runs. `tests/test_layers.py` fails the run if a
+module here imports the data layer.
 
 A panel whose parts must be separately clickable returns a list of `Slice`s
 instead — it names its own files and supplies their `href`s. See rule 10.
@@ -18,7 +24,10 @@ def render(cfg, data, theme):
     return c.slice_svg(theme, height, body, title=..., desc=...)
 ```
 
-- `cfg` — parsed `profile.toml` (hand-written content).
+- `cfg` — the hand-written content: parsed `profile.toml`, plus `stack`,
+  `languages` and `logos` folded in from their own files. A panel reading one of
+  those three is reading config, not data, and draws the same figure on a
+  machine that has never fetched.
 - `data` — `{stem: parsed json}` for every file in `data/`: `stats`, `calendar`,
   `projects`. A panel must tolerate a missing key.
 - `theme` — a `Theme`. Every colour the panel draws comes from here.
@@ -141,4 +150,4 @@ pins the seven theme roles against what that site's `panelTheme()` derives, and
 each panel's tests pin its geometry; a change here that is not also made there
 puts the two renderers out of agreement.
 
-Change the preview first, then port. `../BACKPORT.md` is the procedure.
+Change the preview first, then port. `../../BACKPORT.md` is the procedure.

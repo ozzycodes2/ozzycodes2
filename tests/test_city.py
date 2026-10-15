@@ -4,8 +4,8 @@ import re
 
 import pytest
 
-from tools.profile import console as c
-from tools.profile.panels import city
+from tools.profile.present import console as c
+from tools.profile.present.panels import city
 
 # The section rule `heading` draws, which no roof may cross.
 RULE_Y = 44 + 14

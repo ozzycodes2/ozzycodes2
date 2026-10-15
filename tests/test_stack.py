@@ -16,15 +16,20 @@ import re
 
 import pytest
 
-from tools.profile import console as c
-from tools.profile.panels import stack
+from tools.profile.present import console as c
+from tools.profile.present.panels import stack
+from tools.profile.sources import files
+
+# The real marks, because the brand hexes below are pinned against the preview's
+# own corrections of them — a stub would pin this module against itself.
+LOGOS = files.stack_logos()
 
 CFG = {"stack": {
     "Languages": {"Java": 5, "Rust": 3, "Python": 4, "TypeScript": 2, "Swift": 5, "Shell": 2},
     "Platform": {"Kubernetes": 4, "Terraform": 3, "Helm": 3, "ArgoCD": 4, "Docker": 5},
     "Cloud": {"AWS": 4, "Grafana": 4, "Prometheus": 2, "Datadog": 4},
     "Tooling": {"Claude Code": 5, "MCP": 3, "Git": 4, "Just": 3, "Neovim": 2},
-}}
+}, "logos": LOGOS}
 
 TOTAL = sum(len(v) for v in CFG["stack"].values())
 LAYERS = list(reversed(list(CFG["stack"].items())))   # bottom to top, as drawn
@@ -333,7 +338,7 @@ def test_the_face_paints_match_the_preview(theme):
 def test_a_brand_hex_is_corrected_until_it_clears_three_to_one(theme):
     ground = stack.faces(theme, False, 0.1)[1]
     for name, want in PREVIEW_BRAND[theme.name].items():
-        got = stack.brand(theme, stack.LOGOS[name]["hex"], ground)
+        got = stack.brand(theme, LOGOS[name]["hex"], ground)
         assert got == want, name
         assert c.contrast(got, ground) >= 3
 

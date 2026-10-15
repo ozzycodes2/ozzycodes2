@@ -4,8 +4,10 @@ import re
 
 import pytest
 
-from tools.profile import console as c
-from tools.profile import preview
+from tools.profile import preview as entrypoint
+from tools.profile.present import console as c
+from tools.profile.present import preview
+from tools.profile.sources import assets, store
 
 
 def entry(file, width="100%", desc="d", href=None):
@@ -148,33 +150,34 @@ def test_the_page_is_a_standalone_document(manifest):
 @pytest.fixture
 def out(tmp_path, monkeypatch):
     """Write the page into tmp_path, and read the manifest from there too."""
-    monkeypatch.setattr(preview, "OUT", tmp_path / "assets" / "preview.html")
-    monkeypatch.setattr(preview.c, "DATA", tmp_path)
-    monkeypatch.setattr(preview.c, "ROOT", tmp_path)
-    (tmp_path / "assets").mkdir()
+    monkeypatch.setattr(assets, "ROOT", tmp_path)
+    monkeypatch.setattr(assets, "OUT", tmp_path / "assets")
+    monkeypatch.setattr(assets, "PREVIEW", tmp_path / "assets" / "preview.html")
+    monkeypatch.setattr(store, "DATA", tmp_path)
     return tmp_path / "assets" / "preview.html"
 
 
 def test_main_writes_the_page_beside_the_slices(out, tmp_path, capsys):
     (tmp_path / "manifest.json").write_text(json.dumps([entry("a.svg")]))
-    preview.main()
+    entrypoint.main()
     assert 'src="./light/a.svg"' in out.read_text()
     assert "preview.html" in capsys.readouterr().out
 
 
 def test_main_overwrites_a_stale_page(out, tmp_path):
+    out.parent.mkdir()
     out.write_text("stale")
     (tmp_path / "manifest.json").write_text(json.dumps([entry("a.svg")]))
-    preview.main()
+    entrypoint.main()
     assert "stale" not in out.read_text()
 
 
 def test_main_exits_without_a_manifest(out):
     with pytest.raises(SystemExit, match="render.py"):
-        preview.main()
+        entrypoint.main()
 
 
 def test_main_writes_nothing_without_a_manifest(out):
     with pytest.raises(SystemExit):
-        preview.main()
+        entrypoint.main()
     assert not out.exists()

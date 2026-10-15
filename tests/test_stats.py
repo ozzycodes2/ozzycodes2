@@ -3,8 +3,8 @@ import re
 
 import pytest
 
-from tools.profile import console as c
-from tools.profile.panels import stats
+from tools.profile.present import console as c
+from tools.profile.present.panels import stats
 
 STATS = {
     "updated": "2026-10-12", "year": 2026, "created_at": "2016-08-28T00:35:26Z",

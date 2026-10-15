@@ -8,8 +8,8 @@ import re
 
 import pytest
 
-from tools.profile import console as c
-from tools.profile.panels import header
+from tools.profile.present import console as c
+from tools.profile.present.panels import header
 
 CFG = {"identity": {
     "name": "Osniel Quintana",

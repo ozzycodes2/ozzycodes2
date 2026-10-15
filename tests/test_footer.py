@@ -3,8 +3,8 @@ import re
 
 import pytest
 
-from tools.profile import console as c
-from tools.profile.panels import footer
+from tools.profile.present import console as c
+from tools.profile.present.panels import footer
 
 
 def painted(markup):

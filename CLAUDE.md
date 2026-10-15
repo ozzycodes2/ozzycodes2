@@ -1,8 +1,9 @@
 # ozzycodes2
 
 GitHub profile README, rendered as one terminal window sliced into consecutive
-SVGs. `tools/profile/README.md` is the pipeline; `tools/profile/panels/CONTRACT.md`
-is the panel API — read it before touching a panel.
+SVGs. `tools/profile/README.md` is the pipeline;
+`tools/profile/present/panels/CONTRACT.md` is the panel API — read it before
+touching a panel.
 
 The panels are a **port**. The drawing lives in `~/Documents/personal/design-preview`
 at `site/assets/panels.js`, and that file is the reference. Any change to how a
