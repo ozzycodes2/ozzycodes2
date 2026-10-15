@@ -292,3 +292,11 @@ def test_load_data_ignores_anything_that_is_not_json(tmp_path, monkeypatch):
 def test_load_config_reads_the_committed_profile(monkeypatch):
     """profile.toml is the hand-written half of the console."""
     assert "identity" in render.load_config()
+
+
+def test_load_config_folds_in_both_hand_kept_rosters():
+    """The stack figure and the languages ring are both config. Neither reads
+    `data/`, so `render.py` draws the same slice before any fetch."""
+    cfg = render.load_config()
+    assert cfg["stack"] and cfg["languages"]
+    assert all(isinstance(v, int) and v > 0 for v in cfg["languages"].values())

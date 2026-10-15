@@ -155,6 +155,11 @@ Content diverges on purpose: the preview reads a static snapshot
 the last fetch. So bar widths, dates and counts **will** differ. Compare the
 shape of the markup, not bytes.
 
+One exception. The languages ring is curated in both — `languages.json` here,
+`stats.languages` in the snapshot there — so those two must hold the same
+numbers, and a ring that differs between the repos is a missed port rather than
+a stale fetch.
+
 ```bash
 grep -o '<rect x="172" y="300"[^/]*/>' assets/dark/stats.svg /tmp/preview-slices/dark-stats.svg
 ```

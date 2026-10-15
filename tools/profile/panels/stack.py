@@ -23,11 +23,14 @@ a fourth level of detail and the type caps at three, so the names live in `desc`
 — the README's alt text, and the only place a screen reader finds them.
 
 Left of the figure and the same size as it, a polar ring gives languages by
-bytes: angle is rank, radius is share. The two are one subject at two scales —
-which layer the author writes in, and which language inside it — so they share
-this slice's heading rather than taking a section each. This is the one panel
-spending two literal accents: the leading language's ray, and the dot keying the
-focal slab's tint, which rule 6 counts as a swatch.
+bytes from languages.json: angle is rank, radius is share. The two are one
+subject at two scales — which layer the author writes in, and which language
+inside it — so they share this slice's heading rather than taking a section
+each. This is the one panel spending two literal accents: the leading language's
+ray, and the dot keying the focal slab's tint, which rule 6 counts as a swatch.
+
+Both halves come from config, not from `data/`: the panel renders the same
+figure on a machine that has never fetched.
 """
 import json
 import math
@@ -409,13 +412,13 @@ def polar_layout(languages, cats, r):
     """Languages by bytes as a polar ring: angle is rank, radius is share.
 
     Rank is not a cycle, which is the one thing this type asks of its
-    categories. What the ring buys in exchange is the shape of the fall — three
-    languages carry the whole stack and everything else is rounding error, which
-    a row of bars states one bar at a time.
+    categories. What the ring buys in exchange is the shape of the fall, which a
+    row of bars states one bar at a time.
 
-    `cats` is how many sectors the ring is cut into, 4 to 8; whatever the head
-    does not name folds into a single `other`, so the tail is accounted for
-    without spending a sector on each member of it. The scale runs 0 to the
+    `cats` is how many sectors the ring is cut into, 4 to 8. A roster longer than
+    the cut folds its tail into a single `other`, so the remainder is accounted
+    for without spending a sector on each member of it; a roster shorter than the
+    cut draws one sector per language and no fold. The scale runs 0 to the
     leading share rounded up to the next tenth, so every ring is a tenth of the
     whole and the leader terminates inside the outermost one.
 
@@ -580,7 +583,7 @@ def _empty(theme):
                        title="Tools in rotation", desc="No stack is configured.")
 
 
-def render(cfg, data, theme):
+def render(cfg, _data, theme):
     stack = cfg.get("stack") or {}
     if not stack:
         return _empty(theme)
@@ -640,7 +643,7 @@ def render(cfg, data, theme):
     # is the ring's ceiling, and the span left over only ever shrinks it from
     # there. The figure is the one held fixed, because a slab that resized with
     # the language mix would make two unrelated things move together.
-    lang = polar_fit((data.get("stats") or {}).get("languages"), POLAR_CATS,
+    lang = polar_fit(cfg.get("languages"), POLAR_CATS,
                      c.CONTENT_R - c.TEXT_X - CHART_GAP - fig_w,
                      (obj_r - obj_l) / 2)
     chart_x = c.TEXT_X - lang["left"] if lang else c.TEXT_X

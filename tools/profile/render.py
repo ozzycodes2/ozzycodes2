@@ -35,15 +35,25 @@ MANIFEST = c.DATA / "manifest.json"
 
 
 def load_config():
-    """profile.toml, with the stack roster folded in under `stack`.
+    """profile.toml, with the two hand-kept rosters folded in.
 
-    The roster is its own file because TOML cannot express it: a category is a
-    mapping from tool to pedestal level, and a table of tables inside `[stack]`
-    would put each category on four lines of header. JSON holds it in the shape
-    the panel reads, and key order is draw order in both.
+    Each is its own file because TOML cannot express it: a mapping from name to
+    number, where a table inside `[stack]` would put every category on four
+    lines of header. JSON holds them in the shape the panels read, and key order
+    is draw order.
+
+      stack      category -> tool -> pedestal level 1-5
+      languages  language -> bytes, the ring in `~/stack`
+
+    `languages` is curated rather than fetched. `data/stats.json` still carries
+    what the API reports, but whole-tree byte counts answer a question nobody
+    asked — which checkout is largest, not which languages the work is in — and
+    a single generated monorepo can be half the total. Edit the file to change
+    the chart.
     """
     cfg = tomllib.loads((HERE / "profile.toml").read_text())
     cfg["stack"] = json.loads((HERE / "stack.json").read_text())
+    cfg["languages"] = json.loads((HERE / "languages.json").read_text())
     return cfg
 
 

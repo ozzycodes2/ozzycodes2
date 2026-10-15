@@ -16,7 +16,7 @@
   },
   {
     "file": "stack.svg",
-    "desc": "20 tools on 4 layers of one stack, pulled apart along a single axis and standing on their layers as brand marks. Bottom to top: tooling (5) Claude Code, MCP, Git, Just, Neovim; cloud (4) AWS, Grafana, Prometheus, Datadog; platform (5) Kubernetes, Terraform, Helm, ArgoCD, Docker; languages (6) Java, Rust, Python, TypeScript, Swift, Shell. Languages by bytes: HTML 47.4%, Python 33.2%, Swift 13.4%, TypeScript 5.6%, Shell 0.3%, CSS 0.1%, other <0.1%, Dockerfile <0.1% of 9,043,808.",
+    "desc": "20 tools on 4 layers of one stack, pulled apart along a single axis and standing on their layers as brand marks. Bottom to top: tooling (5) Claude Code, MCP, Git, Just, Neovim; cloud (4) AWS, Grafana, Prometheus, Datadog; platform (5) Kubernetes, Terraform, Helm, ArgoCD, Docker; languages (6) Java, Rust, Python, TypeScript, Swift, Shell. Languages by bytes: Rust 29.7%, Java 25.9%, Swift 17.3%, Python 13.8%, Go 6.6%, HCL 4.5%, TypeScript 2.2% of 54,132,183.",
     "width": "100%"
   },
   {

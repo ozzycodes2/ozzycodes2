@@ -460,7 +460,9 @@ def test_a_category_with_no_tools_still_takes_a_slab():
 # --- the languages ring ----------------------------------------------------
 
 # Nine languages, so one sector folds and the names left to label are short
-# enough that only the ceiling can hold the ring to the figure.
+# enough that only the ceiling can hold the ring to the figure. Deliberately not
+# the shipped languages.json, which is seven and folds nothing: a roster that
+# happens to fit the cut proves nothing about one that does not.
 LANGS = {"Swift": 1213553, "Python": 683170, "TypeScript": 644000,
          "Shell": 25279, "CSS": 8129, "HTML": 5000, "Dockerfile": 2364,
          "JavaScript": 1949, "Mermaid": 1178}
@@ -472,7 +474,7 @@ CIRCLE = re.compile(r'<circle cx="([-\d.]+)" cy="([-\d.]+)" r="([\d.]+)" '
 
 @pytest.fixture(scope="module")
 def ring():
-    return stack.render(CFG, {"stats": {"languages": LANGS}}, c.LIGHT)
+    return stack.render({**CFG, "languages": LANGS}, {}, c.LIGHT)
 
 
 def circles_of(markup, kind):
@@ -498,6 +500,15 @@ def layout_of(markup, cats=stack.POLAR_CATS):
 @pytest.mark.parametrize("cats, want", [(1, 4), (4, 4), (6, 6), (8, 8), (99, 8)])
 def test_the_cut_is_clamped_to_the_types_four_to_eight(cats, want):
     assert len(stack.polar_fit(LANGS, cats)["items"]) == want
+
+
+def test_a_roster_shorter_than_the_cut_names_every_language():
+    """Five languages into eight sectors is five sectors, not four and a fold.
+    The shipped roster is seven and this is the case it takes, so a fixture that
+    always folds would leave the panel's own path untested."""
+    short = dict(list(LANGS.items())[:5])
+    named = [it["name"] for it in stack.polar_fit(short, 8)["items"]]
+    assert named == list(short)
 
 
 @pytest.mark.parametrize("languages", [None, {}, {"Only": 0}])
@@ -588,7 +599,7 @@ def test_the_leading_language_is_the_rings_one_mark(theme):
     """The slice's whole accent budget: the section rule, the dot keying the
     focal slab's tint, and the leading ray. The ray's endpoint stays in ink —
     the accent on both would spend the mark twice on one ray."""
-    body = body_of(stack.render(CFG, {"stats": {"languages": LANGS}}, theme))
+    body = body_of(stack.render({**CFG, "languages": LANGS}, {}, theme))
     assert body.count(theme.accent) == 3
     heavy = f'stroke="{theme.accent}" stroke-width="{stack.POLAR_RAY_W + 0.4}"'
     assert body.count(heavy) == 1
@@ -625,8 +636,8 @@ def test_a_share_too_small_to_print_is_floored_rather_than_zeroed():
     assert [it["pct"] for it in lay["items"]] == ["90.9%", "9.1%", "<0.1%", "<0.1%"]
 
 
-def test_a_snapshot_with_no_languages_renders_the_figure_alone(markup, ring):
-    """Rule 10, and the figure is the half that does not depend on the fetch."""
+def test_a_config_with_no_languages_renders_the_figure_alone(markup, ring):
+    """Rule 10. An absent languages.json costs the ring and nothing else."""
     assert not circles_of(markup, "ring")
     assert "Languages by bytes" not in markup
     assert height_of(markup) == height_of(ring)
