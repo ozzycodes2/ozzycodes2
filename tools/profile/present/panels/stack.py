@@ -712,7 +712,7 @@ def render(cfg, _data, theme):
                        for name, items in layers)
     body = "\n".join([
         c.heading(theme, HEAD_Y, "stack", counter=f"{count} tools",
-                  cmd="cat stack.json languages.json"),
+                  cmd="scan --loadout --top-level"),
         *([chart] if chart else []), *traces, *parts, *labels,
     ])
     mix = ""

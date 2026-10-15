@@ -50,10 +50,10 @@ def body_of(markup):
     return markup.split("</style>")[1]
 
 
-def test_the_heading_quotes_the_two_files_the_figure_is_drawn_from(markup):
-    """Both are curated and reviewed in a diff, which is the point of saying so:
-    nothing in this panel was fetched."""
-    assert "cat stack.json languages.json" in markup
+def test_the_heading_quotes_the_command_the_figure_answers(markup):
+    """This panel has no fetched source to name — both rosters are curated — so
+    the line reads as the window's own voice rather than a transcript."""
+    assert "scan --loadout --top-level" in markup
 
 
 def test_the_figure_starts_below_the_quoted_command(markup):

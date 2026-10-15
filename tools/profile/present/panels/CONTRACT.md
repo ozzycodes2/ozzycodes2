@@ -141,13 +141,14 @@ two radii.
 13. **Both themes must emit the same slice list.** `render.py` pairs them file
     by file and fails the run if they diverge, since the README would otherwise
     pair the wrong two images.
-14. **A section names its own source.** Pass `heading` the command that produced
-    the numbers below it — the real one: `~/skyline` quotes the public
-    contributions page because that is what it reads, and quoting
-    `api.github.com` there would name the one route that cannot report private
-    totals. A command that names no source is better left out. Keep it to
-    glyphs both vendored monospaces carry, which `❯` is not; `$` is the prompt
-    for a quoted command and the footer keeps `❯` for the live one.
+14. **A section that was fetched names where from.** Pass `heading` the real
+    call: `~/skyline` quotes the public contributions page because that is what
+    it reads, and quoting `api.github.com` there would name the one route that
+    cannot report private totals. A section drawn from curated files has no
+    source to cite and takes a command in the window's own voice instead, as
+    `~/stack` does. Keep either to glyphs both vendored monospaces carry, which
+    `❯` is not; `$` is the prompt for a quoted command and the footer keeps `❯`
+    for the live one.
 
 ## Preview
 
