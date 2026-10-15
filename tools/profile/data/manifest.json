@@ -16,7 +16,7 @@
   },
   {
     "file": "stack.svg",
-    "desc": "20 tools across 4 categories: Languages (6), Platform (5), Cloud (4), Tooling (5).",
+    "desc": "20 tools on 4 layers of one stack, pulled apart along a single axis and standing on their layers as brand marks. Bottom to top: tooling (5) Claude Code, MCP, Git, Just, Neovim; cloud (4) AWS, Grafana, Prometheus, Datadog; platform (5) Kubernetes, Terraform, Helm, ArgoCD, Docker; languages (6) Java, Rust, Python, TypeScript, Swift, Shell.",
     "width": "100%"
   },
   {

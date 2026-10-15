@@ -23,11 +23,9 @@ tagline = [
 # be two thirds bare ground and half of it off-frame.
 window_days = 182
 
-[stack]
-Languages = ["Java", "Rust", "Python", "TypeScript", "Swift", "Shell"]
-Platform = ["Kubernetes", "Terraform", "Helm", "ArgoCD", "Docker"]
-Cloud = ["AWS", "EKS", "Grafana", "Prometheus"]
-Tooling = ["Claude Code", "MCP", "Git", "Just", "Neovim"]
+# The `~/stack` roster lives in stack.json, not here. A category maps each tool
+# to the height of its pedestal in the figure, which TOML can only express as a
+# table per category.
 
 # Curated, in display order. `repo` is owner/name; the language and last-push
 # date come from the API at render time, so only the prose lives here. Set

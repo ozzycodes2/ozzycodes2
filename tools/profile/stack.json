@@ -1,0 +1,30 @@
+{
+  "Languages": {
+    "Java": 5,
+    "Rust": 3,
+    "Python": 4,
+    "TypeScript": 2,
+    "Swift": 5,
+    "Shell": 2
+  },
+  "Platform": {
+    "Kubernetes": 4,
+    "Terraform": 3,
+    "Helm": 3,
+    "ArgoCD": 4,
+    "Docker": 5
+  },
+  "Cloud": {
+    "AWS": 4,
+    "Grafana": 4,
+    "Prometheus": 2,
+    "Datadog": 4
+  },
+  "Tooling": {
+    "Claude Code": 5,
+    "MCP": 3,
+    "Git": 4,
+    "Just": 3,
+    "Neovim": 2
+  }
+}

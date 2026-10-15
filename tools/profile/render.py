@@ -35,7 +35,16 @@ MANIFEST = c.DATA / "manifest.json"
 
 
 def load_config():
-    return tomllib.loads((HERE / "profile.toml").read_text())
+    """profile.toml, with the stack roster folded in under `stack`.
+
+    The roster is its own file because TOML cannot express it: a category is a
+    mapping from tool to pedestal level, and a table of tables inside `[stack]`
+    would put each category on four lines of header. JSON holds it in the shape
+    the panel reads, and key order is draw order in both.
+    """
+    cfg = tomllib.loads((HERE / "profile.toml").read_text())
+    cfg["stack"] = json.loads((HERE / "stack.json").read_text())
+    return cfg
 
 
 def load_data():

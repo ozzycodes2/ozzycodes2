@@ -32,6 +32,7 @@ def render(cfg, data, theme):
 | `ago(when, now=None)` | `"today"`, `"9d ago"`, `"14mo ago"`, `"3y ago"` for an ISO-8601 instant; `""` for a missing or unparseable one. Fits a card corner; use it rather than formatting dates in a panel. |
 | `num(value)` | Thousands-separated integer, for counters set in mono. |
 | `mix(a, b, t)` | `t` of colour `a` over `b`, as a literal hex. The way to get a shade between the theme's ink and its canvas. |
+| `contrast(a, b)` | WCAG ratio between two `#rrggbb` colours. The frame needs none of this — the theme roles are already corrected. A panel needs it only when it paints something the design system never declared, as `~/stack` does with twenty brand hexes. |
 | `Slice(file, markup, href=None)` | One output file, and the URL the README should wrap it in. `file` is a path *within* a theme directory. See rule 10. |
 | `title_bar(theme, label)` | Window chrome, with `label` centred in mono 12. Header panel only. Takes no y: the band caps the frame, so it shares the frame's top edge and radius. Its content ends at `MARGIN + TITLE_H`. |
 | `foot_bar(theme, height)` | The mirror of it at the bottom, same depth and surface, no text. Footer panel only. |
@@ -88,10 +89,13 @@ two radii.
    it on the 2px stroke that starts every section rule; that is structure and
    it is identical in every panel. Beyond that a panel may mark the single
    highest value in one set — the live streak, the leading language, the
-   tallest day — at most once, plus a legend swatch keying it. A set of equals
-   gets nothing: `~/stack` and `~/projects` carry only the rule. The accent
-   never sets type. It is corrected to 3:1, which is the threshold for an
-   object, so a word wearing it is the one illegible thing on the page.
+   tallest day, the one layer of the stack the author writes in — at most once,
+   plus a legend swatch keying it. A set of equals gets nothing: `~/projects`
+   carries only the rule. Where the accent paints a surface rather than a mark
+   it goes in as a mix over the canvas, not as the literal: six logos on a field
+   of chroma are six logos nobody can read. The accent never sets type. It is
+   corrected to 3:1, which is the threshold for an object, so a word wearing it
+   is the one illegible thing on the page.
 7. **Never reference an external font, image, or stylesheet.** GitHub strips
    them. Everything inlines; `slice_svg` handles the font subset.
 8. **Escape all interpolated content** with `c.e(...)`.

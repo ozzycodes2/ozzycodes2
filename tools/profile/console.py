@@ -204,6 +204,26 @@ def mix(a, b, t):
                          for p, q in zip(x, y))
 
 
+def contrast(a, b):
+    """WCAG contrast ratio between two #rrggbb colours.
+
+    The themes above are pinned, so nothing in the frame needs this. The stack
+    panel does: it paints twenty brand hexes the design system never declared,
+    onto faces that are themselves mixes, and each one has to be corrected until
+    it can be seen on the one it landed on. The 0.03928 break is the preview's,
+    which differs from the published 0.04045 by less than a code point of any
+    channel — matching it is cheaper than explaining a one-unit divergence.
+    """
+    def lum(hexa):
+        parts = [int(hexa[i:i + 2], 16) / 255 for i in (1, 3, 5)]
+        lin = [p / 12.92 if p <= 0.03928 else ((p + 0.055) / 1.055) ** 2.4
+               for p in parts]
+        return 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2]
+
+    lo, hi = sorted((lum(a) + 0.05, lum(b) + 0.05))
+    return hi / lo
+
+
 def visible(markup):
     """The characters a piece of SVG markup actually paints.
 
