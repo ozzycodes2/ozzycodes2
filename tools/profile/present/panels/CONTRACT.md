@@ -43,8 +43,7 @@ def render(cfg, data, theme):
 | `mix(a, b, t)` | `t` of colour `a` over `b`, as a literal hex. The way to get a shade between the theme's ink and its canvas. |
 | `contrast(a, b)` | WCAG ratio between two `#rrggbb` colours. The frame needs none of this — the theme roles are already corrected. A panel needs it only when it paints something the design system never declared, as `~/stack` does with twenty brand hexes. |
 | `Slice(file, markup, href=None)` | One output file, and the URL the README should wrap it in. `file` is a path *within* a theme directory. See rule 10. |
-| `title_bar(theme, label)` | Window chrome, with `label` centred in mono 12. Header panel only. Takes no y: the band caps the frame, so it shares the frame's top edge and radius. Its content ends at `MARGIN + TITLE_H`. |
-| `foot_bar(theme, height)` | The mirror of it at the bottom, same depth and surface, no text. Footer panel only. |
+| `title_bar(theme, label)` | Window chrome, with `label` centred in mono 12. Header panel only. Takes no y: the band caps the frame, so it shares the frame's top edge and radius. Its content ends at `MARGIN + TITLE_H`. There is no mirror at the foot: this window has one band, at the top. |
 | `heading(theme, y, name, counter="", cmd="")` | `~/section` header over a hairline rule; `counter` is right-aligned mono 12, `cmd` is the command that produced the section, quoted under the rule behind a `$`. Full-width slices only — it positions against `CONTENT_R`, so on a partial slice the counter lands outside the viewBox. Give a split row its own full-width heading slice. |
 | `to_grid(value)` | Rounds a height up to the next multiple of 40. |
 | `e(s)` | `html.escape`. `tx` applies it; use it directly on anything you interpolate by hand. |

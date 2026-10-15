@@ -538,15 +538,11 @@ def test_the_title_bar_rules_off_at_a_fixed_depth():
 
 
 @pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
-def test_the_foot_bar_mirrors_the_title_bar_at_the_frames_other_end(theme):
-    """Same depth, same surface, rounded the other way, so the window has two ends."""
-    markup = c.foot_bar(theme, 200)
-    y0 = 200 - c.MARGIN - c.TITLE_H
-    assert f'y1="{y0}" x2="{c.FRAME_R}" y2="{y0}" stroke="{theme.hairline}"' in markup
-    assert f'fill="{theme.surface}"' in markup
-    band, r = fill_path(markup), c.R_CARD
-    assert band.startswith(f"M{c.FRAME_L} {y0}H{c.FRAME_R}")
-    assert f"a{r} {r} 0 0 1 {-r} {r}H{c.FRAME_L + r}a{r} {r} 0 0 1 {-r} {-r}" in band
+def test_the_bottom_cap_paints_nothing_over_the_frame(theme):
+    """There is a band of surface at the top and no mirror of it at the foot;
+    `tests/test_footer.py` holds the reason. console draws neither."""
+    markup = c.slice_svg(theme, 80, "", title="t", desc="d", bottom=True)
+    assert theme.surface not in markup.split("</style>", 1)[-1]
 
 
 @pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)

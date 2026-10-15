@@ -377,20 +377,6 @@ def title_bar(theme, label):
 <line x1="{FRAME_L}" y1="{rule}" x2="{FRAME_R}" y2="{rule}" stroke="{theme.hairline}" stroke-width="{EDGE_W}" shape-rendering="crispEdges"/>'''
 
 
-def foot_bar(theme, height):
-    """The closing band, mirroring the title bar. Only the last slice draws one.
-
-    Same depth and same surface as the chrome at the top, so the window reads as
-    having two ends rather than one. It carries no text: the title bar already
-    names the window, and repeating that at the foot is the generator credit
-    this profile deliberately does not print.
-    """
-    y1 = height - MARGIN
-    y0 = y1 - TITLE_H
-    return f'''<line x1="{FRAME_L}" y1="{y0}" x2="{FRAME_R}" y2="{y0}" stroke="{theme.hairline}" stroke-width="{EDGE_W}" shape-rendering="crispEdges"/>
-<path d="{_fill(FRAME_L, FRAME_R, y0, y1, R_CARD, tl=False, tr=False, br=True, bl=True)}" fill="{theme.surface}"/>'''
-
-
 def heading(theme, y, name, counter="", cmd=""):
     """A `~/section` header over a hairline rule, and the command behind it.
 

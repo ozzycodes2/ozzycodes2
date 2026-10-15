@@ -1,8 +1,14 @@
 """Bottom slice: closes the frame on a live prompt."""
 from .. import console as c
 
-HEIGHT = 120
-PROMPT_Y = 48
+# The frame closes directly under the prompt. A band mirroring the title bar's
+# depth is the obvious symmetry and it was wrong twice over: the preview sets a
+# second line of metadata inside that band and this footer has no second line,
+# so it drew an empty row under `exit`; and the dark theme's surface is 1.01:1
+# from GitHub's own dark page, so those 44px did not read as a closing band at
+# all but as a hole the bottom of the window fell through.
+HEIGHT = 80
+PROMPT_Y = 40
 
 
 def render(_cfg, _data, theme):
@@ -17,7 +23,7 @@ def render(_cfg, _data, theme):
     )
 
     return c.slice_svg(
-        theme, HEIGHT, f"{prompt}\n{c.foot_bar(theme, HEIGHT)}",
+        theme, HEIGHT, prompt,
         title="End of profile", desc="Closing prompt: exit.",
         text="❯▌", bottom=True,
     )

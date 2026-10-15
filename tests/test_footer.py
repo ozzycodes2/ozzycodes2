@@ -46,11 +46,30 @@ def test_the_three_parts_step_up_the_ink_tiers(out):
     assert fills == [c.LIGHT.faint, c.LIGHT.dim, c.LIGHT.ink]
 
 
-def test_the_closing_band_matches_the_title_bar_depth(out):
-    """Both ends of the window are the same chrome, so they must agree."""
-    y0 = footer.HEIGHT - c.MARGIN - c.TITLE_H
-    assert f'y1="{y0}"' in out and f'y2="{y0}"' in out
-    assert f'fill="{c.LIGHT.surface}"' in out
+def test_nothing_is_drawn_under_the_prompt(out):
+    """A band mirroring the title bar reads as an empty row below `exit`: the
+    preview sets a second line of metadata inside that band and this footer has
+    no second line."""
+    assert c.LIGHT.surface not in out.split("</style>", 1)[-1]
+    assert footer.HEIGHT == 2 * c.ROW
+
+
+def test_the_dark_closing_band_would_dissolve_into_githubs_own_page():
+    """The other half of the reason, and the one a reader cannot see locally.
+    GitHub's dark canvas is #0d1117; `surface` sits 1.01:1 from it, so a band of
+    it at the foot is not a quiet strip but a hole — the window's bottom 44px
+    disappear and the side edges appear to stop above their own corners. The
+    canvas the rest of the window is painted in clears that by an order more."""
+    page = "#0d1117"
+    assert c.contrast(c.DARK.surface, page) < 1.02
+    assert c.contrast(c.DARK.canvas, page) > 1.09
+
+
+def test_the_prompt_sits_one_row_above_the_edge_the_frame_closes_on(out):
+    """It is the last thing in the window, so it needs clearance beneath it as
+    well as the gutter the frame already leaves outside itself."""
+    assert f'y="{footer.PROMPT_Y}"' in out
+    assert footer.HEIGHT - c.MARGIN - footer.PROMPT_Y >= c.MARGIN
 
 
 def test_nothing_animates(out):
@@ -69,7 +88,8 @@ def test_no_accent_is_spent_here(out):
 def test_both_themes_draw_the_same_prompt(theme):
     markup = footer.render({}, {}, theme)
     assert painted(markup) == painted(footer.render({}, {}, c.LIGHT))
-    assert f'fill="{theme.surface}"' in markup
+    assert f'fill="{theme.canvas}"' in markup
+    assert f'stroke="{theme.hairline}"' in markup
 
 
 def test_desc_says_what_the_slice_is(out):
