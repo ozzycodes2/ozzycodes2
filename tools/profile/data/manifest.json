@@ -6,17 +6,17 @@
   },
   {
     "file": "stats.svg",
-    "desc": "1,461 contributions in 2026, 417 of 471 pull requests merged, 8 repositories touched, longest streak 6 days.",
+    "desc": "1,464 contributions in 2026, 418 of 472 pull requests merged, 8 repositories touched, longest streak 6 days.",
     "width": "100%"
   },
   {
     "file": "contribution-city.svg",
-    "desc": "Isometric plan of 26 weeks: 182 tiles, 68 built on, 1,458 contributions. Tallest block is 108 on 2026-10-13.",
+    "desc": "Isometric plan of 26 weeks: 182 tiles, 68 built on, 1,461 contributions. Tallest block is 108 on 2026-10-13.",
     "width": "100%"
   },
   {
     "file": "stack.svg",
-    "desc": "20 tools on 4 layers of one stack, pulled apart along a single axis and standing on their layers as brand marks. Bottom to top: tooling (5) Claude Code, MCP, Git, Just, Neovim; cloud (4) AWS, Grafana, Prometheus, Datadog; platform (5) Kubernetes, Terraform, Helm, ArgoCD, Docker; languages (6) Java, Rust, Python, TypeScript, Swift, Shell. Languages by bytes: HTML 47.4%, Python 33.1%, Swift 13.4%, TypeScript 5.6%, Shell 0.3%, CSS 0.1%, other <0.1%, Dockerfile <0.1% of 9,031,826.",
+    "desc": "20 tools on 4 layers of one stack, pulled apart along a single axis and standing on their layers as brand marks. Bottom to top: tooling (5) Claude Code, MCP, Git, Just, Neovim; cloud (4) AWS, Grafana, Prometheus, Datadog; platform (5) Kubernetes, Terraform, Helm, ArgoCD, Docker; languages (6) Java, Rust, Python, TypeScript, Swift, Shell. Languages by bytes: HTML 47.4%, Python 33.2%, Swift 13.4%, TypeScript 5.6%, Shell 0.3%, CSS 0.1%, other <0.1%, Dockerfile <0.1% of 9,043,808.",
     "width": "100%"
   },
   {
