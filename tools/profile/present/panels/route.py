@@ -3,7 +3,9 @@
 Spacing is the real interval, never an even one — the whole claim of the type is
 that distance on the axis is time. A role is a span rather than an instant, so a
 tenure is a 3px run over the hairline axis and the gaps between runs are the
-gaps between jobs; a circle marks where each one started.
+gaps between jobs; a circle marks where each one started. The axis is not
+ticked: every label states its own dates and the heading counts the span, so a
+year mark repeats a date the reader can already read off the label it belongs to.
 
 An entry with no employer is a milestone — a circle and a label, no run. It is
 what lets the axis open on something that happened rather than on a job, and it
@@ -31,7 +33,6 @@ from .. import console as c
 
 HEAD_Y = c.HEAD_Y
 AXIS_Y = 164      # clears the command transcript by the height of a label block
-TICK = 4          # half a year mark, drawn through the axis
 SEG_W = 3         # a tenure's own weight over the axis
 DOT_R = 4
 EYEBROW = 11
@@ -135,13 +136,8 @@ def layout(roster, now):
                  dates=f"{r['start']} .. {r.get('end') or 'now'}" if org else str(r["start"]),
                  months=r["to"] - r["from"])
 
-    # Whole years inside the span, which is the only scale annotation the axis
-    # carries: the heading counts the span and every label carries its own dates.
-    first, last = -(-t0 // 12), t1 // 12
-    ticks = [at(y * 12) for y in range(first, last + 1)]
     return {
         "rows": rows,
-        "ticks": [x for x in ticks if c.TEXT_X <= x <= c.CONTENT_R],
         "from": t0 // 12,
         "to": t1 // 12,
     }
@@ -189,15 +185,6 @@ def render(cfg, _data, theme, now=None):
              family=c.MONO_STACK, size=YEAR, weight=600, anchor="end"),
     ])
 
-    # Every 1px line in this panel snaps, for the reason deviation 2 in
-    # BACKPORT.md gives: the slice is rasterised at 880px and resampled to the
-    # page column, and an unsnapped hairline axis blurs across two device
-    # columns. The tenure runs are 3px with round caps and stay off it.
-    marks = "\n".join(
-        f'<line x1="{_n(x)}" y1="{AXIS_Y - TICK}" x2="{_n(x)}" y2="{AXIS_Y + TICK}" '
-        f'stroke="{theme.faint}" stroke-width="{c.EDGE_W}" shape-rendering="crispEdges"/>'
-        for x in plan["ticks"]
-    )
     runs = "\n".join(
         f'<line x1="{_n(r["x0"])}" y1="{AXIS_Y}" x2="{_n(r["x1"])}" y2="{AXIS_Y}" '
         f'stroke="{theme.accent if r["current"] else theme.dim}" stroke-width="{SEG_W}" '
@@ -242,9 +229,13 @@ def render(cfg, _data, theme, now=None):
         c.heading(theme, HEAD_Y, "route", counter=f"{plan['from']} — {plan['to']}",
                   cmd=f"traceroute --since={plan['from']}"),
         years,
+        # Every 1px line in this panel snaps, for the reason deviation 2 in
+        # BACKPORT.md gives: the slice is rasterised at 880px and resampled to
+        # the page column, and an unsnapped hairline axis blurs across two device
+        # columns. The tenure runs are 3px with round caps and stay off it.
         f'<line x1="{c.TEXT_X}" y1="{AXIS_Y}" x2="{c.CONTENT_R}" y2="{AXIS_Y}" '
         f'stroke="{theme.faint}" stroke-width="{c.EDGE_W}" shape-rendering="crispEdges"/>',
-        marks, runs, *events,
+        runs, *events,
     ])
     desc = (f"{roles} roles from {plan['from']} to {plan['to']}, "
             f"spaced by date on one axis: {roster}.")

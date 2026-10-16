@@ -125,13 +125,16 @@ def test_a_real_gap_between_two_roles_draws_as_one():
     assert plan["rows"][0]["x1"] < plan["rows"][1]["x0"]
 
 
-def test_the_axis_is_ticked_once_a_year(out):
-    """The only scale annotation it carries: the heading counts the span and
-    every label carries its own dates."""
-    ticks = re.findall(rf'<line x1="([\d.]+)" y1="{route.AXIS_Y - route.TICK}" '
-                       rf'x2="[\d.]+" y2="{route.AXIS_Y + route.TICK}"', out)
-    assert len(ticks) == 2026 - 2017 + 1          # 2016-08 opens inside 2016
-    assert all(c.TEXT_X <= float(x) <= c.CONTENT_R for x in ticks)
+def test_the_axis_carries_no_scale_annotation(out):
+    """Every label states its own dates and the heading counts the span, so a
+    year mark repeats what is already set and asks the reader to count along the
+    axis to recover it. The events are the only thing on the axis; the one thing
+    crossing it is the ground."""
+    crossing = [(int(a), int(b)) for a, b in
+                re.findall(r'<line x1="[\d.]+" y1="(-?\d+)" x2="[\d.]+" y2="(-?\d+)"', out)
+                if min(int(a), int(b)) < route.AXIS_Y < max(int(a), int(b))]
+    assert not crossing
+    assert len(re.findall(r'<circle cx="', out)) == len(ROSTER)
 
 
 def test_a_lone_role_dated_to_one_month_does_not_divide_by_zero():

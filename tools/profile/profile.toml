@@ -67,7 +67,6 @@ end = "2026-07"
 
 [[route]]
 org = "Machinify"
-title = "platform engineer"
 start = "2026-07"
 
 # The `~/stack` roster lives in stack.json, not here. A category maps each tool
