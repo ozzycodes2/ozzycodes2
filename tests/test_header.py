@@ -199,47 +199,44 @@ def test_header_caps_the_tagline_at_four_lines():
     assert "line 4" not in svg
 
 
-# --- the branded chip --------------------------------------------------------
+# --- the one accented run ----------------------------------------------------
 
-def chipped(line="*Machinify* — wiring agents in.", theme=c.LIGHT):
+MARKED = "Wiring coding agents into *MACHINIFY*'s toolchain"
+
+
+def marked(line=MARKED, theme=c.LIGHT):
     cfg = {"identity": {**CFG["identity"], "tagline": [line]}}
     return header.render(cfg, DATA, theme)
 
 
-def test_a_marked_word_is_set_on_an_accent_tinted_chip():
-    """The accent is corrected to 3:1 — the threshold for an object — so the one
-    word carrying a brand gets a surface under it rather than the colour on it.
-    """
-    svg = chipped()
-    chip = elements(svg, "rect")[-1]
-    width = round(len("Machinify") * header.CHIP_SIZE * c.MONO_ADVANCE)
-    assert chip["x"] == str(header.BULLET_X)
-    assert chip["y"] == str(header.TAGLINE_Y - 15)
-    assert chip["width"] == str(width + header.CHIP_PAD * 2)
-    assert chip["height"] == str(header.CHIP_H)
-    assert chip["rx"] == str(c.R_CHIP)
-    assert chip["fill"] == c.LIGHT.accent
-    assert chip["fill-opacity"] == header.CHIP_TINT
-    assert "stroke" not in chip               # a tint is already one paint
+def tspans(svg):
+    """(attributes, content) of every <tspan>, in draw order."""
+    return [(dict(re.findall(r'([\w-]+)="([^"]*)"', attrs)), body)
+            for attrs, body in re.findall(r"<tspan\s([^>]*)>(.*?)</tspan>", svg)]
 
 
-def test_the_chipped_word_is_ink_mono_inside_its_own_chip():
-    """Mono, so the chip can be measured before the prose after it is placed —
-    and so the name reads as a token rather than as more of the sentence."""
-    attrs = one(chipped(), "Machinify")
-    assert attrs["x"] == str(header.BULLET_X + header.CHIP_PAD)
-    assert attrs["y"] == str(header.TAGLINE_Y)
-    assert attrs["font-family"] == MONO
-    assert attrs["font-size"] == str(header.CHIP_SIZE)
+def test_a_marked_run_is_the_one_type_the_accent_sets():
+    """Rule 6's single exception, and the only run in the window under 4.5:1 on
+    the canvas — the accent is corrected to 3:1, the threshold for an object."""
+    runs = tspans(marked())
+    assert [b for _, b in runs] == ["MACHINIFY"]
+    attrs = runs[0][0]
+    assert attrs["fill"] == c.LIGHT.accent
     assert attrs["font-weight"] == "700"
-    assert attrs["fill"] == c.LIGHT.ink
+    assert c.contrast(c.LIGHT.accent, c.LIGHT.canvas) < 4.5
 
 
-def test_the_prose_resumes_a_gap_past_the_chips_right_edge():
-    svg = chipped()
-    chip = elements(svg, "rect")[-1]
-    attrs = one(svg, "wiring agents in.")
-    assert attrs["x"] == str(int(chip["x"]) + int(chip["width"]) + header.CHIP_GAP)
+def test_the_marked_run_sits_in_the_line_it_belongs_to():
+    """One <text>, so the renderer advances the prose around the run: Inter
+    cannot be measured before it is drawn, and three positioned runs would need
+    it to be."""
+    attrs, body = next((a, b) for a, b in texts(marked())
+                       if "Wiring coding agents" in b)
+    assert body == ("Wiring coding agents into "
+                    f'<tspan fill="{c.LIGHT.accent}" font-weight="700">MACHINIFY'
+                    "</tspan>&#x27;s toolchain")
+    assert attrs["x"] == str(header.BULLET_X)
+    assert attrs["y"] == str(header.TAGLINE_Y)
     assert attrs["font-family"] == SANS
     assert attrs["font-size"] == "15"
     assert attrs["fill"] == c.LIGHT.dim
@@ -248,31 +245,33 @@ def test_the_prose_resumes_a_gap_past_the_chips_right_edge():
 def test_the_marker_never_reaches_the_drawing():
     """It spells emphasis in the content file; a literal asterisk in the window
     would be the markup showing through."""
-    assert not [b for _, b in texts(chipped()) if "*" in b]
-
-
-def test_a_mark_part_way_through_a_line_is_left_as_prose():
-    """Only the mono face can be measured before it is drawn, so a chip can only
-    be placed where no Inter precedes it. Mid-line, the asterisks stand."""
-    svg = chipped("wiring agents into *Machinify* today.")
-    assert not [r for r in elements(svg, "rect") if "fill-opacity" in r]
-    assert one(svg, "Machinify")["font-family"] == SANS
-    assert one(svg, "Machinify")["x"] == str(header.BULLET_X)
+    assert "*" not in c.visible(marked().split("</style>")[1])
 
 
 def test_an_unclosed_mark_is_left_as_prose():
-    svg = chipped("*Machinify and nothing closing it.")
-    assert not [r for r in elements(svg, "rect") if "fill-opacity" in r]
-    assert one(svg, "Machinify")["font-family"] == SANS
+    svg = marked("MACHINIFY and nothing *closing it")
+    assert not tspans(svg)
+    assert "*closing it" in c.visible(svg.split("</style>")[1])
+
+
+def test_a_line_with_no_mark_draws_no_runs():
+    assert not tspans(marked("plain prose, no mark"))
+
+
+def test_markup_inside_a_marked_run_is_escaped():
+    """The run is interpolated into a <tspan> by hand, so it is the one place a
+    tagline could carry markup through."""
+    svg = marked("into *<b>M</b>*'s toolchain")
+    assert "<b>" not in svg
+    assert "&lt;b&gt;" in svg
 
 
 @pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
-def test_the_chip_and_the_live_dot_are_the_whole_accent_budget(theme):
-    """Two paints: the tint under the brand, and the one live fact. The chip
-    takes no accent edge — an edge would be a third."""
-    svg = chipped(theme=theme)
+def test_the_accented_run_and_the_live_dot_are_the_whole_budget(theme):
+    """Two paints: the employer's name, and the one live fact."""
+    svg = marked(theme=theme)
     assert svg.count(theme.accent) == 2
-    assert f'fill="{theme.accent}" fill-opacity="{header.CHIP_TINT}"' in svg
+    assert f'<tspan fill="{theme.accent}" font-weight="700">MACHINIFY' in svg
     assert f'r="4" fill="{theme.accent}"' in svg
 
 

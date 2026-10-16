@@ -18,46 +18,32 @@ BULLET_X = c.TEXT_X + 18
 
 STREAK_SIZE = 13
 
-# A `*word*` opening a tagline line is set as a branded chip.
-CHIP = re.compile(r"^\*([^*]+)\*\s*")
-CHIP_SIZE = 13
-CHIP_H = 21
-CHIP_PAD = 9      # mono's side bearing inside the chip
-CHIP_GAP = 10     # chip to the prose that follows it
-CHIP_TINT = "0.18"
+# A `*run*` anywhere in a tagline line is set in the accent.
+MARK = re.compile(r"\*([^*]+)\*")
 
 
 def _tagline(theme, y, line):
-    """One tagline line, with a `*marked*` leading word set as a branded chip.
+    """One tagline line, with any `*marked*` run set in the accent.
 
-    The chip is accent as a *surface* under ink type, which is the only way this
-    system may colour a word: the accent is corrected to 3:1, the threshold for
-    an object, so a word painted in it outright is the one unreadable thing on
-    the page. A tint and no edge — the accent budget counts paints, and an edge
-    would spend the panel's second one on the same shape.
+    This is the one run of type in the window painted in the accent, and so the
+    only one that does not clear 4.5:1 on the canvas — the accent is corrected
+    to 3:1, which is the threshold for an object. It is a proper noun in caps,
+    not prose the line depends on, and it is there by instruction. CONTRACT.md
+    rule 6 records it as the exception it is.
 
-    The mark is honoured only at the start of a line. The prose after the chip
-    is placed from the chip's width, and only the mono face can be measured
-    before it is drawn; Inter mid-line cannot be, so there is nowhere else in a
-    line to put one.
+    One <text> with tspans rather than three positioned runs: Inter cannot be
+    measured before it is drawn, so the renderer has to do the advancing.
     """
-    out = [c.tx(c.TEXT_X, y, BULLET, fill=theme.faint, family=c.MONO_STACK,
-                size=13)]
-    x = BULLET_X
-    marked = CHIP.match(line)
-    if marked:
-        word = marked.group(1)
-        width = round(len(word) * CHIP_SIZE * c.MONO_ADVANCE) + CHIP_PAD * 2
-        out += [
-            f'<rect x="{x}" y="{y - 15}" width="{width}" height="{CHIP_H}" '
-            f'rx="{c.R_CHIP}" fill="{theme.accent}" fill-opacity="{CHIP_TINT}"/>',
-            c.tx(x + CHIP_PAD, y, word, fill=theme.ink, family=c.MONO_STACK,
-                 size=CHIP_SIZE, weight=700),
-        ]
-        x += width + CHIP_GAP
-        line = line[marked.end():]
-    out.append(c.tx(x, y, line, fill=theme.dim, family=c.SANS_STACK, size=15))
-    return out
+    runs = "".join(
+        f'<tspan fill="{theme.accent}" font-weight="700">{c.e(part)}</tspan>'
+        if i % 2 else c.e(part)
+        for i, part in enumerate(MARK.split(line))
+    )
+    return [
+        c.tx(c.TEXT_X, y, BULLET, fill=theme.faint, family=c.MONO_STACK, size=13),
+        f'<text x="{BULLET_X}" y="{y}" fill="{theme.dim}" '
+        f'font-family="{c.e(c.SANS_STACK)}" font-size="15">{runs}</text>',
+    ]
 
 
 def render(cfg, data, theme):

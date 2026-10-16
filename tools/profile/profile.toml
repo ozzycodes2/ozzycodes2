@@ -7,15 +7,13 @@ handle = "ozzycodes2"
 role = "platform engineer"
 # One line per rendered line. Keep each under ~72 characters or it will clip.
 #
-# A `*word*` at the start of a line is set as an accent-tinted chip instead of
-# prose. Only at the start, and only in one word: the chip's width is measured
-# off the mono face so the prose after it can be placed, which cannot be done
-# part-way through a line of Inter. The chip's own text costs ~8 characters of
-# the line's budget beyond the word itself.
+# A `*run*` anywhere in a line is set in the accent at weight 700. It is the one
+# place in the window the accent touches type, and it does not clear 4.5:1 —
+# keep it to a proper noun the line does not depend on.
 tagline = [
   "Backend by trade, platform by habit.",
   "I build the developer tooling other engineers ship on.",
-  "*Machinify* — wiring coding agents into the toolchain.",
+  "Wiring coding agents into *MACHINIFY*'s toolchain",
 ]
 
 [city]

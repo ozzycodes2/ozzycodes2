@@ -114,12 +114,12 @@ families and the two radii.
    than a second datum. A set of equals gets nothing: `~/projects`
    carries only the rule. Where the accent paints a surface rather than a mark
    it goes in as a mix over the canvas, not as the literal: six logos on a field
-   of chroma are six logos nobody can read. A tint is still a paint and counts
-   against the budget, so a tinted shape takes no accent edge as well. The
-   accent never sets type. It is corrected to 3:1, which is the threshold for an
-   object, so a word wearing it is the one illegible thing on the page — a word
-   that has to carry a brand gets a tinted chip under ink type instead, which is
-   what `~/header` does with the employer named in its tagline.
+   of chroma are six logos nobody can read. The accent sets type in exactly one
+   place — the employer's name in `~/header`'s tagline, in caps at weight 700 —
+   and that run is the only type in the window below 4.5:1 on the canvas, since
+   the accent is corrected to 3:1. It is there by instruction. Nothing else
+   joins it: a second accented word and the first stops reading as the
+   exception. The three tiers corrected for type are `ink`, `dim` and `faint`.
 7. **Never reference an external font, image, or stylesheet.** GitHub strips
    them. Everything inlines; `slice_svg` handles the font subset.
 8. **Escape all interpolated content** with `c.e(...)`.
