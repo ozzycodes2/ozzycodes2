@@ -5,6 +5,7 @@ checked here is position: that the scale is constant, that unequal intervals
 arrive unequal, and that a role the author never dated is left out rather than
 placed at the origin.
 """
+import datetime
 import re
 
 import pytest
@@ -49,9 +50,14 @@ def runs(svg):
 
 
 def texts(svg):
-    """(x, y, content) of every <text>, in draw order."""
-    return [(float(x), int(y), body) for x, y, body in re.findall(
-        r'<text x="([\d.]+)" y="(\d+)"[^>]*>(.*?)</text>', svg)]
+    """(x, y, content) of every label, in draw order.
+
+    The bounding years are left out: they are ground, not a label, and the only
+    run in the slice set at the year step.
+    """
+    return [(float(x), int(y), body) for x, y, attrs, body in re.findall(
+        r'<text x="([\d.]+)" y="(\d+)"([^>]*)>(.*?)</text>', svg)
+        if f'font-size="{route.YEAR}"' not in attrs]
 
 
 @pytest.fixture(scope="module")
@@ -191,6 +197,56 @@ def test_a_role_with_no_title_reads_eyebrow_and_employer_only(out):
              if y in [route.AXIS_Y + dy for dy in route.ABOVE[1:]]]
     assert "2019-09 .. 2022-06" in block and "Veridian Health" in block
     assert "Veridian Health, 2019-09 .. 2022-06 (2y 10mo)" in desc_of(out)
+
+
+# --- the ground --------------------------------------------------------------
+
+def ground_years(svg, theme=c.LIGHT):
+    """(x, size, year) of every year washed into the canvas behind the figure."""
+    wash = c.mix(theme.ink, theme.canvas, route.WASH)
+    return [(float(x), int(size), year) for x, size, year in re.findall(
+        rf'<text x="([\d.]+)"[^>]*fill="{wash}"[^>]*font-size="(\d+)"[^>]*>(\d{{4}})',
+        svg)]
+
+
+@pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
+def test_the_span_is_grounded_by_its_two_bounding_years(theme):
+    svg = render(theme=theme)
+    wash = c.mix(theme.ink, theme.canvas, route.WASH)
+    assert [y for _, _, y in ground_years(svg, theme)] == ["2016", "2026"]
+    assert [x for x, _, _ in ground_years(svg, theme)] == [c.TEXT_X, c.CONTENT_R]
+    # Each is set from the rail it sits against, so neither can grow past it as
+    # the years roll over into five digits' worth of glyphs.
+    assert re.search(rf'<text x="{c.CONTENT_R}"[^>]*fill="{wash}"[^>]*text-anchor="end"', svg)
+    assert not re.search(rf'<text x="{c.TEXT_X}"[^>]*fill="{wash}"[^>]*text-anchor', svg)
+
+
+def test_the_ground_is_the_largest_type_in_the_slice(out):
+    """It reads as ground by scale as much as by wash. 32 is spelled out rather
+    than read off the module, which would pin the constant to itself; it is the
+    top of the mono scale the console declares."""
+    assert all(size == 32 for _, size, _ in ground_years(out))
+    assert max(int(s) for s in re.findall(r'font-size="(\d+)"', out)) == 32
+
+
+@pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
+def test_the_ground_sits_below_the_floor_for_type(theme):
+    """Rule 6's tiers corrected for type are ink, dim and faint. This is none of
+    them, and it carries nothing the heading's counter and the alt text do not
+    also state in a tier that is corrected."""
+    wash = c.mix(theme.ink, theme.canvas, route.WASH)
+    assert c.contrast(wash, theme.canvas) < 1.5
+    assert wash not in theme[1:]
+    svg = render(theme=theme)
+    assert "2016 — 2026" in svg
+    assert "from 2016 to 2026" in desc_of(svg)
+
+
+def test_the_ground_is_painted_under_the_axis(out):
+    """Everything else in the panel has to sit over it, or it stops being ground."""
+    body = out.split("</style>", 1)[-1]
+    wash = c.mix(c.LIGHT.ink, c.LIGHT.canvas, route.WASH)
+    assert body.index(f'fill="{wash}"') < body.index(f'y1="{route.AXIS_Y}"')
 
 
 # --- the marked tenure -------------------------------------------------------
@@ -360,25 +416,64 @@ def test_the_open_tenure_dates_itself_from_the_clock():
     assert "2024-03 .. now" in later
 
 
+def test_the_axis_re_spans_off_the_clock_on_every_render():
+    """The daily job passes no date of its own, so the range has to follow the
+    calendar: a tenure still open stretches, the scale compresses to hold it in
+    the column, and the closing year reaches the heading, the ground and the alt
+    text. A render pinned to a release would freeze all four."""
+    now = (2028 * 12) + 1
+    later, plan = render(now=now), route.layout(ROSTER, now)
+    assert (plan["from"], plan["to"]) == (2016, 2028)
+    assert "2016 — 2028" in later and "to 2028" in desc_of(later)
+    assert [y for _, _, y in ground_years(later)] == ["2016", "2028"]
+    assert runs(later)[-1][1] == c.CONTENT_R
+    # Every closed tenure is the same number of months either way, so a wider
+    # span has to draw each of them narrower. Only the open one grows.
+    widths = [x1 - x0 for x0, x1, _ in runs(later)]
+    was = [x1 - x0 for x0, x1, _ in runs(render())]
+    assert all(a < b for a, b in zip(widths[:-1], was[:-1]))
+    assert widths[-1] > was[-1]
+    assert height_of(later) == route.HEIGHT
+
+
+def test_a_render_with_no_clock_reads_the_month_it_runs_in(monkeypatch):
+    """What the daily job relies on: `render.py` passes no `now`, so the panel
+    asks the clock. Pinned against a stubbed clock rather than against today's
+    date, which a frozen `now` would agree with for the rest of this month."""
+    class _Clock(datetime.datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return datetime.datetime(2031, 5, 9, tzinfo=tz)
+
+    monkeypatch.setattr(route.datetime, "datetime", _Clock)
+    assert route.render(CFG, {}, c.LIGHT) == render(now=2031 * 12 + 4)
+
+
 # --- colour and alt text -------------------------------------------------------
 
 @pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
 def test_route_takes_every_paint_from_the_theme(theme):
+    """Rule 5. The ground is the one derived paint, and it is derived from two
+    roles by `mix` rather than hardcoded — so it inverts with the scheme."""
     svg = render(theme=theme)
     assert f'fill="{theme.canvas}"' in svg
     assert f'stroke="{theme.hairline}"' in svg
+    allowed = list(theme[1:]) + [c.mix(theme.ink, theme.canvas, route.WASH)]
     assert not re.search(r'(fill|stroke)="#(?!'
-                         + "|".join(v.lstrip("#") for v in theme[1:]) + r')', svg)
+                         + "|".join(v.lstrip("#") for v in allowed) + r')', svg)
 
 
 def test_the_two_themes_differ_in_nothing_but_colour():
     light, dark = (render(theme=theme) for theme in c.THEMES)
-    for role, value in zip(c.LIGHT._fields, c.LIGHT):
-        if role != "name":
-            light = light.replace(value, role)
-    for role, value in zip(c.DARK._fields, c.DARK):
-        if role != "name":
-            dark = dark.replace(value, role)
+    for svg, theme in ((light, c.LIGHT), (dark, c.DARK)):
+        swap = [(c.mix(theme.ink, theme.canvas, route.WASH), "ground")]
+        swap += [(v, role) for role, v in zip(theme._fields, theme) if role != "name"]
+        for value, role in swap:
+            svg = svg.replace(value, role)
+        if theme is c.LIGHT:
+            light = svg
+        else:
+            dark = svg
     assert light == dark
 
 

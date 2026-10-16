@@ -38,6 +38,8 @@ EYEBROW = 11
 NAME = 13
 SUBLABEL = 11
 PAD_BELOW = 28
+YEAR = 32         # the span's bounding years, as ground — the largest mono step
+WASH = 0.1        # how much ink that ground carries
 
 # Label baselines, as offsets from the axis. Both blocks read eyebrow, employer,
 # title from the top, so a label means the same thing wherever it sits; the
@@ -160,6 +162,21 @@ def render(cfg, _data, theme, now=None):
     if not plan:
         return _empty(theme)
 
+    # The years bounding the span, set large and washed into the canvas as ground
+    # for the figure. They are the one run in the window deliberately below the
+    # floor for type, and they can be: the heading's counter prints the same two
+    # years in faint and the alt text states them, so nothing is carried here
+    # alone. Painted first, so the axis and every label sit over them. At the 72px
+    # the type reference uses they would need their own step on the scale; 32 is
+    # the largest the console already declares and reads as ground at this wash.
+    ground = c.mix(theme.ink, theme.canvas, WASH)
+    years = "\n".join([
+        c.tx(c.TEXT_X, AXIS_Y + BELOW[2], str(plan["from"]), fill=ground,
+             family=c.MONO_STACK, size=YEAR, weight=700),
+        c.tx(c.CONTENT_R, AXIS_Y + BELOW[2], str(plan["to"]), fill=ground,
+             family=c.MONO_STACK, size=YEAR, weight=700, anchor="end"),
+    ])
+
     # Every 1px line in this panel snaps, for the reason deviation 2 in
     # BACKPORT.md gives: the slice is rasterised at 880px and resampled to the
     # page column, and an unsnapped hairline axis blurs across two device
@@ -212,6 +229,7 @@ def render(cfg, _data, theme, now=None):
     body = "\n".join([
         c.heading(theme, HEAD_Y, "route", counter=f"{plan['from']} — {plan['to']}",
                   cmd=f"traceroute --since={plan['from']}"),
+        years,
         f'<line x1="{c.TEXT_X}" y1="{AXIS_Y}" x2="{c.CONTENT_R}" y2="{AXIS_Y}" '
         f'stroke="{theme.faint}" stroke-width="{c.EDGE_W}" shape-rendering="crispEdges"/>',
         marks, runs, *events,

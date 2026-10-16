@@ -18,6 +18,8 @@
 <line x1="52" y1="50" x2="828" y2="50" stroke="#d9d9d9" stroke-width="1" shape-rendering="crispEdges"/><line x1="52" y1="50" x2="172" y2="50" stroke="#ef6306" stroke-width="2" shape-rendering="crispEdges"/>
 <text x="52" y="66" fill="#727272" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="12">$</text>
 <text x="66" y="66" fill="#4d4d4d" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="12">traceroute --since=2016</text>
+<text x="52" y="244" fill="#e2e2e2" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="32" font-weight="700">2016</text>
+<text x="828" y="244" fill="#e2e2e2" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="32" font-weight="700" text-anchor="end">2026</text>
 <line x1="52" y1="164" x2="828" y2="164" stroke="#727272" stroke-width="1" shape-rendering="crispEdges"/>
 <line x1="83.8" y1="160" x2="83.8" y2="168" stroke="#727272" stroke-width="1" shape-rendering="crispEdges"/>
 <line x1="160.13" y1="160" x2="160.13" y2="168" stroke="#727272" stroke-width="1" shape-rendering="crispEdges"/>

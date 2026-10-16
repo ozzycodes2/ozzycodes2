@@ -119,10 +119,16 @@ families and the two radii.
    it goes in as a mix over the canvas, not as the literal: six logos on a field
    of chroma are six logos nobody can read. The accent sets type in exactly one
    place — the employer's name in `~/header`'s tagline, in caps at weight 700 —
-   and that run is the only type in the window below 4.5:1 on the canvas, since
-   the accent is corrected to 3:1. It is there by instruction. Nothing else
-   joins it: a second accented word and the first stops reading as the
+   since the accent is corrected to 3:1. It is there by instruction. Nothing
+   else joins it: a second accented word and the first stops reading as the
    exception. The three tiers corrected for type are `ink`, `dim` and `faint`.
+
+   Two runs in the window sit below 4.5:1 on the canvas, and they are the only
+   two: that accented noun, and the years grounding `~/route`'s axis. The second
+   is not type at all but a surface the figure sits on, and it is admissible
+   only because it carries nothing alone — the heading's counter prints the same
+   two years in `faint` and the `desc` states them. A glyph that is the sole
+   carrier of a fact is type, whatever its size, and takes a corrected tier.
 7. **Never reference an external font, image, or stylesheet.** GitHub strips
    them. Everything inlines; `slice_svg` handles the font subset.
 8. **Escape all interpolated content** with `c.e(...)`.
