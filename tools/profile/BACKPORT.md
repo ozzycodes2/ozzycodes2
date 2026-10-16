@@ -112,13 +112,15 @@ match:
    baseline-aligns consecutive half-width slices and the frame seams. It goes on
    the `<img>`, which is the element actually laid out, not the `<picture>`.
    `readme.py` owns this; no preview equivalent.
-6. **The footer closes on the prompt, with no band under it.**
-   `panelFooter` sets its second metadata row inside the closing band; this
-   footer has only the `❯ exit ▌` line, so the same band renders as an empty
-   strip. Worse in the dark theme: `surface` is 1.01:1 from GitHub's own dark
-   page background, so the band reads as a hole the last 44px of the window
-   falls through rather than as chrome. The slice is 80px and ends at the
-   prompt. Only the top of this window has a band.
+6. **The footer is a sign-off, not a token snapshot, and carries no band.**
+   `panelFooter` reports what the preview is for — the capture stamp, the theme
+   source, the token counts — none of which exists here. This one ends the
+   session: `$ exit`, then what the shell printed back. The closing band goes
+   with it. `panelFooter` sets a second metadata row inside that band and this
+   footer has none to put there, so the same band renders as an empty strip;
+   worse in the dark theme, where `surface` is 1.01:1 from GitHub's own dark
+   page background, so it reads as a hole the last 44px of the window falls
+   through rather than as chrome. Only the top of this window has a band.
 7. **Four embedded font faces.** GitHub strips `<link>` and off-origin `url()`,
    so Inter 400/600 and JBM 400/700 are subset and inlined. SF Mono is asked for
    first and is not redistributable, hence the fallback stack.

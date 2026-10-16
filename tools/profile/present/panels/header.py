@@ -11,7 +11,7 @@ LINE_H = 22
 MAX_LINES = 4     # beyond four the slice stops reading as a headline
 
 # The tagline is a list, not a paragraph. Each line is one claim and reads as
-# output of the command above it. `»` rather than a bullet or `❯`: both vendored
+# output of the command above it. `»` rather than a bullet: both vendored
 # monospaces carry it, so it needs no fallback face.
 BULLET = "»"
 BULLET_X = c.TEXT_X + 18

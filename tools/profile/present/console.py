@@ -392,10 +392,10 @@ def heading(theme, y, name, counter="", cmd=""):
     the window without ranking the panels against each other.
 
     `cmd` goes under the rule as a transcript of what produced the section, so
-    the numbers below it name their own source. Its prompt is `$` rather than
-    the `❯` the footer closes on: that one is the live prompt, this is quoted
-    shell. `$` is also in the subset both vendored monospaces carry, which `❯`
-    is not — a glyph repeated in five panels should not depend on a fallback.
+    the numbers below it name their own source. Its prompt is `$`, which is the
+    only prompt in this window — the footer closes on the same one. It is in the
+    subset both vendored monospaces carry, and a glyph repeated in six panels
+    should not depend on a fallback face.
     """
     rule = (f'<line x1="{TEXT_X}" y1="{y + 14}" x2="{CONTENT_R}" y2="{y + 14}" '
             f'stroke="{theme.hairline}" stroke-width="{EDGE_W}" shape-rendering="crispEdges"/>'

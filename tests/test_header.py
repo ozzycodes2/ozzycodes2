@@ -317,12 +317,10 @@ def test_header_without_a_streak_drops_the_dot_and_the_label():
 
 # --- what the reference does not draw ----------------------------------------
 
-def test_header_draws_no_live_prompt_and_no_cursor():
-    """`$` quotes a command; `❯ … ▌` is the live prompt and closes the window.
-
-    The footer draws that one, once. A second cursor in the header would make
-    the window look like two sessions.
-    """
+def test_header_draws_no_second_prompt_glyph_and_no_cursor():
+    """`$` is the window's only prompt, and neither `❯` nor a block cursor is in
+    the subset both vendored monospaces carry. Either would fall through to a
+    substitute face in the one slice that opens the window."""
     svg = render()
     assert "❯" not in svg
     assert "▌" not in svg

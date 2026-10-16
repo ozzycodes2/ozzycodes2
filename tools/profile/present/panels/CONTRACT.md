@@ -151,8 +151,8 @@ families and the two radii.
     cannot report private totals. A section drawn from curated files has no
     source to cite and takes a command in the window's own voice instead, as
     `~/stack` does. Keep either to glyphs both vendored monospaces carry, which
-    `❯` is not; `$` is the prompt for a quoted command and the footer keeps `❯`
-    for the live one.
+    `❯` is not. `$` is the window's only prompt: the sections quote commands
+    with it and the footer ends the session on it.
 
 ## Preview
 
