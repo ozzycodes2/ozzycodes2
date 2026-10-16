@@ -107,8 +107,11 @@ families and the two radii.
    it on the 2px stroke that starts every section rule; that is structure and
    it is identical in every panel. Beyond that a panel may mark the single
    highest value in one set — the live streak, the leading language, the
-   tallest day, the one layer of the stack the author writes in — at most once,
-   plus a legend swatch keying it. `~/stack` is the one slice carrying two
+   tallest day, the one layer of the stack the author writes in, the tenure
+   still being held — at most once, plus a legend swatch keying it. `~/route`
+   is where the restraint costs something: the timeline type would paint both
+   the current tenure and the circle that opens it, and the circle stays in the
+   ink because a second mark on one event spends the budget twice. `~/stack` is the one slice carrying two
    figures and so two literals: the leading language's ray, and the dot on the
    focal slab, which keys that slab's tint and is therefore the swatch rather
    than a second datum. A set of equals gets nothing: `~/projects`

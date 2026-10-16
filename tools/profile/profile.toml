@@ -26,6 +26,23 @@ tagline = [
 # be two thirds bare ground and half of it off-frame.
 window_days = 182
 
+# `~/route`, oldest first — order here is ignored, the panel sorts by `start`.
+#
+# `start` and `end` are `YYYY-MM`, or `YYYY` for a year with no month. Omit `end`
+# on the role still held; it is the one the accent marks, and the only date the
+# panel takes from the clock rather than from this file. `end` is the last month
+# held, so two roles that ran back to back meet on the axis with no gap.
+#
+# Distance along the axis is time, so an entry missing or mis-spelling `start` is
+# dropped rather than placed at the origin. Labels alternate above and below the
+# axis and are clamped to the content column; about 30 characters of `title` fit
+# before the clamp starts carrying a late role's label back off the right rail.
+#
+# [[route]]
+# org = "Machinify"
+# title = "platform engineer"
+# start = "2024-03"
+
 # The `~/stack` roster lives in stack.json, not here. A category maps each tool
 # to the height of its pedestal in the figure, which TOML can only express as a
 # table per category.

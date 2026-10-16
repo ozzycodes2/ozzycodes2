@@ -20,6 +20,11 @@
     "width": "100%"
   },
   {
+    "file": "route.svg",
+    "desc": "No route is configured: 0 roles.",
+    "width": "100%"
+  },
+  {
     "file": "projects.svg",
     "desc": "Section heading: projects, 4 public repositories.",
     "width": "100%"

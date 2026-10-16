@@ -4,7 +4,7 @@ Produces markup and manifest rows; writes nothing. `render.py` takes what comes
 back and hands it to the data layer, which is the only thing that touches disk.
 """
 from . import console as c
-from .panels import city, footer, header, projects, stack, stats
+from .panels import city, footer, header, projects, route, stack, stats
 from ..transform import layout
 
 # Display order, and the order of the manifest. `top` and `bottom` are decided
@@ -14,6 +14,7 @@ PANELS = [
     ("stats.svg", stats),
     ("contribution-city.svg", city),
     ("stack.svg", stack),
+    ("route.svg", route),
     ("projects.svg", projects),
     ("footer.svg", footer),
 ]
