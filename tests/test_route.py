@@ -222,11 +222,30 @@ def test_the_span_is_grounded_by_its_two_bounding_years(theme):
 
 
 def test_the_ground_is_the_largest_type_in_the_slice(out):
-    """It reads as ground by scale as much as by wash. 32 is spelled out rather
-    than read off the module, which would pin the constant to itself; it is the
-    top of the mono scale the console declares."""
-    assert all(size == 32 for _, size, _ in ground_years(out))
-    assert max(int(s) for s in re.findall(r'font-size="(\d+)"', out)) == 32
+    """It reads as ground by scale as much as by wash. 72 is spelled out rather
+    than read off the module, which would pin the constant to itself, and it is
+    the one size in the window off the console's declared scale: the slice may
+    carry exactly this one exception and no other."""
+    steps = [11, 12, 13, 15, 20, 32]
+    sizes = [int(s) for s in re.findall(r'font-size="(\d+)"', out)]
+    assert all(size == 72 for _, size, _ in ground_years(out))
+    assert max(sizes) == 72
+    assert all(s == 72 for s in sizes if s not in steps)
+
+
+def test_the_axis_crosses_a_third_of_the_way_down_the_ground(out):
+    """What separates ground from two marks in the corners: the figure runs
+    through the numeral rather than beside it. A third down, not halfway, so the
+    digits read as sitting under the axis rather than being struck through."""
+    cap = 0.7 * route.YEAR                       # cap height of a digit at 72px
+    top, bottom = route.AXIS_Y + route.YEAR_DROP - cap, route.AXIS_Y + route.YEAR_DROP
+    assert top < route.AXIS_Y < bottom
+    assert abs((route.AXIS_Y - top) / cap - 1 / 3) < 0.05
+    # And it stays out of both label blocks it passes between.
+    assert top > route.AXIS_Y + route.ABOVE[2]
+    assert bottom < route.AXIS_Y + route.BELOW[0] - 0.7 * route.EYEBROW
+    # The drawing is on the baseline that geometry assumes, not a tier away.
+    assert set(re.findall(r'<text x="[\d.]+" y="(\d+)"[^>]*font-size="72"', out)) == {str(bottom)}
 
 
 @pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)

@@ -38,8 +38,14 @@ EYEBROW = 11
 NAME = 13
 SUBLABEL = 11
 PAD_BELOW = 28
-YEAR = 32         # the span's bounding years, as ground — the largest mono step
-WASH = 0.1        # how much ink that ground carries
+YEAR = 72         # the span's bounding years, as ground. Off the console's scale
+WASH = 0.06       # on purpose — see `render`. Washed to where it stops being type.
+
+# Two thirds of the cap height of a 72px digit, so the axis crosses the numeral a
+# third of the way down rather than halving it. The numeral is ground for the
+# figure: ground the figure sits beside is two marks in the corners, and ground
+# the line bisects reads as a numeral struck through.
+YEAR_DROP = 34
 
 # Label baselines, as offsets from the axis. Both blocks read eyebrow, employer,
 # title from the top, so a label means the same thing wherever it sits; the
@@ -166,15 +172,21 @@ def render(cfg, _data, theme, now=None):
     # for the figure. They are the one run in the window deliberately below the
     # floor for type, and they can be: the heading's counter prints the same two
     # years in faint and the alt text states them, so nothing is carried here
-    # alone. Painted first, so the axis and every label sit over them. At the 72px
-    # the type reference uses they would need their own step on the scale; 32 is
-    # the largest the console already declares and reads as ground at this wash.
+    # alone. Painted first, so the axis, the runs, the drops and every label sit
+    # over them — the line crossing the numeral is what makes it ground.
+    #
+    # 72px is off the console's scale, and it is the one size in the window that
+    # is. The scale exists to keep type in a few steps a reader can tell apart;
+    # this is a surface, sized against the figure it sits under rather than
+    # against the other type, and at any step the console declares it reads as a
+    # small label that has lost its colour instead.
     ground = c.mix(theme.ink, theme.canvas, WASH)
+    year_y = AXIS_Y + YEAR_DROP
     years = "\n".join([
-        c.tx(c.TEXT_X, AXIS_Y + BELOW[2], str(plan["from"]), fill=ground,
-             family=c.MONO_STACK, size=YEAR, weight=700),
-        c.tx(c.CONTENT_R, AXIS_Y + BELOW[2], str(plan["to"]), fill=ground,
-             family=c.MONO_STACK, size=YEAR, weight=700, anchor="end"),
+        c.tx(c.TEXT_X, year_y, str(plan["from"]), fill=ground,
+             family=c.MONO_STACK, size=YEAR, weight=600),
+        c.tx(c.CONTENT_R, year_y, str(plan["to"]), fill=ground,
+             family=c.MONO_STACK, size=YEAR, weight=600, anchor="end"),
     ])
 
     # Every 1px line in this panel snaps, for the reason deviation 2 in

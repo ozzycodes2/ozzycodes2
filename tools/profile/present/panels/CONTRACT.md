@@ -76,7 +76,12 @@ Type is set per element, as a presentation attribute through `tx`, not as a
 class. Two families — `MONO_STACK` and `SANS_STACK` — and the sizes a terminal
 needs: mono at 11/12/13/15/20/32 for everything structural, sans at 13/15 for
 the two runs of prose. These are not the token type scale, deliberately: the
-console speaks in its own voice. The one borrowing is the name, set at
+console speaks in its own voice. One run in the window is off even this scale —
+the 72px years grounding `~/route`'s axis, which are a surface sized against the
+figure sitting on them rather than type to be told apart from other type, and
+which at any declared step read as a small label that has lost its colour
+instead. It is the only exception, and a test pins that. The one borrowing from
+the tokens is the name, set at
 `{typography.display}` exactly — sans 40/600/-0.8 — which is the largest step
 the system declares and is spent once. What the tokens otherwise supply is the
 families and the two radii.
