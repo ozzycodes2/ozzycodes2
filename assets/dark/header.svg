@@ -18,18 +18,18 @@
 <line x1="16" y1="60" x2="864" y2="60" stroke="#23252a" stroke-width="1" shape-rendering="crispEdges"/>
 <text x="52" y="84" fill="#909091" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="12">$</text>
 <text x="66" y="84" fill="#d0d6e0" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="12">whoami</text>
-<text x="52" y="120" fill="#f7f8f8" font-family="Inter, &#x27;Helvetica Neue&#x27;, Helvetica, Arial, system-ui, sans-serif" font-size="30" font-weight="600" letter-spacing="-0.5">Osniel Quintana</text>
-<text x="52" y="146" fill="#d0d6e0" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="13">@ozzycodes2 · platform engineer</text>
-<circle class="live" cx="722" cy="141" r="4" fill="#ef6306"/>
-<text x="828" y="146" fill="#f7f8f8" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="13" text-anchor="end">4-day streak</text>
-<text x="52" y="184" fill="#909091" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="13">»</text>
-<text x="70" y="184" fill="#d0d6e0" font-family="Inter, &#x27;Helvetica Neue&#x27;, Helvetica, Arial, system-ui, sans-serif" font-size="15">Backend by trade, platform by habit.</text>
-<text x="52" y="206" fill="#909091" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="13">»</text>
-<text x="70" y="206" fill="#d0d6e0" font-family="Inter, &#x27;Helvetica Neue&#x27;, Helvetica, Arial, system-ui, sans-serif" font-size="15">Java, Rust, Python and TypeScript at the core,</text>
-<text x="52" y="228" fill="#909091" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="13">»</text>
-<text x="70" y="228" fill="#d0d6e0" font-family="Inter, &#x27;Helvetica Neue&#x27;, Helvetica, Arial, system-ui, sans-serif" font-size="15">Kubernetes, Terraform and Argo in production, agents in the toolchain.</text>
-<text x="52" y="250" fill="#909091" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="13">»</text>
-<text x="70" y="250" fill="#d0d6e0" font-family="Inter, &#x27;Helvetica Neue&#x27;, Helvetica, Arial, system-ui, sans-serif" font-size="15">I build the developer tooling other engineers ship on.</text>
+<text x="52" y="126" fill="#f7f8f8" font-family="Inter, &#x27;Helvetica Neue&#x27;, Helvetica, Arial, system-ui, sans-serif" font-size="40" font-weight="600" letter-spacing="-0.8">Osniel Quintana</text>
+<text x="52" y="154" fill="#d0d6e0" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="13">@ozzycodes2 · platform engineer</text>
+<circle class="live" cx="722" cy="149" r="4" fill="#ef6306"/>
+<text x="828" y="154" fill="#f7f8f8" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="13" text-anchor="end">4-day streak</text>
+<text x="52" y="188" fill="#909091" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="13">»</text>
+<text x="70" y="188" fill="#d0d6e0" font-family="Inter, &#x27;Helvetica Neue&#x27;, Helvetica, Arial, system-ui, sans-serif" font-size="15">Backend by trade, platform by habit.</text>
+<text x="52" y="210" fill="#909091" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="13">»</text>
+<text x="70" y="210" fill="#d0d6e0" font-family="Inter, &#x27;Helvetica Neue&#x27;, Helvetica, Arial, system-ui, sans-serif" font-size="15">Java, Rust, Python and TypeScript at the core,</text>
+<text x="52" y="232" fill="#909091" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="13">»</text>
+<text x="70" y="232" fill="#d0d6e0" font-family="Inter, &#x27;Helvetica Neue&#x27;, Helvetica, Arial, system-ui, sans-serif" font-size="15">Kubernetes, Terraform and Argo in production, agents in the toolchain.</text>
+<text x="52" y="254" fill="#909091" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="13">»</text>
+<text x="70" y="254" fill="#d0d6e0" font-family="Inter, &#x27;Helvetica Neue&#x27;, Helvetica, Arial, system-ui, sans-serif" font-size="15">I build the developer tooling other engineers ship on.</text>
 <path d="M16 280V34M864 34V280" fill="none" stroke="#23252a" stroke-width="2" shape-rendering="crispEdges"/>
 <path d="M16 34a18 18 0 0 1 18 -18H846a18 18 0 0 1 18 18" fill="none" stroke="#23252a" stroke-width="2"/>
 </svg>

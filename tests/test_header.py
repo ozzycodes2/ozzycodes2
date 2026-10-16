@@ -103,14 +103,15 @@ def test_header_draws_the_chrome_once_titled_for_the_handle():
 # --- type --------------------------------------------------------------------
 
 def test_the_name_is_the_one_display_size_element():
-    """30/600 sans with -0.5 tracking: the only element off the label scale."""
+    """`{typography.display}` to the pixel: the system's largest step, and the
+    only element in the window that reaches it."""
     attrs = one(render(), "Osniel Quintana")
     assert attrs["x"] == str(c.TEXT_X)
     assert attrs["y"] == str(header.NAME_Y)
     assert attrs["font-family"] == SANS
-    assert attrs["font-size"] == "30"
+    assert attrs["font-size"] == "40"
     assert attrs["font-weight"] == "600"
-    assert attrs["letter-spacing"] == "-0.5"
+    assert attrs["letter-spacing"] == "-0.8"
     assert attrs["fill"] == c.LIGHT.ink
 
 
@@ -213,7 +214,8 @@ def test_the_accent_marks_the_live_dot_and_nothing_else_here(theme):
     no section heading, so the dot is the only accent in the slice."""
     svg = header.render(CFG, DATA, theme)
     assert svg.count(theme.accent) == 1
-    assert f'class="live" cx="722" cy="141" r="4" fill="{theme.accent}"' in svg
+    assert f'class="live" cx="722" cy="{header.META_Y - 5}" r="4" '
+    f'fill="{theme.accent}"' in svg
 
 
 def test_the_dot_pulses_through_the_shared_class():

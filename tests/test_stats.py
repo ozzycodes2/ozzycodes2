@@ -131,22 +131,30 @@ def test_the_six_cells_sit_three_to_a_row_on_even_columns(markup):
     assert stats.COL_W * stats.COLS <= c.CONTENT_R - c.TEXT_X
 
 
-def test_a_cell_stacks_its_label_value_and_note_at_a_fixed_offset(markup):
+def test_a_cell_stacks_its_label_over_its_value_at_a_fixed_offset(markup):
     """One rhythm for all six, so the two rows read as a table and not as six
     separate blocks."""
     label_y = said(markup, "longest streak")[1]
     assert said(markup, "6d")[1] == label_y + stats.VALUE_DY
-    assert said(markup, "current 2d")[1] == label_y + stats.NOTE_DY
+
+
+def test_a_cell_carries_nothing_under_its_value(markup):
+    """Two tiers, not three. The note was a second quantity in the same voice as
+    the number above it, and the rule closing the cell comes up to meet it."""
+    drawn = c.visible(markup)
+    for note in ("all time", "of 423 opened", "commits", "current", "years",
+                 "public"):
+        assert note not in drawn
+    assert stats.RULE_DY - stats.VALUE_DY == 20
 
 
 @pytest.mark.parametrize("content, tier", [
     ("private share", (c.LIGHT.faint, 11, None, "0.5")),
-    ("1,122 commits", (c.LIGHT.dim, 12, None, None)),
-    ("96%", (c.LIGHT.ink, 30, "700", "-0.5")),
+    ("96%", (c.LIGHT.ink, 32, "700", "-0.5")),
 ])
-def test_a_cell_uses_three_type_tiers_and_nothing_else(markup, content, tier):
-    """Faint label, ink value, dim note: the hierarchy is carried by tone and
-    size rather than by a rule or a box around each cell."""
+def test_a_cell_uses_two_type_tiers_and_nothing_else(markup, content, tier):
+    """Faint label over ink value: the hierarchy is carried by tone and size
+    rather than by a rule or a box around each cell."""
     _, _, fill, size, weight, ls, _, _ = said(markup, content)
     assert (fill, size, weight, ls) == tier
 
@@ -163,8 +171,7 @@ def test_each_cell_is_closed_by_a_rule_stopping_short_of_the_next_column(markup)
 
 
 def test_counters_over_a_thousand_are_separated(markup):
-    for value in ("1,174", "1,441 all time", "1,122 commits"):
-        assert said(markup, value)
+    assert said(markup, "1,174")
 
 
 def test_the_private_share_is_rounded_against_this_years_contributions(markup):
@@ -173,12 +180,13 @@ def test_the_private_share_is_rounded_against_this_years_contributions(markup):
     preview rounds it — round() would send a .5 to the nearest even instead."""
     share = STATS["private_year"] / STATS["contributions_year"] * 100
     assert said(markup, f"{int(share + 0.5)}%")
-    assert said(markup, "1,122 commits")
 
 
-def test_the_account_age_is_the_span_between_opening_and_the_stamp(markup):
+def test_the_account_opening_year_is_the_cells_whole_value(markup):
+    """A year, not a span: `10 years` was the note under it and the note is gone,
+    so the cell says when rather than how long."""
     assert said(markup, "2016")
-    assert said(markup, "10 years")
+    assert "years" not in c.visible(markup)
 
 
 @pytest.mark.parametrize("raw", [None, "", "not-a-date", 12345])

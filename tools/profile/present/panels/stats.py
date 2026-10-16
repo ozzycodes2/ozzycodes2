@@ -4,9 +4,11 @@ Stars and forks are deliberately absent: the account has none, and a row of
 zeroes says less than nothing. Most of the work here happens in private repos,
 so the private share carries the honest signal.
 
-Each cell is a three-tier stack — faint label, ink value, dim note — closed by a
-hairline under the column it belongs to, which is what separates the two rows
-without a second colour or a box.
+Each cell is a faint label over an ink value, closed by a hairline under the
+column it belongs to, which is what separates the two rows without a second
+colour or a box. Two tiers, not three: the note that used to sit under each
+number was a second quantity in the same voice as the first, and six of them
+read as a table nobody asked for.
 
 Languages used to be charted here as a row of bars. They are a polar ring in
 `~/stack` now, beside the figure that says which layer the author writes in —
@@ -21,10 +23,9 @@ HEAD_Y = c.HEAD_Y
 COLS = 3
 COL_W = (c.CONTENT_R - c.TEXT_X) // COLS   # integral, so the columns stay even
 GRID_Y = HEAD_Y + c.BODY_DY                # first label baseline
-GRID_PITCH = 84                            # label to label, row to row
-VALUE_DY = 34
-NOTE_DY = 54
-RULE_DY = 66
+GRID_PITCH = 80                            # label to label, row to row
+VALUE_DY = 38
+RULE_DY = 58
 RULE_INSET = 24                            # gap between a rule and the next column
 
 PAD_BELOW = 24
@@ -43,7 +44,7 @@ def _year(raw):
 
 
 def _counters(stats):
-    """(label, value, note) per cell, in reading order across the grid.
+    """(label, value) per cell, in reading order across the grid.
 
     Every cell is kept even when its field is missing: the grid is the panel's
     structure, and a hole in it reads as a rendering fault rather than as an
@@ -54,39 +55,32 @@ def _counters(stats):
     year = stats.get("year", "")
     counted = int(stats.get("contributions_year") or 0)
     private = int(stats.get("private_year") or 0)
-    opened, now = _year(stats.get("created_at")), _year(stats.get("updated"))
+    opened = _year(stats.get("created_at"))
     # Rounded half up, as the preview's Math.round is; Python's round() would
     # send a .5 to the nearest even and disagree on one share in two hundred.
     share = f"{int(private / counted * 100 + 0.5)}%" if counted else "0%"
-    age = f"{now - opened} years" if opened and now else ""
 
     return [
-        (f"contributions {year}".strip(), c.num(counted),
-         f"{c.num(stats.get('contributions_all'))} all time"),
-        ("pull requests merged", c.num(stats.get("prs_merged")),
-         f"of {c.num(stats.get('prs'))} opened"),
-        ("repositories touched", c.num(stats.get("repos_contributed")),
-         f"{stats.get('repos_public', 0)} public · {stats.get('orgs', 0)} org"),
-        ("private share", share, f"{c.num(private)} commits"),
-        ("longest streak", f"{stats.get('streak_longest', 0)}d",
-         f"current {stats.get('streak_current', 0)}d"),
-        ("account opened", str(opened) if opened else "—", age),
+        (f"contributions {year}".strip(), c.num(counted)),
+        ("pull requests merged", c.num(stats.get("prs_merged"))),
+        ("repositories touched", c.num(stats.get("repos_contributed"))),
+        ("private share", share),
+        ("longest streak", f"{stats.get('streak_longest', 0)}d"),
+        ("account opened", str(opened) if opened else "—"),
     ]
 
 
 def _grid(theme, cells):
     """The counter cells, three to a row, each closed by a rule under its column."""
     out = []
-    for i, (label, value, note) in enumerate(cells):
+    for i, (label, value) in enumerate(cells):
         x = c.TEXT_X + (i % COLS) * COL_W
         y = GRID_Y + (i // COLS) * GRID_PITCH
         out += [
             c.tx(x, y, label, fill=theme.faint, family=c.MONO_STACK,
                  size=11, ls=0.5),
             c.tx(x, y + VALUE_DY, value, fill=theme.ink, family=c.MONO_STACK,
-                 size=30, weight=700, ls="-0.5"),
-            c.tx(x, y + NOTE_DY, note, fill=theme.dim, family=c.MONO_STACK,
-                 size=12),
+                 size=32, weight=700, ls="-0.5"),
             f'<line x1="{x}" y1="{y + RULE_DY}" x2="{x + COL_W - RULE_INSET}" '
             f'y2="{y + RULE_DY}" stroke="{theme.hairline}" '
             f'stroke-width="{c.EDGE_W}" shape-rendering="crispEdges"/>',

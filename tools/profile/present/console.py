@@ -24,9 +24,11 @@ changes with the reader's system setting is two brands. It clears 3:1 on both
 canvases and 4.5:1 on neither, which is the whole reason it never sets type.
 
 Type is not the token scale. A terminal has its own, and these panels set it per
-element in presentation attributes: mono at 11/12/13/15/20/30 for everything
-structural, sans at 13/15/30 for the two runs of prose. What the tokens supply
-is the two families and the two radii.
+element in presentation attributes: mono at 11/12/13/15/20/32 for everything
+structural, sans at 13/15 for the two runs of prose. The one exception is the
+name, which is `{typography.display}` to the pixel — 40/600/-0.8 — because it is
+the only thing here the token scale has an opinion about. What the tokens
+otherwise supply is the two families and the two radii.
 
 `slice_svg` inlines a woff2 subset of every face its body needs, because GitHub
 strips <link> and external url() from a rendered SVG; `fonts.py` is how.

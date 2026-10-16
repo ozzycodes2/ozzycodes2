@@ -74,10 +74,12 @@ step above the canvas and the whole of this system's depth; there are no shadows
 
 Type is set per element, as a presentation attribute through `tx`, not as a
 class. Two families — `MONO_STACK` and `SANS_STACK` — and the sizes a terminal
-needs: mono at 11/12/13/15/20/30 for everything structural, sans at 13/15/30 for
+needs: mono at 11/12/13/15/20/32 for everything structural, sans at 13/15 for
 the two runs of prose. These are not the token type scale, deliberately: the
-console speaks in its own voice. What the tokens supply is the families and the
-two radii.
+console speaks in its own voice. The one borrowing is the name, set at
+`{typography.display}` exactly — sans 40/600/-0.8 — which is the largest step
+the system declares and is spent once. What the tokens otherwise supply is the
+families and the two radii.
 
 `.live` is the only class, and the only animation.
 

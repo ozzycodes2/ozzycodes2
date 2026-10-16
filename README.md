@@ -1,5 +1,5 @@
 <!-- profile:start -->
-<p align="center">
+<p>
 <picture><source media="(prefers-color-scheme: dark)" srcset="./assets/dark/header.svg"><img src="./assets/light/header.svg" width="100%" align="top" alt="Osniel Quintana (@ozzycodes2), platform engineer. 4 tagline lines. Current streak 4 days."></picture>
 <picture><source media="(prefers-color-scheme: dark)" srcset="./assets/dark/stats.svg"><img src="./assets/light/stats.svg" width="100%" align="top" alt="1,495 contributions in 2026, 426 of 480 pull requests merged, 8 repositories touched, longest streak 6 days."></picture>
 <picture><source media="(prefers-color-scheme: dark)" srcset="./assets/dark/contribution-city.svg"><img src="./assets/light/contribution-city.svg" width="100%" align="top" alt="Isometric plan of 26 weeks: 182 tiles, 68 built on, 1,492 contributions. Tallest block is 108 on 2026-10-13."></picture>

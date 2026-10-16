@@ -86,8 +86,13 @@ def test_tiled_slices_share_a_line_with_no_whitespace_between():
     assert "> <" not in row and ">\n<" not in row
 
 
-def test_block_centres_the_console():
-    assert '<p align="center">' in readme.block([entry("a.svg")])
+def test_the_console_is_flush_with_the_left_of_the_column():
+    """Centring aligned nothing — every slice is width="100%" — but it decided
+    where the rounding slack went on the one row that is two 50% halves: half a
+    pixel on the left, which puts that row's rail inside the rail above it."""
+    out = readme.block([entry("a.svg")])
+    assert "<p>" in out
+    assert "align=\"center\"" not in out
 
 
 # --- splice ----------------------------------------------------------------

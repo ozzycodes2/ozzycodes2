@@ -40,8 +40,19 @@ def img(entry):
 
 
 def block(manifest):
+    """The whole console, one `<p>`, left-aligned.
+
+    Not centred, which it was: every slice is `width="100%"` except the two
+    halves of a card row, so centring aligns nothing — it only decides where the
+    slack goes when those halves do not sum to the column. Engines that lay
+    images out in whole pixels round each 50% down, leaving the row a pixel
+    narrow; centred, half that pixel lands on the left and the row's rail sits
+    inside the rail of every full-width slice above and below it. Left-aligned,
+    every slice's left edge is the column's left edge and the slack collects at
+    the right, inside the frame's own gutter.
+    """
     lines = ["".join(img(entry) for entry in row) for row in layout.rows(manifest)]
-    return "\n".join([START, '<p align="center">', *lines, "</p>", END])
+    return "\n".join([START, "<p>", *lines, "</p>", END])
 
 
 def splice(text, generated):

@@ -2,9 +2,9 @@
 from .. import console as c
 
 CMD_Y = 84        # `$ whoami`, the command the rest of the slice answers
-NAME_Y = 120      # the one display-size baseline; everything hangs off it
-META_Y = 146      # handle · role, and the streak opposite it
-TAGLINE_Y = 184
+NAME_Y = 126      # the one display-size baseline; everything hangs off it
+META_Y = 154      # handle · role, and the streak opposite it
+TAGLINE_Y = 188
 LINE_H = 22
 MAX_LINES = 4     # beyond four the slice stops reading as a headline
 
@@ -31,8 +31,10 @@ def render(cfg, data, theme):
         c.tx(c.TEXT_X, CMD_Y, "$", fill=theme.faint, family=c.MONO_STACK, size=12),
         c.tx(c.TEXT_X + 14, CMD_Y, "whoami", fill=theme.dim,
              family=c.MONO_STACK, size=12),
+        # `{typography.display}` literally — the system's largest step, spent
+        # on the one thing in the window entitled to it.
         c.tx(c.TEXT_X, NAME_Y, name, fill=theme.ink, family=c.SANS_STACK,
-             size=30, weight=600, ls="-0.5"),
+             size=40, weight=600, ls="-0.8"),
         c.tx(c.TEXT_X, META_Y, f"@{handle} · {role}", fill=theme.dim,
              family=c.MONO_STACK, size=13),
     ]
