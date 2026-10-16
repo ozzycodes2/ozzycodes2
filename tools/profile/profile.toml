@@ -33,15 +33,42 @@ window_days = 182
 # panel takes from the clock rather than from this file. `end` is the last month
 # held, so two roles that ran back to back meet on the axis with no gap.
 #
+# An entry with no `org` is a milestone, not a job: one point on the axis, no
+# run, never the accent, and its `title` is set in the tier an employer would
+# hold. That is what opens the axis before the first job.
+#
+# `title` is optional on a role too; the block then reads eyebrow and employer
+# only. Both short blocks keep the tiers nearest the axis, so a label always
+# starts where its drop line ends.
+#
 # Distance along the axis is time, so an entry missing or mis-spelling `start` is
 # dropped rather than placed at the origin. Labels alternate above and below the
 # axis and are clamped to the content column; about 30 characters of `title` fit
 # before the clamp starts carrying a late role's label back off the right rail.
-#
-# [[route]]
-# org = "Machinify"
-# title = "platform engineer"
-# start = "2024-03"
+
+[[route]]
+title = "first commit"
+start = "2016-08"
+
+[[route]]
+org = "JP Morgan"
+start = "2019-07"
+end = "2020-12"
+
+[[route]]
+org = "Apple"
+start = "2020-12"
+end = "2022-01"
+
+[[route]]
+org = "Twilio"
+start = "2022-01"
+end = "2026-07"
+
+[[route]]
+org = "Machinify"
+title = "platform engineer"
+start = "2026-07"
 
 # The `~/stack` roster lives in stack.json, not here. A category maps each tool
 # to the height of its pedestal in the figure, which TOML can only express as a

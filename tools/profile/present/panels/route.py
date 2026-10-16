@@ -5,6 +5,11 @@ that distance on the axis is time. A role is a span rather than an instant, so a
 tenure is a 3px run over the hairline axis and the gaps between runs are the
 gaps between jobs; a circle marks where each one started.
 
+An entry with no employer is a milestone — a circle and a label, no run. It is
+what lets the axis open on something that happened rather than on a job, and it
+is why a label block is built from the tiers it has rather than from a fixed
+three.
+
 The accent falls on the tenure still being held, which is this panel's one datum
 worth pointing at. The milestone circle the type reference would paint in the
 accent stays in the ink: a second mark on the same role spends the budget twice
@@ -36,7 +41,9 @@ PAD_BELOW = 28
 
 # Label baselines, as offsets from the axis. Both blocks read eyebrow, employer,
 # title from the top, so a label means the same thing wherever it sits; the
-# alternation only decides which side it falls on.
+# alternation only decides which side it falls on. A block with fewer than three
+# tiers keeps the ones nearest the axis, so every label still starts where its
+# drop line ends rather than floating a tier away from it.
 ABOVE = (-72, -54, -36)
 BELOW = (44, 62, 80)
 DROP_ABOVE = (-30, -9)   # the 1px line binding a label block to its event
@@ -79,11 +86,18 @@ def layout(roster, now):
     A dated `end` is the last month held, so the run reaches the month after it.
     Taken literally the figure would lose a month off every tenure and leave a
     visible gap between two roles that in fact ran back to back.
+
+    An entry with no employer is a milestone rather than a tenure: it is one
+    month wide, it draws no run, and it never takes the accent however it is
+    dated. An open `end` means "still held", which a thing that happened once
+    cannot be.
     """
     rows = []
     for entry in roster or []:
         start = month_of(entry.get("start"))
-        if entry.get("end") is None:
+        if not entry.get("org"):
+            end = start
+        elif entry.get("end") is None:
             end = now
         else:
             end = month_of(entry["end"])
@@ -105,10 +119,12 @@ def layout(roster, now):
         return c.TEXT_X + (m - t0) / total * (c.CONTENT_R - c.TEXT_X)
 
     for i, r in enumerate(rows):
+        org = r.get("org")
         r.update(x0=at(r["from"]), x1=at(r["to"]),
-                 current=r.get("end") is None,
+                 milestone=not org,
+                 current=bool(org) and r.get("end") is None,
                  above=i % 2 == 0,
-                 dates=f"{r['start']} .. {r.get('end') or 'now'}",
+                 dates=f"{r['start']} .. {r.get('end') or 'now'}" if org else str(r["start"]),
                  months=r["to"] - r["from"])
 
     # Whole years inside the span, which is the only scale annotation the axis
@@ -157,22 +173,25 @@ def render(cfg, _data, theme, now=None):
         f'<line x1="{_n(r["x0"])}" y1="{AXIS_Y}" x2="{_n(r["x1"])}" y2="{AXIS_Y}" '
         f'stroke="{theme.accent if r["current"] else theme.dim}" stroke-width="{SEG_W}" '
         f'stroke-linecap="round"/>'
-        for r in plan["rows"]
+        for r in plan["rows"] if not r["milestone"]
     )
 
     events = []
     for r in plan["rows"]:
-        lines = [
+        # The employer's tier carries the milestone's name when there is no
+        # employer, so the ink line of a block is always the thing that happened.
+        lines = [(s, o) for s, o in [
             (r["dates"], dict(fill=theme.faint, size=EYEBROW, ls=0.5)),
-            (r["org"], dict(fill=theme.ink, size=NAME, weight=700)),
-            (r["title"], dict(fill=theme.dim, size=SUBLABEL)),
-        ]
+            (r.get("org") or r.get("title"), dict(fill=theme.ink, size=NAME, weight=700)),
+            (r.get("title") if r.get("org") else None, dict(fill=theme.dim, size=SUBLABEL)),
+        ] if s]
         # Mono advances 0.6em, and a tracked line advances its tracking on top of
         # that — dropping the second term leaves the eyebrow nine pixels wider
         # than the clamp believes it is.
         width = max(len(str(s)) * (o["size"] * 0.6 + o.get("ls", 0)) for s, o in lines)
         x = _n(max(c.TEXT_X, min(r["x0"], c.CONTENT_R - width)))
-        ys = ABOVE if r["above"] else BELOW
+        side = ABOVE if r["above"] else BELOW
+        ys = side[len(side) - len(lines):] if r["above"] else side[:len(lines)]
         d0, d1 = DROP_ABOVE if r["above"] else DROP_BELOW
         events += [
             f'<circle cx="{_n(r["x0"])}" cy="{AXIS_Y}" r="{DOT_R}" fill="{theme.ink}"/>',
@@ -183,8 +202,13 @@ def render(cfg, _data, theme, now=None):
               for i, (s, o) in enumerate(lines)),
         ]
 
-    roster = "; ".join(f"{r['org']}, {r['title']}, {r['dates']} ({span_of(r['months'])})"
-                       for r in plan["rows"])
+    roster = "; ".join(
+        ", ".join(str(part) for part in [
+            r.get("org"), r.get("title"),
+            r["dates"] if r["milestone"] else f"{r['dates']} ({span_of(r['months'])})",
+        ] if part)
+        for r in plan["rows"])
+    roles = sum(1 for r in plan["rows"] if not r["milestone"])
     body = "\n".join([
         c.heading(theme, HEAD_Y, "route", counter=f"{plan['from']} — {plan['to']}",
                   cmd=f"traceroute --since={plan['from']}"),
@@ -192,7 +216,7 @@ def render(cfg, _data, theme, now=None):
         f'stroke="{theme.faint}" stroke-width="{c.EDGE_W}" shape-rendering="crispEdges"/>',
         marks, runs, *events,
     ])
-    desc = (f"{len(plan['rows'])} roles from {plan['from']} to {plan['to']}, "
+    desc = (f"{roles} roles from {plan['from']} to {plan['to']}, "
             f"spaced by date on one axis: {roster}.")
 
     return c.slice_svg(theme, HEIGHT, body, title="Work route", desc=desc)

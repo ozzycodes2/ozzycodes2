@@ -110,8 +110,8 @@ families and the two radii.
    tallest day, the one layer of the stack the author writes in, the tenure
    still being held — at most once, plus a legend swatch keying it. `~/route`
    is where the restraint costs something: the timeline type would paint both
-   the current tenure and the circle that opens it, and the circle stays in the
-   ink because a second mark on one event spends the budget twice. `~/stack` is the one slice carrying two
+   the current tenure and the milestone that opens the axis, and the milestone
+   stays in the ink because the panel's one mark is already spent. `~/stack` is the one slice carrying two
    figures and so two literals: the leading language's ray, and the dot on the
    focal slab, which keys that slab's tint and is therefore the swatch rather
    than a second datum. A set of equals gets nothing: `~/projects`
