@@ -1,4 +1,6 @@
 """Top slice: window chrome, name, handle, role, tagline, live streak."""
+import re
+
 from .. import console as c
 
 CMD_Y = 84        # `$ whoami`, the command the rest of the slice answers
@@ -15,6 +17,47 @@ BULLET = "»"
 BULLET_X = c.TEXT_X + 18
 
 STREAK_SIZE = 13
+
+# A `*word*` opening a tagline line is set as a branded chip.
+CHIP = re.compile(r"^\*([^*]+)\*\s*")
+CHIP_SIZE = 13
+CHIP_H = 21
+CHIP_PAD = 9      # mono's side bearing inside the chip
+CHIP_GAP = 10     # chip to the prose that follows it
+CHIP_TINT = "0.18"
+
+
+def _tagline(theme, y, line):
+    """One tagline line, with a `*marked*` leading word set as a branded chip.
+
+    The chip is accent as a *surface* under ink type, which is the only way this
+    system may colour a word: the accent is corrected to 3:1, the threshold for
+    an object, so a word painted in it outright is the one unreadable thing on
+    the page. A tint and no edge — the accent budget counts paints, and an edge
+    would spend the panel's second one on the same shape.
+
+    The mark is honoured only at the start of a line. The prose after the chip
+    is placed from the chip's width, and only the mono face can be measured
+    before it is drawn; Inter mid-line cannot be, so there is nowhere else in a
+    line to put one.
+    """
+    out = [c.tx(c.TEXT_X, y, BULLET, fill=theme.faint, family=c.MONO_STACK,
+                size=13)]
+    x = BULLET_X
+    marked = CHIP.match(line)
+    if marked:
+        word = marked.group(1)
+        width = round(len(word) * CHIP_SIZE * c.MONO_ADVANCE) + CHIP_PAD * 2
+        out += [
+            f'<rect x="{x}" y="{y - 15}" width="{width}" height="{CHIP_H}" '
+            f'rx="{c.R_CHIP}" fill="{theme.accent}" fill-opacity="{CHIP_TINT}"/>',
+            c.tx(x + CHIP_PAD, y, word, fill=theme.ink, family=c.MONO_STACK,
+                 size=CHIP_SIZE, weight=700),
+        ]
+        x += width + CHIP_GAP
+        line = line[marked.end():]
+    out.append(c.tx(x, y, line, fill=theme.dim, family=c.SANS_STACK, size=15))
+    return out
 
 
 def render(cfg, data, theme):
@@ -58,12 +101,7 @@ def render(cfg, data, theme):
     last_y = META_Y
     for i, line in enumerate(lines):
         last_y = TAGLINE_Y + i * LINE_H
-        body += [
-            c.tx(c.TEXT_X, last_y, BULLET, fill=theme.faint,
-                 family=c.MONO_STACK, size=13),
-            c.tx(BULLET_X, last_y, line, fill=theme.dim,
-                 family=c.SANS_STACK, size=15),
-        ]
+        body += _tagline(theme, last_y, line)
 
     return c.slice_svg(
         theme, c.to_grid(last_y + 26), "\n".join(body),

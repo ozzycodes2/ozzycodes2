@@ -83,9 +83,13 @@ def test_header_height_is_on_the_grid():
     assert height_of(render()) % c.ROW == 0
 
 
-def test_header_is_the_reference_280_tall_for_a_four_line_tagline():
-    """The shipped tagline is four lines; the reference slice is 280px."""
-    assert height_of(render()) == 280
+@pytest.mark.parametrize("count", [3, 4])
+def test_header_is_the_reference_280_tall(count):
+    """Three lines and four both land on the reference slice, so dropping a
+    tagline line does not move every section below it."""
+    cfg = {"identity": {**CFG["identity"],
+                        "tagline": [f"line {i}" for i in range(count)]}}
+    assert height_of(header.render(cfg, DATA, c.LIGHT)) == 280
 
 
 def test_header_draws_the_chrome_once_titled_for_the_handle():
@@ -193,6 +197,83 @@ def test_header_caps_the_tagline_at_four_lines():
     svg = header.render(cfg, DATA, c.LIGHT)
     assert len([b for _, b in texts(svg) if b.startswith("line ")]) == 4
     assert "line 4" not in svg
+
+
+# --- the branded chip --------------------------------------------------------
+
+def chipped(line="*Machinify* — wiring agents in.", theme=c.LIGHT):
+    cfg = {"identity": {**CFG["identity"], "tagline": [line]}}
+    return header.render(cfg, DATA, theme)
+
+
+def test_a_marked_word_is_set_on_an_accent_tinted_chip():
+    """The accent is corrected to 3:1 — the threshold for an object — so the one
+    word carrying a brand gets a surface under it rather than the colour on it.
+    """
+    svg = chipped()
+    chip = elements(svg, "rect")[-1]
+    width = round(len("Machinify") * header.CHIP_SIZE * c.MONO_ADVANCE)
+    assert chip["x"] == str(header.BULLET_X)
+    assert chip["y"] == str(header.TAGLINE_Y - 15)
+    assert chip["width"] == str(width + header.CHIP_PAD * 2)
+    assert chip["height"] == str(header.CHIP_H)
+    assert chip["rx"] == str(c.R_CHIP)
+    assert chip["fill"] == c.LIGHT.accent
+    assert chip["fill-opacity"] == header.CHIP_TINT
+    assert "stroke" not in chip               # a tint is already one paint
+
+
+def test_the_chipped_word_is_ink_mono_inside_its_own_chip():
+    """Mono, so the chip can be measured before the prose after it is placed —
+    and so the name reads as a token rather than as more of the sentence."""
+    attrs = one(chipped(), "Machinify")
+    assert attrs["x"] == str(header.BULLET_X + header.CHIP_PAD)
+    assert attrs["y"] == str(header.TAGLINE_Y)
+    assert attrs["font-family"] == MONO
+    assert attrs["font-size"] == str(header.CHIP_SIZE)
+    assert attrs["font-weight"] == "700"
+    assert attrs["fill"] == c.LIGHT.ink
+
+
+def test_the_prose_resumes_a_gap_past_the_chips_right_edge():
+    svg = chipped()
+    chip = elements(svg, "rect")[-1]
+    attrs = one(svg, "wiring agents in.")
+    assert attrs["x"] == str(int(chip["x"]) + int(chip["width"]) + header.CHIP_GAP)
+    assert attrs["font-family"] == SANS
+    assert attrs["font-size"] == "15"
+    assert attrs["fill"] == c.LIGHT.dim
+
+
+def test_the_marker_never_reaches_the_drawing():
+    """It spells emphasis in the content file; a literal asterisk in the window
+    would be the markup showing through."""
+    assert not [b for _, b in texts(chipped()) if "*" in b]
+
+
+def test_a_mark_part_way_through_a_line_is_left_as_prose():
+    """Only the mono face can be measured before it is drawn, so a chip can only
+    be placed where no Inter precedes it. Mid-line, the asterisks stand."""
+    svg = chipped("wiring agents into *Machinify* today.")
+    assert not [r for r in elements(svg, "rect") if "fill-opacity" in r]
+    assert one(svg, "Machinify")["font-family"] == SANS
+    assert one(svg, "Machinify")["x"] == str(header.BULLET_X)
+
+
+def test_an_unclosed_mark_is_left_as_prose():
+    svg = chipped("*Machinify and nothing closing it.")
+    assert not [r for r in elements(svg, "rect") if "fill-opacity" in r]
+    assert one(svg, "Machinify")["font-family"] == SANS
+
+
+@pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
+def test_the_chip_and_the_live_dot_are_the_whole_accent_budget(theme):
+    """Two paints: the tint under the brand, and the one live fact. The chip
+    takes no accent edge — an edge would be a third."""
+    svg = chipped(theme=theme)
+    assert svg.count(theme.accent) == 2
+    assert f'fill="{theme.accent}" fill-opacity="{header.CHIP_TINT}"' in svg
+    assert f'r="4" fill="{theme.accent}"' in svg
 
 
 # --- the live dot ------------------------------------------------------------
