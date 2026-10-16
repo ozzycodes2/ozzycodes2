@@ -84,12 +84,12 @@ def test_header_height_is_on_the_grid():
 
 
 @pytest.mark.parametrize("count", [3, 4])
-def test_header_is_the_reference_280_tall(count):
+def test_header_is_the_reference_320_tall(count):
     """Three lines and four both land on the reference slice, so dropping a
     tagline line does not move every section below it."""
     cfg = {"identity": {**CFG["identity"],
                         "tagline": [f"line {i}" for i in range(count)]}}
-    assert height_of(header.render(cfg, DATA, c.LIGHT)) == 280
+    assert height_of(header.render(cfg, DATA, c.LIGHT)) == 320
 
 
 def test_header_draws_the_chrome_once_titled_for_the_handle():
@@ -181,8 +181,10 @@ def test_the_slice_opens_on_the_command_it_answers():
     assert one(svg, "whoami")["y"] == str(header.CMD_Y)
     assert one(svg, "whoami")["font-family"] == MONO
     assert one(svg, "whoami")["font-size"] == "12"
-    assert one(svg, "$")["x"] == str(c.TEXT_X)
-    assert one(svg, "$")["fill"] == c.LIGHT.faint
+    opening = [a for a, body in texts(svg) if body == "$" and a["y"] == str(header.CMD_Y)]
+    assert len(opening) == 1
+    assert opening[0]["x"] == str(c.TEXT_X)
+    assert opening[0]["fill"] == c.LIGHT.faint
 
 
 def test_every_run_stays_inside_the_content_column():
@@ -267,12 +269,15 @@ def test_markup_inside_a_marked_run_is_escaped():
 
 
 @pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
-def test_the_accented_run_and_the_live_dot_are_the_whole_budget(theme):
-    """Two paints: the employer's name, and the one live fact."""
+def test_the_accent_pays_for_a_noun_a_datum_and_the_caret(theme):
+    """Three paints, and the slice has room for no fourth: the employer's name,
+    the one live fact, and the caret — which is chrome rather than a datum, in
+    the same way the rule under every section heading is."""
     svg = marked(theme=theme)
-    assert svg.count(theme.accent) == 2
+    assert svg.count(theme.accent) == 3
     assert f'<tspan fill="{theme.accent}" font-weight="700">MACHINIFY' in svg
     assert f'r="4" fill="{theme.accent}"' in svg
+    assert f'<rect class="caret" ' in svg and f'fill="{theme.accent}"/>' in svg
 
 
 # --- the live dot ------------------------------------------------------------
@@ -289,19 +294,19 @@ def test_the_live_dot_sits_one_label_width_in_from_the_right():
 
 
 @pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
-def test_the_accent_marks_the_live_dot_and_nothing_else_here(theme):
-    """The streak is this panel's one datum worth pointing at. The header draws
-    no section heading, so the dot is the only accent in the slice."""
+def test_the_accent_marks_the_live_dot_and_the_caret_and_nothing_else_here(theme):
+    """The streak is this panel's one datum worth pointing at, and an unmarked
+    tagline spends nothing. The header draws no section heading."""
     svg = header.render(CFG, DATA, theme)
-    assert svg.count(theme.accent) == 1
-    assert f'class="live" cx="722" cy="{header.META_Y - 5}" r="4" '
-    f'fill="{theme.accent}"' in svg
+    assert svg.count(theme.accent) == 2
+    assert f'<circle class="live" cx="722" cy="{header.META_Y - 5}" r="4" fill="{theme.accent}"/>' in svg
 
 
-def test_the_dot_pulses_through_the_shared_class():
+def test_the_dot_and_the_caret_move_through_the_shared_classes():
     """Inline animation shorthand would escape the reduced-motion override."""
     svg = render()
     assert ".live{animation:pulse" in svg
+    assert ".caret{animation:blink" in svg
     assert "prefers-reduced-motion" in svg
     assert "animation:" not in re.sub(r"<style>.*?</style>", "", svg, flags=re.S)
 
@@ -311,19 +316,41 @@ def test_header_without_a_streak_drops_the_dot_and_the_label():
     svg = header.render(CFG, {}, c.LIGHT)
     assert svg.count("<circle") == 3          # the chrome rings only
     assert "streak" not in svg
-    assert c.LIGHT.accent not in svg
+    # The caret is chrome and stays; the datum it sat beside is what goes.
+    assert svg.count(c.LIGHT.accent) == 1
+    assert '<rect class="caret"' in svg
     assert "Osniel Quintana" in svg
 
 
 # --- what the reference does not draw ----------------------------------------
 
-def test_header_draws_no_second_prompt_glyph_and_no_cursor():
-    """`$` is the window's only prompt, and neither `❯` nor a block cursor is in
-    the subset both vendored monospaces carry. Either would fall through to a
-    substitute face in the one slice that opens the window."""
+def test_the_cursor_is_a_rect_and_the_prompt_is_a_dollar():
+    """`$` is the window's only prompt, and neither `❯` nor `▌` is in the subset
+    both vendored monospaces carry — either would fall through to a substitute
+    face in the one slice that opens the window. So the caret is drawn rather
+    than set, which is also why it can be one cell to the pixel."""
     svg = render()
-    assert "❯" not in svg
-    assert "▌" not in svg
+    assert "❯" not in svg and "▌" not in svg
+    caret = elements(svg, "rect")[-1]
+    assert caret["class"] == "caret"
+    assert (caret["width"], caret["height"]) == (str(header.CARET_W), str(header.CARET_H))
+
+
+def test_the_caret_stands_in_the_cell_the_command_above_it_occupies():
+    """The prompt reads as waiting for input, so the caret sits where a command's
+    first glyph would land and covers that whole cell. It carries no opacity of
+    its own: GitHub paints a rendered SVG as a still at frame zero, and a caret
+    that starts transparent is absent there however it animates."""
+    svg = render()
+    prompts = [a for a, body in texts(svg) if body == "$"]
+    caret = elements(svg, "rect")[-1]
+    assert len(prompts) == 2                   # `$ whoami`, then the bare prompt
+    assert int(prompts[-1]["y"]) == (header.TAGLINE_Y
+                                     + len(CFG["identity"]["tagline"]) * header.LINE_H
+                                     + header.PROMPT_DY)
+    assert caret["x"] == str(c.TEXT_X + 14) == one(svg, "whoami")["x"]
+    assert int(caret["y"]) + header.CARET_H == int(prompts[-1]["y"]) + 3
+    assert "opacity" not in caret
 
 
 def test_header_has_no_fade_in_stagger():

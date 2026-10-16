@@ -232,17 +232,22 @@ def visible(markup):
 
 
 def base_css(_theme):
-    """The one animation in the system, and nothing else.
+    """The two animations in the system, and nothing else.
 
     Every fill, size and weight is a presentation attribute on the element that
     needs it, so there are no utility classes left to declare. What cannot be an
-    attribute is the pulse on the live dot — and it is deliberately the only
-    thing moving. A rendered SVG is painted by GitHub as a still image at frame
-    zero, so anything that animates *in* is simply invisible; the dot survives
-    because it starts at full opacity and the pulse only ever dims it.
+    attribute is the pulse on the live dot and the blink on the prompt caret —
+    and those are all that moves. A rendered SVG is painted by GitHub as a still
+    image at frame zero, so anything that animates *in* is simply invisible; both
+    of these start at full opacity and only ever go dark from there.
+
+    The caret switches rather than fades. A cursor that eases is a glow, and the
+    thing being imitated is a terminal's hard on and off at about twice a second.
     """
     return """@keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
-.live{animation:pulse 2.4s ease-in-out infinite}"""
+.live{animation:pulse 2.4s ease-in-out infinite}
+@keyframes blink{0%,50%{opacity:1}50.01%,100%{opacity:0}}
+.caret{animation:blink 1.06s steps(1,end) infinite}"""
 
 
 def _outline(x0, x1, y0, y1, r, *, top, bottom, left, right):

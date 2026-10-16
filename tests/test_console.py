@@ -150,10 +150,18 @@ def test_the_three_text_tiers_are_distinct_and_ordered(theme):
 
 
 @pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
-def test_base_css_declares_only_the_pulse(theme):
-    """Type is set per element now; the stylesheet has one job left."""
+def test_base_css_declares_only_the_two_animations(theme):
+    """Type is set per element now; the stylesheet has one job left. Both of
+    these start opaque, which is what survives being painted as a still."""
     css = c.base_css(theme)
     assert ".live{animation:pulse" in css
+    assert ".caret{animation:blink" in css
+    assert re.findall(r"@keyframes (\w+)", css) == ["pulse", "blink"]
+    # Both open at full opacity, which is the frame GitHub paints and keeps.
+    for frames in re.findall(r"@keyframes \w+\{(.*?\})\}", css):
+        assert re.match(r"0%[^{]*\{opacity:1\}", frames), frames
+    # The dot eases, the caret switches: a cursor that fades is a glow.
+    assert "steps(1,end)" in css and "ease-in-out" in css
     assert "font-size" not in css and "fill:" not in css
 
 
@@ -434,10 +442,10 @@ def test_a_slice_escapes_markup_in_its_title_and_desc():
     assert "&lt;script&gt;" in markup
 
 
-def test_reduced_motion_switches_the_one_animation_off():
+def test_reduced_motion_switches_every_animation_off():
     markup = bare()
     assert "@media (prefers-reduced-motion:reduce){*{animation:none!important}}" in markup
-    assert ".live{animation:" in markup
+    assert ".live{animation:" in markup and ".caret{animation:" in markup
 
 
 # --- font embedding --------------------------------------------------------

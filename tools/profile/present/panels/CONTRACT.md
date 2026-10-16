@@ -86,7 +86,7 @@ the tokens is the name, set at
 the system declares and is spent once. What the tokens otherwise supply is the
 families and the two radii.
 
-`.live` is the only class, and the only animation.
+`.live` and `.caret` are the only classes, and the only animations.
 
 ## Rules
 
@@ -110,7 +110,10 @@ families and the two radii.
    `fill-opacity`, wherever the shapes overlap.
 6. **The accent indexes, then marks — nothing else.** `heading` already spends
    it on the 2px stroke that starts every section rule; that is structure and
-   it is identical in every panel. Beyond that a panel may mark the single
+   it is identical in every panel. The caret on `~/header`'s closing prompt is
+   the same kind of spend: it stands for the shell rather than for a quantity,
+   so it marks nothing and takes nothing from the budget below. There is one of
+   it in the window. Beyond that a panel may mark the single
    highest value in one set — the live streak, the leading language, the
    tallest day, the one layer of the stack the author writes in, the tenure
    still being held — at most once, plus a legend swatch keying it. `~/route`
@@ -143,11 +146,13 @@ families and the two radii.
 10. **Degrade, don't crash.** Empty `data` or a missing key renders a short
     panel saying nothing is available, not a traceback.
 11. **Nothing animates in.** GitHub paints a rendered SVG as a still at frame
-    zero, so an element that fades up from `opacity:0` is simply invisible. The
-    live dot is the sole exception and it works the other way round: it starts
-    opaque and `.live` only ever dims it. Use that class rather than an inline
-    `animation:`, so the `prefers-reduced-motion` override in `slice_svg`
-    reaches it.
+    zero, so an element that fades up from `opacity:0` is simply invisible. Two
+    things move, and both work the other way round: the live dot, which starts
+    opaque and is only ever dimmed by `.live`, and the prompt caret, which
+    starts opaque and is only ever blanked by `.caret`. The caret switches
+    rather than eases — a cursor that fades is a glow. Use those classes rather
+    than an inline `animation:`, so the `prefers-reduced-motion` override in
+    `slice_svg` reaches them.
 12. **Never emit `<a>`.** GitHub strips anchors from a rendered SVG, so a
     clickable region has to be its own file for the README to wrap. A panel
     needing that returns `Slice`s instead of markup, one per file, and splits

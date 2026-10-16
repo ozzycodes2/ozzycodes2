@@ -1,4 +1,4 @@
-"""Top slice: window chrome, name, handle, role, tagline, live streak."""
+"""Top slice: window chrome, name, handle, role, tagline, live streak, prompt."""
 import re
 
 from .. import console as c
@@ -17,6 +17,13 @@ BULLET = "»"
 BULLET_X = c.TEXT_X + 18
 
 STREAK_SIZE = 13
+
+PROMPT_DY = 10    # the prompt, a tagline line plus this below the last one
+# One cell of mono 12: 0.6em of advance wide, and tall enough to cover the glyph
+# it would be sitting on — a caret narrower than the cell reads as an underscore
+# and one shorter reads as a bar.
+CARET_W = 7
+CARET_H = 14
 
 # A `*run*` anywhere in a tagline line is set in the accent.
 MARK = re.compile(r"\*([^*]+)\*")
@@ -89,8 +96,19 @@ def render(cfg, data, theme):
         last_y = TAGLINE_Y + i * LINE_H
         body += _tagline(theme, last_y, line)
 
+    # `whoami` has printed, so the shell is back at the prompt. The caret is
+    # chrome, not a datum: it stands where the next command would be typed, in
+    # the cell the command above it occupies. The accent paints it for the same
+    # reason it indexes every section rule — it marks nothing.
+    prompt_y = last_y + LINE_H + PROMPT_DY
+    body += [
+        c.tx(c.TEXT_X, prompt_y, "$", fill=theme.faint, family=c.MONO_STACK, size=12),
+        f'<rect class="caret" x="{c.TEXT_X + 14}" y="{prompt_y - 11}" '
+        f'width="{CARET_W}" height="{CARET_H}" fill="{theme.accent}"/>',
+    ]
+
     return c.slice_svg(
-        theme, c.to_grid(last_y + 26), "\n".join(body),
+        theme, c.to_grid(prompt_y + 26), "\n".join(body),
         title="Profile header",
         desc=f"{name} (@{handle}), {role}. {len(lines)} tagline lines.{tail}",
         top=True,

@@ -183,7 +183,8 @@ for f in assets/dark/*.svg; do printf "%-26s %s\n" "$(basename $f)" "$(grep -o '
 ```
 
 Expected, and worth re-deriving rather than trusting this table if the doctrine
-changes: header 1 (the live dot — the header draws no section heading), stats 1
+changes: header 3 (the live dot, the one accented noun in the tagline and the
+prompt caret — the header draws no section heading), stats 1
 (the rule; six counters are a set of equals), contribution-city 3 (rule + legend
 circle + the peak block's saturated wall), route 2 (rule + the tenure still being
 held; 1 for a roster whose roles all ended), stack 3 (rule + the focal slab's dot
