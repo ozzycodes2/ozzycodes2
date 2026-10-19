@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="880" height="520" viewBox="0 0 880 520" role="img" aria-labelledby="t d">
+<svg preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" width="880" height="520" viewBox="0 0 880 520" role="img" aria-labelledby="t d">
 <title id="t">Tools in rotation</title>
 <desc id="d">20 tools on 4 layers of one stack, pulled apart along a single axis and standing on their layers as brand marks. Bottom to top: tooling (5) Claude Code, MCP, Git, Just, Neovim; cloud (4) AWS, Grafana, Prometheus, Datadog; platform (5) Kubernetes, Terraform, Helm, ArgoCD, Docker; languages (6) Java, Rust, Python, TypeScript, Swift, Shell. Languages by bytes: Rust 29.7%, Java 25.9%, Swift 17.3%, Python 13.8%, Go 6.6%, HCL 4.5%, TypeScript 2.2% of 54,132,183.</desc>
 <style>

@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="880" height="280" viewBox="0 0 880 280" role="img" aria-labelledby="t d">
+<svg preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" width="880" height="280" viewBox="0 0 880 280" role="img" aria-labelledby="t d">
 <title id="t">Work route</title>
 <desc id="d">4 roles from 2016 to 2026, spaced by date on one axis: first commit, 2016-08; JP Morgan, 2019-07 .. 2020-12 (1y 6mo); Apple, 2020-12 .. 2022-01 (1y 2mo); Twilio, 2022-01 .. 2026-07 (4y 7mo); Machinify, 2026-07 .. now (3mo).</desc>
 <style>

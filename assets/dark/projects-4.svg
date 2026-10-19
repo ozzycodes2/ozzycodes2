@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="440" height="200" viewBox="0 0 440 200" role="img" aria-labelledby="t d">
+<svg preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" width="440" height="200" viewBox="0 0 440 200" role="img" aria-labelledby="t d">
 <title id="t">facebook-message-parser — Python</title>
 <desc id="d">facebook-message-parser, updated 7y ago. Tagged Python, HTML. Turns a Facebook data export into readable, searchable HTML conversation history.</desc>
 <style>

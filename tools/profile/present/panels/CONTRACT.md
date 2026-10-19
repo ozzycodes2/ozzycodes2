@@ -61,9 +61,11 @@ panel's tail plus `HEAD_Y`.
 Two stroke weights: `EDGE_W` (1) for anything a panel draws, `RAIL_W` (2) for the
 frame rails only. The rails are heavier because they are the one stroke that
 spans two files: each slice is rasterised at 880px and resampled to the page's
-column width, and a 1px rail lands on one device column in a tall slice and
-spreads across two in a short one, so the frame steps at that seam. Panels do
-not draw rails — `slice_svg` does — so `EDGE_W` is the only one you need.
+column width, where a 1px rail arrives as under two device pixels of soft edge
+and the frame reads lighter than the rules inside it. What keeps the rails on
+the same device columns from one slice to the next is the `preserveAspectRatio`
+`slice_svg` sets — without it they step at the seams. Panels do not draw rails —
+`slice_svg` does — so `EDGE_W` is the only one you need.
 
 Theme roles: `canvas` `surface` `ink` `dim` `faint` `hairline` `accent`. Three
 text tiers, not two — `ink` carries meaning, `dim` is supporting prose, `faint`

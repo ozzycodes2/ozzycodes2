@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="440" height="200" viewBox="0 0 440 200" role="img" aria-labelledby="t d">
+<svg preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" width="440" height="200" viewBox="0 0 440 200" role="img" aria-labelledby="t d">
 <title id="t">cc-powerline — TypeScript</title>
 <desc id="d">cc-powerline, updated 2mo ago. Tagged TypeScript, CLI. A Claude Code status line for Powerline users: segments for model, context burn, git state and cost, rendered in the glyphs your prompt already uses.</desc>
 <style>

@@ -112,16 +112,15 @@ CONTENT_R = FRAME_R - 36
 
 EDGE_W = 1
 
-# The rails are the one stroke that has to agree across slices, and they are
-# twice the weight of everything else because of it. Each slice is rasterised at
-# its intrinsic 880px and then resampled to whatever width the page gives it;
-# `crispEdges` snaps the rail inside the raster, but the resample afterwards
-# redistributes it, and by how much depends on the slice's own height. Measured
-# at an 877px column: a 1px rail lands on one device column in a 280px slice and
-# spreads across two in an 80px one, so the frame visibly steps at that seam.
-# A 2px rail still covers one whole device column at any sub-pixel offset, and
-# renders identically in every slice. Interior strokes stay at EDGE_W: they live
-# wholly inside one file and never cross a seam.
+# The rails are the one stroke that has to agree across eleven files, and they
+# are twice the weight of everything else because of it. A slice is drawn at its
+# intrinsic 880px and rasterised to whatever the page column gives it — 0.894 of
+# that at a default window — so a 1px rail arrives as 1.8 device pixels of soft
+# edge and the frame reads lighter than the hairline rules inside it. At 2px it
+# covers whole device columns and the window keeps one continuous edge. What
+# makes those the *same* columns in every slice is `preserveAspectRatio`; see
+# `slice_svg`. Interior strokes stay at EDGE_W: they live wholly inside one file
+# and never cross a seam.
 RAIL_W = 2
 
 TITLE_H = 44     # chrome band, measured down from the frame's top edge
@@ -316,6 +315,22 @@ def slice_svg(theme, height, body, *, title, desc, text="", top=False,
 
     A row cut into three or more pieces needs `rails="none"` for the middle
     ones: they sit between two neighbours and draw no vertical edge at all.
+
+    `preserveAspectRatio="none"` is what holds the frame together across the
+    files. A browser rasterises an SVG <img> into a destination rect snapped to
+    whole device pixels, so that rect's aspect ratio differs from the viewBox's
+    by up to half a pixel, and the default `xMidYMid meet` absorbs the
+    difference by scaling to the tighter axis and centring — a sideways shift of
+    a fraction of a pixel, different in every slice and largest in the shortest
+    ones, where half a device pixel is the biggest share of the height.
+    `crispEdges` then rounds the rails outward in some files and not in others,
+    and the frame steps a whole device column at that seam; the two half-width
+    card slices, each centred on its own, stop meeting and leave a strip of the
+    page showing between the columns. `none` puts the drawing flush into the
+    rect, so every slice shares one horizontal scale and one origin and the
+    rounding is absorbed as a half-pixel vertical stretch nobody can see.
+    Measured at 2x across 42 column widths from 740 to 1030: five stepped under
+    the default, none under this.
     """
     if height % ROW:
         raise ValueError(f"slice height {height} is not a multiple of {ROW}")
@@ -341,7 +356,7 @@ def slice_svg(theme, height, body, *, title, desc, text="", top=False,
         if d
     )
 
-    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-labelledby="t d">
+    return f'''<svg preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-labelledby="t d">
 <title id="t">{e(title)}</title>
 <desc id="d">{e(desc)}</desc>
 <style>

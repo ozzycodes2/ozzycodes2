@@ -303,14 +303,28 @@ def test_unknown_rails_value_is_rejected():
         bare(rails="middle")
 
 
+def test_every_slice_fills_its_box_rather_than_fitting_inside_it():
+    """The frame is eleven files and has to land on one device grid.
+
+    A browser snaps an SVG <img>'s destination rect to whole device pixels and
+    the default `xMidYMid meet` absorbs the leftover fraction of aspect ratio by
+    centring the drawing, which shifts each slice sideways by a different
+    sub-pixel amount: the rails step at the seams and the two card halves stop
+    meeting. `none` is what makes the eleven agree.
+    """
+    for markup in (bare(), bare(width=440, rails="left"), bare(top=True),
+                   bare(bottom=True), bare(height=40)):
+        assert markup.startswith('<svg preserveAspectRatio="none" '), markup[:80]
+
+
 def test_the_rails_snap_to_whole_pixels_in_every_slice():
     """Each slice is a separate file rasterised on its own.
 
-    A rail whose stroke edges fall mid-unit can round one way in one slice and
-    the other way in the next, which shows up as the frame stepping sideways at
-    the seam. Integer coordinates, the rendering hint, and twice the weight of
-    an interior stroke, since a 1px rail survives neither the resample nor the
-    difference in height between one slice and the next.
+    A rail whose stroke edges fall mid-unit rounds one way in one slice and the
+    other way in the next, which shows up as the frame stepping sideways at the
+    seam. Integer coordinates, the rendering hint, and twice the weight of an
+    interior stroke, which at the 0.89 the page column resamples to is the
+    difference between a soft line and an edge.
     """
     assert c.RAIL_W == 2 and c.RAIL_W > c.EDGE_W
     assert c.MARGIN % 1 == 0

@@ -97,9 +97,10 @@ bearing, and more than one has been reintroduced by someone making the two files
 match:
 
 1. **`RAIL_W = 2` vs `EDGE_W = 1`.** Each slice is rasterised at its intrinsic
-   880px and bitmap-resampled to the page column, so a 1px `crispEdges` rail
-   lands on one device column in a tall slice and two in a short one — the frame
-   visibly steps at the seam. Rails are 2px; everything a panel draws is 1px.
+   880px and resampled to the page column — 0.894 of it at a default window — so
+   a 1px rail arrives as 1.8 device pixels of soft edge and the frame reads
+   lighter than the hairline rules inside it. Rails are 2px; everything a panel
+   draws is 1px.
 2. **`shape-rendering="crispEdges"` on rules.** Same resample. The preview has
    no equivalent because a browser is not resampling anything.
 3. **The projects panel splits into half-width slices.** GitHub strips `<a>`
@@ -124,6 +125,19 @@ match:
 7. **Four embedded font faces.** GitHub strips `<link>` and off-origin `url()`,
    so Inter 400/600 and JBM 400/700 are subset and inlined. SF Mono is asked for
    first and is not redistributable, hence the fallback stack.
+8. **`preserveAspectRatio="none"` on every slice root.** The frame stepping at
+   the projects and footer seams was this, not the rails. A browser snaps an SVG
+   `<img>`'s destination rect to whole device pixels, so the rect's aspect ratio
+   differs from the viewBox's by up to half a pixel, and the default
+   `xMidYMid meet` absorbs that by centring — a sideways shift of a fraction of
+   a pixel, different in every slice and worst in the short ones. `crispEdges`
+   then rounds the rails outward in some files and not others; the two card
+   halves, each centred on its own, also stop meeting and leave a strip of the
+   page showing between the columns. `none` gives every slice one horizontal
+   scale and one origin and spends the rounding on a half-pixel vertical stretch
+   instead. Measured at 2x across 42 column widths from 740 to 1030: five
+   stepped without it, none with it. The preview has no equivalent — it renders
+   the markup inline, where nothing is being rasterised into a rect.
 
 ## 5. What GitHub's sanitiser allows
 

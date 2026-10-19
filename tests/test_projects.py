@@ -98,8 +98,9 @@ def chips(markup):
 def rail(markup):
     """The slice's frame path: one vertical, on the card's outer edge.
 
-    `RAIL_W`, not `EDGE_W` — the rail is the one stroke that spans two files and
-    is drawn at twice the weight so the two agree after resampling.
+    `RAIL_W`, not `EDGE_W` — the rail is the one stroke that spans two files,
+    at twice the weight so it still reads as an edge once the page column
+    resamples it.
     """
     return re.search(rf'<path d="([^"]*)" fill="none" stroke="[^"]*" '
                      rf'stroke-width="{c.RAIL_W}"', markup).group(1)
