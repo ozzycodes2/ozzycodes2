@@ -200,9 +200,12 @@ Taken by the designer, open to reversal:
 - **The preview figure is a new asset file on its own tab**, not a member of
   `PANEL_ORDER`. A figure inside `panelSlices` becomes a slice `render.py` must
   pair against a Python panel that will never exist, and `CONTRACT.md` rule 13
-  fails the run on exactly that divergence. The new tab renders only for systems
-  that declare the figure, so the preview's smoke test does not acquire nine
-  systems' worth of a drawing that means something under one.
+  fails the run on exactly that divergence. The tab renders for every system
+  from that system's own tokens, as `tabPanels` already does. Gating it to the
+  one system the drawing means something under was the first instinct and does
+  not survive contact: `test/smoke.mjs` hardcodes `TAB_IDS` and asserts every
+  system × tab yields at least 400 characters, so a gate would mean shipping a
+  filler panel for eight systems to satisfy a test.
 - **The motion exception is recorded as prose** in the mine-final system
   document, not as tokens. That system reports `0 unspent` and nothing in a GIF
   pipeline would ever reference a motion token, so adding them breaks the census
