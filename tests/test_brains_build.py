@@ -7,8 +7,8 @@ import pytest
 from tools.brains import build, encode, figures
 
 needs_browser = pytest.mark.skipif(
-    shutil.which("ffmpeg") is None or build.playwright_missing(),
-    reason="needs ffmpeg and a browser",
+    shutil.which("ffmpeg") is None or build.playwright_missing() or build.chrome_missing(),
+    reason="needs ffmpeg, Playwright and Google Chrome",
 )
 
 

@@ -25,6 +25,11 @@ ACCENT = "#ef6306"
 _FIELD = re.compile(r"^(?:\s|<!--)*(source|generated):\s*(\S+)\s*$", re.M)
 
 
+def accent_rgb():
+    """`ACCENT` as the byte triple the GIF palette is built from."""
+    return tuple(int(ACCENT[i : i + 2], 16) for i in (1, 3, 5))
+
+
 def path(name):
     """The vendored file for `name`, whether or not it exists yet."""
     if name not in NAMES:

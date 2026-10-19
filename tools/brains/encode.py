@@ -11,18 +11,28 @@ chosen:
   needs ffmpeg 6.0.
 - A generous palette is expensive: re-encoding a two-colour reference GIF with
   `max_colors=32` grew it from 117 KB to 291 KB.
+- `palettegen` will not reproduce a known colour. Asked for the smallest palette
+  ffmpeg allows alongside a reserved transparent slot, it still resolves its one
+  painted entry to a histogram average, and the browser's antialiased edge pulls
+  that average off the accent — measured at `#ed6206` against `#ef6306`, two
+  parts in 255, with no way to correct it downstream. So the palette here is
+  built, not measured: the caller names the colour and gets that colour.
 """
 import re
 import shutil
 import struct
 import subprocess
+import zlib
 
-# ffmpeg rejects `max_colors=2` alongside `reserve_transparent=1`, and reserving
-# the slot costs two entries rather than one, so 3 is both the floor and what
-# yields a single painted colour.
-MIN_COLOURS = 3
 MIN_DELAY_CS = 2
 MIN_FFMPEG = (6, 0)
+
+# `paletteuse` refuses anything else: "Palette input must contain exactly 256
+# pixels". 16x16 is the shape that satisfies it.
+PALETTE_SIDE = 16
+PALETTE_ENTRIES = PALETTE_SIDE * PALETTE_SIDE
+
+CHAIN = "[0:v][1:v]paletteuse=dither=atkinson:diff_mode=rectangle:alpha_threshold=128"
 
 _VERSION = re.compile(r"ffmpeg version \D*(\d+)\.(\d+)")
 
@@ -47,26 +57,48 @@ def ffmpeg_version():
     return found
 
 
-def chain(colours):
-    """The filter graph, named so the dither and the reserved slot are checkable.
+def palette_pixels(accent):
+    """The 256 RGBA entries, in raster order.
 
-    Neither survives into the output bytes: the palette says nothing about how
-    it was applied, and a cheaper dither only shows up as a bigger file.
+    Every padding entry is the accent rather than black. Black would be a
+    nearest-match target for any dark pixel the drawing acquired, and in the
+    written table it is indistinguishable from the padding ffmpeg adds anyway —
+    so a check on the output could not tell a painted black from an unused slot.
+    Transparency goes last because that is where GIF's reserved sentinel lands.
     """
+    return [(*accent, 255)] * (PALETTE_ENTRIES - 1) + [(0, 0, 0, 0)]
+
+
+def palette_png(accent):
+    """`palette_pixels` as a 16x16 RGBA PNG, which is what ffmpeg will read.
+
+    Written here rather than with an imaging library: the pipeline's only
+    dependency is a browser, and this is twelve lines of `zlib`.
+    """
+    px = palette_pixels(accent)
+    rows = b"".join(
+        b"\x00" + b"".join(bytes(p) for p in px[y * PALETTE_SIDE : (y + 1) * PALETTE_SIDE])
+        for y in range(PALETTE_SIDE)
+    )
+
+    def chunk(tag, data):
+        return struct.pack(">I", len(data)) + tag + data + struct.pack(">I", zlib.crc32(tag + data))
+
     return (
-        "[0:v]split[a][b];"
-        f"[a]palettegen=max_colors={colours}:reserve_transparent=1:stats_mode=diff[p];"
-        "[b][p]paletteuse=dither=atkinson:diff_mode=rectangle:alpha_threshold=128"
+        b"\x89PNG\r\n\x1a\n"
+        + chunk(b"IHDR", struct.pack(">IIBBBBB", PALETTE_SIDE, PALETTE_SIDE, 8, 6, 0, 0, 0))
+        + chunk(b"IDAT", zlib.compress(rows, 9))
+        + chunk(b"IEND", b"")
     )
 
 
-def gif(frames, out, *, delay_cs, colours=MIN_COLOURS, version=None):
+def gif(frames, out, *, delay_cs, accent, version=None):
     """Encode `frames` — PNG bytes, in order — to `out`.
 
-    `colours` is the palette cap passed to `palettegen`; at the default of 3 one
-    slot goes to transparency and the drawing keeps a single painted colour.
-    `version` exists so the floor check is testable without a second ffmpeg on
-    the machine.
+    `accent` is an `(r, g, b)` triple and is the only colour the output can
+    carry; there is no default, because a palette the encoder invented is the
+    bug this signature exists to prevent. `version` exists so the floor check is
+    testable without a second ffmpeg on the machine.
     """
     if not frames:
         raise ValueError("no frames to encode")
@@ -75,8 +107,6 @@ def gif(frames, out, *, delay_cs, colours=MIN_COLOURS, version=None):
             f"delay {delay_cs}cs is below the {MIN_DELAY_CS}cs floor: "
             "browsers clamp 0 and 1 up to 100ms"
         )
-    if colours < MIN_COLOURS:
-        raise ValueError(f"colours must be at least {MIN_COLOURS} to reserve a transparent entry")
 
     found = version or ffmpeg_version()
     if found < MIN_FFMPEG:
@@ -85,13 +115,21 @@ def gif(frames, out, *, delay_cs, colours=MIN_COLOURS, version=None):
             f"{MIN_FFMPEG[0]}.{MIN_FFMPEG[1]} or newer is required"
         )
 
-    subprocess.run(
-        ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
-         "-f", "image2pipe", "-c:v", "png", "-framerate", f"{100 // delay_cs}",
-         "-i", "-", "-filter_complex", chain(colours), "-loop", "0", str(out)],
-        input=b"".join(frames),
-        check=True,
-    )
+    # The palette has to be a second input, and the frames already own stdin, so
+    # it goes to a file beside the output and is removed either way.
+    pal = out.parent / f".{out.stem}.palette.png"
+    pal.write_bytes(palette_png(accent))
+    try:
+        subprocess.run(
+            ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
+             "-f", "image2pipe", "-c:v", "png", "-framerate", f"{100 // delay_cs}",
+             "-i", "-", "-i", str(pal),
+             "-filter_complex", CHAIN, "-loop", "0", str(out)],
+            input=b"".join(frames),
+            check=True,
+        )
+    finally:
+        pal.unlink(missing_ok=True)
 
 
 def _header(path):

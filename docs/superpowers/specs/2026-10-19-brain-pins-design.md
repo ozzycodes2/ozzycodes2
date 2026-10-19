@@ -131,9 +131,13 @@ Measured numbers, to save the builder rediscovering them:
 - Dither cost over 24 frames: none 54,944 B · atkinson 56,037 · floyd_steinberg
   61,981 · bayer 68,510. `atkinson` is the right default for flat vector art and
   needs ffmpeg ≥ 6.0.
-- Do not let `palettegen` pick a generous palette. Re-encoding Terkel's
-  two-colour GIF with `max_colors=32` grew it from 117 KB to 291 KB.
-- Reserve the transparent entry explicitly (`reserve_transparent=1`).
+- Do not let `palettegen` pick the palette at all. A generous one is expensive —
+  re-encoding Terkel's two-colour GIF with `max_colors=32` grew it from 117 KB
+  to 291 KB — and the smallest one ffmpeg permits alongside a reserved
+  transparent slot still resolves its painted entry to a histogram average,
+  which the browser's antialiased edge pulls off the accent: `#ed6206` against
+  `#ef6306`, measured. Supply the 256 entries `paletteuse` demands instead, with
+  the fully transparent one last.
 
 Camo is not in the path — gist files serve from `gist.githubusercontent.com`
 directly — so the 5 MiB camo cap does not apply. Keep files small anyway; 48

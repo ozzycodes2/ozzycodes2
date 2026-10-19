@@ -68,9 +68,17 @@ def test_regenerate_runs_the_preview_renderer(tmp_path):
     assert figures.ACCENT in svg
 
 
-def test_the_vendored_copy_matches_the_preview():
-    """The obligation itself. Skips, never fails, without the preview."""
-    report = parity.diff("left-brain")
+@pytest.mark.parametrize("name", figures.NAMES)
+def test_the_vendored_copy_matches_the_preview(name):
+    """The obligation itself. Skips, never fails, without the preview.
+
+    Parametrised because a drift alarm wired to one of two drawings is an alarm
+    that stays green while the other one rots — and `build.py` deliberately
+    downgrades drift to a warning, so this is the only gate.
+    """
+    if not figures.path(name).exists():
+        pytest.skip(f"{name} is not vendored")
+    report = parity.diff(name)
     assert report is None, report
 
 

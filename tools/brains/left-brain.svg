@@ -5,40 +5,69 @@
      `python -m tools.brains.parity --write left-brain`. -->
 <svg xmlns="http://www.w3.org/2000/svg" id="left-brain" viewBox="0 0 1340 400" width="1340" height="400" role="img" aria-labelledby="left-brain-t left-brain-d">
   <title id="left-brain-t">Left Brain</title>
-  <desc id="left-brain-d">Three dimetric modules on one bus: the engineering half, on the grid.</desc>
+  <desc id="left-brain-d">The left hemisphere as a dimetric hex lattice, on the 4px grid, its outline lit by a travelling trace.</desc>
   <style>
-    svg#left-brain .slide-a, svg#left-brain .slide-b {
-      animation: brain-slide 3.6s ease-in-out infinite;
+    svg#left-brain .trace {
+      animation: brain-trace 3.6s linear infinite;
     }
-    svg#left-brain .slide-b { animation-delay: -1.8s; }
-    svg#left-brain .lift {
-      animation: brain-lift 3.6s ease-in-out infinite;
-      animation-delay: -0.9s;
-    }
-    @keyframes brain-slide {
-      0%, 100% { transform: translateX(0) }
-      50%      { transform: translateX(24px) }
-    }
-    @keyframes brain-lift {
-      0%, 100% { transform: translateY(0) }
-      50%      { transform: translateY(-24px) }
+    @keyframes brain-trace {
+      from { stroke-dashoffset: 0 }
+      to   { stroke-dashoffset: calc(-1 * var(--len) * 1px) }
     }
   </style>
-  <path d="M64 296 H1276" stroke="#ef6306" stroke-width="8" stroke-linejoin="round" fill="none"/>
-  <polygon points="288,136 416,200 288,264 160,200" stroke="#ef6306" stroke-width="8" stroke-linejoin="round" fill="none"/>
-  <polygon points="416,200 288,264 288,296 416,232" stroke="#ef6306" stroke-width="8" stroke-linejoin="round" fill="none"/>
-  <polygon points="288,264 160,200 160,232 288,296" stroke="#ef6306" stroke-width="8" stroke-linejoin="round" fill="none"/>
-  <polygon points="672,136 800,200 672,264 544,200" stroke="#ef6306" stroke-width="8" stroke-linejoin="round" fill="none"/>
-  <polygon points="800,200 672,264 672,296 800,232" stroke="#ef6306" stroke-width="8" stroke-linejoin="round" fill="none"/>
-  <polygon points="672,264 544,200 544,232 672,296" stroke="#ef6306" stroke-width="8" stroke-linejoin="round" fill="none"/>
-  <polygon class="lift" points="672,104 736,136 672,168 608,136" stroke="#ef6306" stroke-width="8" stroke-linejoin="round" fill="none"/>
-  <polygon class="lift" points="736,136 672,168 672,232 736,200" stroke="#ef6306" stroke-width="8" stroke-linejoin="round" fill="none"/>
-  <polygon class="lift" points="672,168 608,136 608,200 672,232" stroke="#ef6306" stroke-width="8" stroke-linejoin="round" fill="none"/>
-  <polygon points="1056,136 1184,200 1056,264 928,200" stroke="#ef6306" stroke-width="8" stroke-linejoin="round" fill="none"/>
-  <polygon points="1184,200 1056,264 1056,296 1184,232" stroke="#ef6306" stroke-width="8" stroke-linejoin="round" fill="none"/>
-  <polygon points="1056,264 928,200 928,232 1056,296" stroke="#ef6306" stroke-width="8" stroke-linejoin="round" fill="none"/>
-  <path d="M1120 168 L992 232" stroke="#ef6306" stroke-width="8" stroke-linejoin="round" fill="none"/>
-  <path d="M992 168 L1120 232" stroke="#ef6306" stroke-width="8" stroke-linejoin="round" fill="none"/>
-  <rect class="slide-a" x="468" y="284" width="24" height="24" fill="#ef6306"/>
-  <rect class="slide-b" x="852" y="284" width="24" height="24" fill="#ef6306"/>
+  <path d="M1284 104 L1236 80" stroke="#ef6306" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke-dasharray="12 24"/>
+  <path d="M1284 152 L1236 176" stroke="#ef6306" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke-dasharray="12 24"/>
+  <path d="M1236 176 L1188 152" stroke="#ef6306" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1188 152 L1188 104" stroke="#ef6306" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1188 152 L1140 176" stroke="#ef6306" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1284 248 L1236 224" stroke="#ef6306" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke-dasharray="12 24"/>
+  <path d="M1236 224 L1236 176" stroke="#ef6306" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke-dasharray="12 24"/>
+  <path d="M1236 224 L1188 248" stroke="#ef6306" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1188 248 L1140 224" stroke="#ef6306" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1284 296 L1236 320" stroke="#ef6306" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke-dasharray="12 24"/>
+  <path d="M1188 296 L1188 248" stroke="#ef6306" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1284 8 L1332 32 L1332 80 L1284 104 L1284 152 L1332 176 L1332 224 L1284 248 L1284 296 L1332 320 L1332 368 L1284 392 L1236 368 L1236 320 L1188 296 L1140 320 L1092 296 L1092 248 L1140 224 L1140 176 L1092 152 L1092 104 L1140 80 L1188 104 L1236 80 L1236 32 Z" stroke-width="6" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="trace" d="M1284 8 L1332 32 L1332 80 L1284 104 L1284 152 L1332 176 L1332 224 L1284 248 L1284 296 L1332 320 L1332 368 L1284 392 L1236 368 L1236 320 L1188 296 L1140 320 L1092 296 L1092 248 L1140 224 L1140 176 L1092 152 L1092 104 L1140 80 L1188 104 L1236 80 L1236 32 Z" stroke-width="11" stroke-dasharray="214.2 1124.5" style="--len: 1338.7;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="1284" cy="8" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
+  <circle cx="1332" cy="32" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
+  <circle cx="1332" cy="80" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
+  <circle cx="1284" cy="104" r="8" fill="#ef6306"/>
+  <circle cx="1236" cy="80" r="8" fill="#ef6306"/>
+  <circle cx="1236" cy="32" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
+  <circle cx="1284" cy="152" r="8" fill="#ef6306"/>
+  <circle cx="1236" cy="176" r="8" fill="#ef6306"/>
+  <circle cx="1188" cy="152" r="8" fill="#ef6306"/>
+  <circle cx="1188" cy="104" r="8" fill="#ef6306"/>
+  <circle cx="1140" cy="80" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
+  <circle cx="1140" cy="176" r="8" fill="#ef6306"/>
+  <circle cx="1092" cy="152" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
+  <circle cx="1092" cy="104" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
+  <circle cx="1332" cy="176" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
+  <circle cx="1332" cy="224" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
+  <circle cx="1284" cy="248" r="8" fill="#ef6306"/>
+  <circle cx="1236" cy="224" r="8" fill="#ef6306"/>
+  <circle cx="1188" cy="248" r="8" fill="#ef6306"/>
+  <circle cx="1140" cy="224" r="8" fill="#ef6306"/>
+  <circle cx="1284" cy="296" r="8" fill="#ef6306"/>
+  <circle cx="1236" cy="320" r="8" fill="#ef6306"/>
+  <circle cx="1188" cy="296" r="8" fill="#ef6306"/>
+  <circle cx="1140" cy="320" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
+  <circle cx="1092" cy="296" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
+  <circle cx="1092" cy="248" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
+  <circle cx="1332" cy="320" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
+  <circle cx="1332" cy="368" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
+  <circle cx="1284" cy="392" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
+  <circle cx="1236" cy="368" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
+  <circle cx="1080" cy="60" r="8" fill="#ef6306"/>
+  <circle cx="1076" cy="272" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
+  <circle cx="1068" cy="160" r="8" fill="#ef6306"/>
+  <circle cx="1056" cy="324" r="8" fill="#ef6306"/>
+  <circle cx="1036" cy="100" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
+  <circle cx="1012" cy="224" r="8" fill="#ef6306"/>
+  <circle cx="960" cy="64" r="8" fill="#ef6306"/>
+  <circle cx="900" cy="300" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
+  <circle cx="804" cy="144" r="8" fill="#ef6306"/>
+  <circle cx="660" cy="248" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
+  <circle cx="440" cy="112" r="8" fill="#ef6306"/>
+  <circle cx="196" cy="260" r="4" fill="#ef6306"/>
 </svg>

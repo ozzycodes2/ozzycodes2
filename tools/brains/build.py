@@ -40,9 +40,33 @@ def playwright_missing():
     return importlib.util.find_spec("playwright") is None
 
 
+# Where `channel="chrome"` looks. Playwright resolves the channel through the
+# OS, not through its own download cache.
+CHROME = (
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "/Applications/Chromium.app/Contents/MacOS/Chromium",
+)
+
+
+def chrome_missing():
+    """Whether the browser itself is absent, which the library's presence does
+    not answer.
+
+    `capture.chrome_shoot` launches `channel="chrome"` — the Google Chrome
+    already on the machine. A clone that ran `playwright install chromium` has
+    the pip package and a managed build and still cannot satisfy that channel,
+    so gating a test on the package alone turns a skip into a hard failure.
+    """
+    import shutil
+
+    return not any(pathlib.Path(p).exists() for p in CHROME) and not any(
+        shutil.which(c) for c in ("google-chrome", "chromium", "chromium-browser")
+    )
+
+
 def render(name, out, *, shoot=None):
     frames = capture.frames(figures.load(name), count=FRAMES, duration=DURATION, shoot=shoot)
-    encode.gif(frames, out, delay_cs=DELAY_CS)
+    encode.gif(frames, out, delay_cs=DELAY_CS, accent=figures.accent_rgb())
 
 
 def main(argv=None):

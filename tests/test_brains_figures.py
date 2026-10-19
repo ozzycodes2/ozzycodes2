@@ -53,17 +53,64 @@ def test_nothing_animates_in(name):
     assert not re.search(r"(?:^|[,{\s])(?:0%|from)\s*(?:,\s*[\d.]+%\s*)*\{[^}]*opacity:\s*0(?![.\d])", svg)
 
 
+def keyframe_declarations(svg):
+    """Every `(property, value)` declared inside a `@keyframes` block."""
+    out = []
+    for body in re.findall(r"@keyframes[^{]*\{(.*?\})\s*\}", svg, re.S):
+        for step in re.findall(r"\{([^}]*)\}", body):
+            out += [
+                tuple(s.strip() for s in d.split(":", 1))
+                for d in step.split(";")
+                if ":" in d
+            ]
+    return out
+
+
+# A whitelist, because the failure is open-ended: `opacity: 0` is only the
+# best-known way to make an element absent at frame zero, and `scale(0)`,
+# `visibility: hidden` and a `stroke-dasharray` draw-on all do it too. These two
+# are what the medium renders honestly.
+#
+# `stroke-dashoffset` is safe only because the marching trace is a second,
+# heavier copy laid over a path that is painted unconditionally: the drawing is
+# complete at every instant and the dash only ever adds to it. That is why the
+# dash is exempt from the travel budget below, and why the test after it has to
+# hold — without the unlit copy, a marching dash is a draw-on.
+ANIMATABLE = {"stroke-dashoffset", "transform"}
+TRANSFORMS = {"translate", "translateX", "translateY"}
+
+
+def test_motion_touches_only_properties_that_cannot_hide_the_drawing(name):
+    declared = keyframe_declarations(figures.load(name))
+    assert declared, "the figure declares keyframes but no properties"
+    assert {p for p, _ in declared} <= ANIMATABLE
+
+
+def test_any_transform_is_a_translate_inside_the_budget(name):
+    svg = figures.load(name)
+    functions = re.findall(r"([A-Za-z]+)\(([^)]*)\)", "".join(
+        v for p, v in keyframe_declarations(svg) if p == "transform"
+    ))
+    assert {f for f, _ in functions} <= TRANSFORMS
+    moves = [abs(float(v)) for _, a in functions for v in re.findall(r"-?\d+(?:\.\d+)?", a)]
+    assert all(m <= 24 for m in moves)
+
+
+def test_a_marching_dash_is_drawn_over_a_copy_that_is_always_painted(name):
+    """What makes `stroke-dashoffset` legal. A lit path with no unlit copy
+    beneath it reads, at frame zero, as a broken line — which is an element
+    animating in by another name."""
+    svg = figures.load(name)
+    lit = re.findall(r'<path[^>]*class="trace"[^>]*\sd="([^"]*)"', svg)
+    base = set(re.findall(r'<path(?![^>]*class="trace")[^>]*\sd="([^"]*)"', svg))
+    assert lit
+    assert set(lit) <= base
+
+
 def test_motion_is_a_loop_of_at_least_three_seconds(name):
     svg = figures.load(name)
     assert "@keyframes" in svg
     assert max(float(d) for d in re.findall(r"animation:[^;}]*?(\d+(?:\.\d+)?)s", svg)) >= 3
-
-
-def test_travel_stays_inside_the_motion_budget(name):
-    svg = figures.load(name)
-    moves = [abs(float(v)) for m in re.findall(r"translate[XY]?\(([^)]*)\)", svg)
-             for v in re.findall(r"-?\d+(?:\.\d+)?", m)]
-    assert max(moves) <= 24
 
 
 def test_it_names_where_it_was_generated_from(name):

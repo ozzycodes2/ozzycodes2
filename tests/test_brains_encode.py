@@ -1,13 +1,16 @@
 """Tests for GIF encoding.
 
 The numbers here are measured, not chosen. A pinned card is a GIF played by a
-browser on a surface we do not control, so the delay floor, the dither and the
-palette cap are all properties of that player rather than preferences.
+browser on a surface we do not control, so the delay floor and the dither are
+properties of that player rather than preferences. The palette is the one thing
+that is neither: it is supplied, because a measured one lands near the accent
+instead of on it.
 
 Tests that shell out to ffmpeg are skipped without it; the rest run anywhere.
 """
 import pathlib
 import shutil
+import struct
 import subprocess
 
 import pytest
@@ -15,6 +18,7 @@ import pytest
 from tools.brains import encode, figures
 
 FIXTURE = pathlib.Path(__file__).parent / "fixtures" / "two-colour-transparent.gif"
+ACCENT = (0xEF, 0x63, 0x06)
 needs_ffmpeg = pytest.mark.skipif(shutil.which("ffmpeg") is None, reason="no ffmpeg")
 
 
@@ -23,10 +27,9 @@ def pngs(n, size=32):
 
     The bar carries a two-pixel antialiased fringe, in roughly the proportion a
     browser's 4x downscale of an 8px stroke leaves: solid accent dominating, a
-    thin softened edge. Both halves matter — flat frames would make any palette
-    cap look like one visible colour, and a fringe-heavy bar would drag
-    `palettegen`'s single slot to the average of the three tones instead of the
-    accent.
+    thin softened edge. The fringe is the whole point — flat frames would make
+    any palette look like one visible colour, and this fringe is what used to
+    drag the painted entry off the accent.
     """
     import struct
     import zlib
@@ -67,7 +70,7 @@ def out(tmp_path):
 @pytest.fixture
 def encoded(out):
     # Every consumer carries `needs_ffmpeg`; a mark on a fixture is ignored.
-    encode.gif(pngs(4), out, delay_cs=10)
+    encode.gif(pngs(4), out, delay_cs=10, accent=ACCENT)
     return out
 
 
@@ -75,13 +78,13 @@ def test_a_delay_below_the_honoured_floor_is_refused(out):
     """0 and 1 are clamped *up* to 100ms by both Chromium and Firefox: asking
     for the fastest frame rate gives you the slowest. 2cs is the real floor."""
     with pytest.raises(ValueError, match="2cs"):
-        encode.gif(pngs(1), out, delay_cs=1)
+        encode.gif(pngs(1), out, delay_cs=1, accent=ACCENT)
 
 
 def test_the_floor_itself_is_allowed(out):
     """Boundary: 2cs is honoured, so it must not be refused alongside 1."""
     with pytest.raises(RuntimeError):
-        encode.gif(pngs(1), out, delay_cs=2, version=(5, 0))
+        encode.gif(pngs(1), out, delay_cs=2, accent=ACCENT, version=(5, 0))
 
 
 def test_ffmpeg_below_six_is_refused(out):
@@ -89,46 +92,58 @@ def test_ffmpeg_below_six_is_refused(out):
     dither would silently ship a GIF 25% larger, which is the kind of failure
     nobody notices until the card is already pinned."""
     with pytest.raises(RuntimeError, match=r"6\.0"):
-        encode.gif(pngs(1), out, delay_cs=10, version=(5, 1))
-
-
-def test_a_palette_too_small_to_reserve_transparency_is_refused(out):
-    """ffmpeg rejects `max_colors=2` with `reserve_transparent=1` outright, and
-    does it from inside the filter graph where the message is easy to miss."""
-    with pytest.raises(ValueError, match="at least 3"):
-        encode.gif(pngs(1), out, delay_cs=10, colours=2)
+        encode.gif(pngs(1), out, delay_cs=10, accent=ACCENT, version=(5, 1))
 
 
 def test_encoding_nothing_is_refused(out):
     with pytest.raises(ValueError, match="no frames"):
-        encode.gif([], out, delay_cs=10)
+        encode.gif([], out, delay_cs=10, accent=ACCENT)
 
 
 @needs_ffmpeg
-def test_the_encoded_palette_is_one_visible_colour_and_one_transparent(encoded):
-    """The whole theme story. One visible entry means the drawing is a single
-    flat tone; the transparent index means GitHub's own surface — light or dark
-    — shows through everywhere else.
+def test_the_encoded_palette_is_the_accent_and_one_transparent_entry(encoded):
+    """The whole theme story, and the reason the palette is built rather than
+    measured. One visible entry means the drawing is a single flat tone; the
+    transparent index means GitHub's own surface — light or dark — shows through
+    everywhere else.
 
-    Which tone it is belongs to the drawing, not to the encoder:
-    `stats_mode=diff` histograms only the pixels that change between frames, so
-    a figure whose motion is all antialiased edge resolves its one slot to the
-    average of that edge. `test_brains_build.py` is where the real figure's tone
-    is held to the accent.
+    Which tone it is belongs to the caller, not to a histogram. `pngs` carries
+    an antialiased fringe in roughly the proportion a 4x downscale leaves, and
+    that fringe is exactly what dragged `palettegen`'s single slot off the
+    accent by two parts in 255 — a drift nothing downstream can correct.
     """
     table, transparent = encode.palette(encoded)
-    assert transparent is not None
-    assert len(visible(table, transparent)) == 1
+    assert transparent == 255
+    assert {c for i, c in enumerate(table) if i != transparent} == {ACCENT}
 
 
 @needs_ffmpeg
-def test_a_generous_palette_is_what_the_cap_is_for(out):
-    """Re-encoding a two-colour reference GIF with `max_colors=32` grew it from
-    117 KB to 291 KB. The drawing has one colour; the antialiased edge is the
-    browser's, and dithering it against transparency is what keeps it one."""
-    encode.gif(pngs(4), out, delay_cs=10, colours=32)
-    table, transparent = encode.palette(out)
-    assert len(visible(table, transparent)) > 1
+def test_no_second_tone_survives_the_antialiased_fringe(encoded):
+    """The fringe is the browser's, not the drawing's. A palette with room for
+    it would dither a second tone onto a card that has one colour — and on a
+    reference GIF that cost 117 KB to 291 KB."""
+    table, _ = encode.palette(encoded)
+    assert (247, 160, 96) not in table
+    assert (252, 214, 184) not in table
+
+
+def test_the_palette_is_the_256_pixels_paletteuse_demands():
+    """`paletteuse` refuses any other count outright — "Palette input must
+    contain exactly 256 pixels" — from inside the filter graph, where the
+    message is easy to miss."""
+    png = encode.palette_png(ACCENT)
+    assert png.startswith(b"\x89PNG\r\n\x1a\n")
+    assert struct.unpack(">II", png[16:24]) == (16, 16)
+
+
+def test_the_palette_holds_no_colour_the_drawing_could_land_on():
+    """Padding entries are the accent too, not black. A black filler is a
+    nearest-match target for every dark pixel and indistinguishable, in the
+    written table, from the padding ffmpeg adds on its own."""
+    px = encode.palette_pixels(ACCENT)
+    assert len(px) == 256
+    assert set(px[:255]) == {(*ACCENT, 255)}
+    assert px[255] == (0, 0, 0, 0)
 
 
 @needs_ffmpeg
@@ -139,14 +154,15 @@ def test_the_gif_loops_forever(encoded):
     assert encode.loops(encoded) == 0
 
 
-def test_the_filter_chain_names_the_cheap_dither_and_reserves_transparency():
+def test_the_filter_chain_names_the_cheap_dither_and_the_alpha_cut():
     """Neither survives into the output bytes, so the chain is the only place
     they can be checked. `atkinson` is 2% over no dither at all on flat vector
-    art, where floyd_steinberg is 13% and bayer 25%."""
-    chain = encode.chain(3)
+    art, where floyd_steinberg is 13% and bayer 25%. `palettegen` is absent on
+    purpose: the palette is supplied, not measured."""
+    chain = encode.CHAIN
     assert "dither=atkinson" in chain
-    assert "max_colors=3:reserve_transparent=1" in chain
     assert "alpha_threshold=128" in chain
+    assert "palettegen" not in chain
 
 
 @needs_ffmpeg
@@ -156,13 +172,13 @@ def test_the_requested_delay_reaches_the_file(out, delay_cs):
     that can be wrong — and at 10cs it is its own fixed point, which hides a
     conversion that does nothing. The values here are the exact ones: 50, 20,
     10 and 4 fps."""
-    encode.gif(pngs(2), out, delay_cs=delay_cs)
+    encode.gif(pngs(2), out, delay_cs=delay_cs, accent=ACCENT)
     assert encode.delay(out) == delay_cs
 
 
 @needs_ffmpeg
 def test_the_frames_are_the_size_they_were_drawn_at(out):
-    encode.gif(pngs(2), out, delay_cs=10)
+    encode.gif(pngs(2), out, delay_cs=10, accent=ACCENT)
     assert encode.size(out) == (32, 32)
 
 
@@ -269,4 +285,4 @@ def test_the_accent_the_art_declares_is_the_one_the_encoder_must_keep():
     """Ties the two halves together: `figures.ACCENT` is a hex string and the
     palette is a byte triple, and nothing else in the suite would notice them
     drifting apart."""
-    assert tuple(int(figures.ACCENT[i : i + 2], 16) for i in (1, 3, 5)) == (0xEF, 0x63, 0x06)
+    assert figures.accent_rgb() == ACCENT

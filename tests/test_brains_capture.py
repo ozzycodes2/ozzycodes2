@@ -5,6 +5,8 @@ installs `fonttools` and `brotli` and nothing else, and a suite that needs
 Chromium to go green would be red on every machine but this one. The seam is
 the point, so it is what gets tested.
 """
+import pathlib
+import subprocess
 import sys
 import types
 
@@ -147,9 +149,26 @@ def test_the_shooter_uses_the_installed_chrome_and_the_master_viewport(fake_play
     assert ("close",) in fake_playwright
 
 
-def test_capture_skips_cleanly_when_no_browser_is_installed():
-    """`chrome_shoot` imports Playwright inside the call, so importing this
-    module on a machine without it must still work — which is what every test
-    above already proves. This one states the dependency that is allowed to be
-    absent."""
-    pytest.importorskip("playwright")
+def test_importing_capture_does_not_pull_in_playwright():
+    """`chrome_shoot` imports Playwright inside the call so that a clone without
+    it still collects. Asserted in a fresh interpreter with the import blocked,
+    because on a machine that has Playwright a module-scope import would pass
+    every other test here and nothing would say when it stopped being deferred.
+    """
+    script = (
+        "import sys\n"
+        "class Block:\n"
+        "    def find_module(self, name, path=None):\n"
+        "        if name.split('.')[0] == 'playwright':\n"
+        "            raise ImportError('blocked')\n"
+        "sys.meta_path.insert(0, Block())\n"
+        "import tools.brains.capture\n"
+        "assert not [m for m in sys.modules if m.startswith('playwright')]\n"
+    )
+    done = subprocess.run(
+        [sys.executable, "-c", script],
+        cwd=pathlib.Path(__file__).resolve().parents[1],
+        capture_output=True,
+        text=True,
+    )
+    assert done.returncode == 0, done.stderr

@@ -32,13 +32,32 @@ Playwright inside the call and every test injects a fake shooter.
 `chrome_shoot` launches `channel="chrome"`, the Google Chrome already on the
 machine, rather than a Playwright-managed build — a pin whose bundled browser
 was never fetched otherwise fails hunting for a headless shell that is not on
-disk. `playwright install chromium` is an alternative, not a requirement.
+disk. So Chrome itself is a requirement and `playwright install chromium` does
+not substitute for it: a managed chromium does not satisfy that channel.
+`build.chrome_missing` is what the browser-gated tests skip on, because the pip
+package being present says nothing about the browser.
 
 If `pip` reports `401` against a CodeArtifact host, it is picking up a work
 registry from `~/.config/pip`; add `--index-url https://pypi.org/simple`.
 
 ffmpeg must be 6.0 or newer. `atkinson` dither does not exist before it, and
 the next-cheapest dither is 25% more bytes on flat vector art.
+
+## Why the palette is built rather than measured
+
+`palettegen` will not reproduce a known colour. Asked for the smallest palette
+ffmpeg permits alongside a reserved transparent slot, it still resolves its one
+painted entry to a histogram average, and the browser's antialiased edge pulls
+that average off the accent — `#ed6206` against `#ef6306`, measured. Nothing
+downstream can correct it, and the drift tracks how much curve the drawing has,
+so it appears when the art changes rather than when the encoder does.
+
+So `encode.palette_png` writes the 256 entries `paletteuse` demands: the accent
+255 times and one fully transparent entry last, where GIF's reserved sentinel
+lands. Padding is the accent and not black, because black is a nearest-match
+target for any dark pixel and, in the written table, indistinguishable from the
+entries ffmpeg pads with anyway — a check on the output could not tell a painted
+black from an unused slot.
 
 ## Why a browser
 
