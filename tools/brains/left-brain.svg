@@ -1,0 +1,43 @@
+<!-- source: site/assets/brains.js
+     generated: 2026-10-19
+     Vendored from design-preview, system mine-final. Never hand-edit:
+     change the preview, then run tools/brains/build.py. -->
+<svg xmlns="http://www.w3.org/2000/svg" id="left-brain" viewBox="0 0 1340 400" width="1340" height="400" role="img" aria-labelledby="left-brain-t left-brain-d">
+  <title id="left-brain-t">Left Brain</title>
+  <desc id="left-brain-d">Three dimetric modules on one bus: the engineering half, on the grid.</desc>
+  <style>
+    svg#left-brain .slide-a, svg#left-brain .slide-b {
+      animation: brain-slide 3.6s ease-in-out infinite;
+    }
+    svg#left-brain .slide-b { animation-delay: -1.8s; }
+    svg#left-brain .lift {
+      animation: brain-lift 3.6s ease-in-out infinite;
+      animation-delay: -0.9s;
+    }
+    @keyframes brain-slide {
+      0%, 100% { transform: translateX(0) }
+      50%      { transform: translateX(24px) }
+    }
+    @keyframes brain-lift {
+      0%, 100% { transform: translateY(0) }
+      50%      { transform: translateY(-24px) }
+    }
+  </style>
+  <path d="M64 296 H1276" stroke="#ef6306" stroke-width="8" stroke-linejoin="round" fill="none"/>
+  <polygon points="288,136 416,200 288,264 160,200" stroke="#ef6306" stroke-width="8" stroke-linejoin="round" fill="none"/>
+  <polygon points="416,200 288,264 288,296 416,232" stroke="#ef6306" stroke-width="8" stroke-linejoin="round" fill="none"/>
+  <polygon points="288,264 160,200 160,232 288,296" stroke="#ef6306" stroke-width="8" stroke-linejoin="round" fill="none"/>
+  <polygon points="672,136 800,200 672,264 544,200" stroke="#ef6306" stroke-width="8" stroke-linejoin="round" fill="none"/>
+  <polygon points="800,200 672,264 672,296 800,232" stroke="#ef6306" stroke-width="8" stroke-linejoin="round" fill="none"/>
+  <polygon points="672,264 544,200 544,232 672,296" stroke="#ef6306" stroke-width="8" stroke-linejoin="round" fill="none"/>
+  <polygon class="lift" points="672,104 736,136 672,168 608,136" stroke="#ef6306" stroke-width="8" stroke-linejoin="round" fill="none"/>
+  <polygon class="lift" points="736,136 672,168 672,232 736,200" stroke="#ef6306" stroke-width="8" stroke-linejoin="round" fill="none"/>
+  <polygon class="lift" points="672,168 608,136 608,200 672,232" stroke="#ef6306" stroke-width="8" stroke-linejoin="round" fill="none"/>
+  <polygon points="1056,136 1184,200 1056,264 928,200" stroke="#ef6306" stroke-width="8" stroke-linejoin="round" fill="none"/>
+  <polygon points="1184,200 1056,264 1056,296 1184,232" stroke="#ef6306" stroke-width="8" stroke-linejoin="round" fill="none"/>
+  <polygon points="1056,264 928,200 928,232 1056,296" stroke="#ef6306" stroke-width="8" stroke-linejoin="round" fill="none"/>
+  <path d="M1120 168 L992 232" stroke="#ef6306" stroke-width="8" stroke-linejoin="round" fill="none"/>
+  <path d="M992 168 L1120 232" stroke="#ef6306" stroke-width="8" stroke-linejoin="round" fill="none"/>
+  <rect class="slide-a" x="468" y="284" width="24" height="24" fill="#ef6306"/>
+  <rect class="slide-b" x="852" y="284" width="24" height="24" fill="#ef6306"/>
+</svg>
