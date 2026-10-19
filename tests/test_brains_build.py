@@ -25,7 +25,10 @@ def test_it_builds_every_vendored_hemisphere_by_default(monkeypatch, tmp_path):
     monkeypatch.setattr(build, "OUT", tmp_path)
     monkeypatch.setattr(build, "render", lambda name, out, **kw: (made.append((name, out)), out.touch()))
     assert build.main([]) == 0
-    assert made == [("left-brain", tmp_path / "Left Brain.gif")]
+    assert made == [
+        ("left-brain", tmp_path / "Left Brain.gif"),
+        ("right-brain", tmp_path / "Right Brain.gif"),
+    ]
 
 
 def test_it_builds_only_what_it_is_asked_for(monkeypatch, tmp_path):
@@ -36,10 +39,12 @@ def test_it_builds_only_what_it_is_asked_for(monkeypatch, tmp_path):
     assert made == ["left-brain"]
 
 
-def test_a_hemisphere_that_is_not_vendored_yet_is_an_error(monkeypatch, tmp_path):
-    """Asking for the right half before it is drawn should say so, not capture
-    four seconds of nothing."""
+def test_a_hemisphere_that_is_not_vendored_is_an_error(monkeypatch, tmp_path):
+    """Asking for a half that has not been drawn should say so, not capture four
+    seconds of nothing. Both are vendored now, so this points `figures` at an
+    empty directory to reach the case."""
     monkeypatch.setattr(build, "OUT", tmp_path)
+    monkeypatch.setattr(figures, "HERE", tmp_path / "empty")
     assert build.main(["right-brain"]) == 1
 
 
@@ -63,23 +68,26 @@ def test_the_frame_schedule_divides_the_loop_exactly(monkeypatch, tmp_path):
     assert 100 % build.DELAY_CS == 0
 
 
-def test_the_loop_is_the_one_the_drawing_declares():
+@pytest.mark.parametrize("name", figures.NAMES)
+def test_the_loop_is_the_one_the_drawing_declares(name):
     """The capture duration has to be the figure's own loop, or the GIF cuts
-    the animation off mid-cycle and the seam shows once per repeat."""
+    the animation off mid-cycle and the seam shows once per repeat. Both halves
+    run on one clock: side by side, two periods would beat against each other."""
     import re
 
-    svg = figures.load("left-brain")
+    svg = figures.load(name)
     declared = max(float(d) for d in re.findall(r"animation:[^;}]*?(\d+(?:\.\d+)?)s", svg))
     assert build.DURATION == declared
 
 
 @needs_browser
-def test_the_built_card_is_the_accent_on_transparency(tmp_path):
+@pytest.mark.parametrize("name", figures.NAMES)
+def test_the_built_card_is_the_accent_on_transparency(tmp_path, name):
     """The assertion `test_brains_encode.py` cannot make: that this drawing's
     one visible colour is the accent, and that GitHub's own surface shows
     through the rest on both themes."""
-    out = tmp_path / "Left Brain.gif"
-    build.render("left-brain", out)
+    out = tmp_path / f"{build.title(name)}.gif"
+    build.render(name, out)
     table, transparent = encode.palette(out)
     accent = tuple(int(figures.ACCENT[i : i + 2], 16) for i in (1, 3, 5))
     assert transparent is not None
@@ -89,12 +97,13 @@ def test_the_built_card_is_the_accent_on_transparency(tmp_path):
 
 
 @needs_browser
-def test_the_built_card_fits_the_budget(tmp_path):
+@pytest.mark.parametrize("name", figures.NAMES)
+def test_the_built_card_fits_the_budget(tmp_path, name):
     """Terkel's reference is 117 KB for 48 frames at this size. Camo is not in
     the path for a gist file, so there is no hard cap — but a card that costs
     more than the page around it is a card drawn wrong."""
-    out = tmp_path / "Left Brain.gif"
-    build.render("left-brain", out)
+    out = tmp_path / f"{build.title(name)}.gif"
+    build.render(name, out)
     assert out.stat().st_size < 200_000, f"{out.stat().st_size} bytes"
 
 

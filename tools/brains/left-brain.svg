@@ -1,7 +1,8 @@
 <!-- source: site/assets/brains.js
      generated: 2026-10-19
      Vendored from design-preview, system mine-final. Never hand-edit:
-     change the preview, then run tools/brains/build.py. -->
+     change the preview, look at it, then run
+     `python -m tools.brains.parity --write left-brain`. -->
 <svg xmlns="http://www.w3.org/2000/svg" id="left-brain" viewBox="0 0 1340 400" width="1340" height="400" role="img" aria-labelledby="left-brain-t left-brain-d">
   <title id="left-brain-t">Left Brain</title>
   <desc id="left-brain-d">Three dimetric modules on one bus: the engineering half, on the grid.</desc>

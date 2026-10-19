@@ -62,6 +62,15 @@ re-checking if the frames ever start to shimmer.
 tab, and vendored here so a capture is reproducible on a machine that has only
 this repository. Each file states its provenance in a leading comment.
 
-Never hand-edit them. Change the preview, look at it, then regenerate.
-`parity.py` regenerates from the preview and diffs against the vendored copy; it
-skips rather than fails when the preview is not on the machine.
+Never hand-edit them. Change the preview, look at it, then:
+
+```
+.venv/bin/python -m tools.brains.parity                     # report drift
+.venv/bin/python -m tools.brains.parity --write right-brain # re-vendor
+```
+
+The drift report skips, and says it skipped, when the preview is not on the
+machine — a clone of this repository alone has to run green. Writing does not
+skip: there would be nothing to copy from, and a silent no-op would leave the
+stale drawing in place and call it success. `build.py` reports drift as a
+warning and builds anyway, for the same reason.

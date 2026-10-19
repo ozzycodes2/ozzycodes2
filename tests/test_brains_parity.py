@@ -6,6 +6,7 @@ other "leaves two renderers disagreeing about one drawing, and nothing will tell
 you which is right." Vendoring was chosen anyway, so this is the something that
 tells you.
 """
+import datetime
 import pathlib
 
 import pytest
@@ -76,3 +77,80 @@ def test_the_vendored_copy_matches_the_preview():
 def test_regenerate_refuses_a_name_the_preview_has_no_side_for(tmp_path):
     with pytest.raises(FileNotFoundError):
         parity.regenerate("middle-brain", tmp_path)
+
+
+@pytest.fixture
+def elsewhere(tmp_path, monkeypatch):
+    """Point `figures.path` at a scratch directory so vendoring under test can
+    never overwrite the real drawings."""
+    monkeypatch.setattr(figures, "HERE", tmp_path)
+    return tmp_path
+
+
+def test_vendor_writes_a_copy_parity_then_accepts(elsewhere):
+    """The round trip is the point: whatever `vendor` writes, `diff` must find
+    nothing to say about."""
+    parity.vendor("left-brain", regenerate=lambda _: "<svg>body</svg>")
+    assert (elsewhere / "left-brain.svg").exists()
+    assert parity.diff("left-brain", regenerate=lambda _: "<svg>body</svg>") is None
+
+
+def test_vendor_states_its_provenance(elsewhere):
+    """A generated file that does not say where it came from is a file someone
+    will edit by hand."""
+    parity.vendor("left-brain", regenerate=lambda _: "<svg/>", today=datetime.date(2026, 10, 19))
+    found = figures.provenance("left-brain")
+    assert found["source"] == "site/assets/brains.js"
+    assert found["generated"] == "2026-10-19"
+
+
+def test_vendor_names_the_command_that_regenerates_it(elsewhere):
+    """`build.py` builds GIFs; it has never written an SVG. A header that sends
+    the reader to the wrong command is worse than one that sends them nowhere."""
+    parity.vendor("right-brain", regenerate=lambda _: "<svg/>")
+    head = figures.load("right-brain").split("-->", 1)[0]
+    assert "tools.brains.parity --write right-brain" in head
+
+
+def test_vendor_refuses_a_name_that_is_not_a_hemisphere(elsewhere):
+    with pytest.raises(FileNotFoundError):
+        parity.vendor("middle-brain", regenerate=lambda _: "<svg/>")
+
+
+def test_vendor_without_the_preview_is_an_error(elsewhere, monkeypatch):
+    """`diff` skips when the preview is absent, because a clone of this
+    repository alone must run green. Vendoring cannot skip: there is nothing to
+    copy from, and a silent no-op would leave the old drawing in place."""
+    monkeypatch.setattr(parity, "PREVIEW", pathlib.Path("/nope"))
+    with pytest.raises(FileNotFoundError, match="brains.js"):
+        parity.vendor("left-brain")
+
+
+def test_the_cli_is_silent_and_clean_when_the_copies_match(elsewhere, capsys):
+    parity.vendor("left-brain", regenerate=lambda _: "<svg/>")
+    assert parity.main([], regenerate=lambda _: "<svg/>") == 0
+    assert capsys.readouterr().out == ""
+
+
+def test_the_cli_reports_drift_and_fails(elsewhere, capsys):
+    parity.vendor("left-brain", regenerate=lambda _: "<svg/>")
+    assert parity.main([], regenerate=lambda _: "<svg>moved</svg>") == 1
+    assert "moved" in capsys.readouterr().out
+
+
+def test_the_cli_skips_a_hemisphere_that_is_not_vendored_yet(elsewhere):
+    assert parity.main([], regenerate=lambda _: "<svg/>") == 0
+
+
+def test_the_cli_says_so_when_it_could_not_check(elsewhere, monkeypatch, capsys):
+    """Printing nothing would read as "checked, clean". It checked nothing."""
+    parity.vendor("left-brain", regenerate=lambda _: "<svg/>")
+    monkeypatch.setattr(parity, "PREVIEW", pathlib.Path("/nope"))
+    assert parity.main([]) == 0
+    assert "design-preview" in capsys.readouterr().out
+
+
+def test_the_cli_writes_when_asked(elsewhere, capsys):
+    assert parity.main(["--write", "right-brain"], regenerate=lambda _: "<svg/>") == 0
+    assert "<svg/>" in figures.load("right-brain")
+    assert "wrote" in capsys.readouterr().out
