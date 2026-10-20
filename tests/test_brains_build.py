@@ -70,6 +70,19 @@ def test_the_frame_schedule_divides_the_loop_exactly(monkeypatch, tmp_path):
     assert 100 % build.DELAY_CS == 0
 
 
+def test_the_frame_rate_reads_as_motion_rather_than_stepping():
+    """A comet crossing the drawing is a small bright mark on a dark field,
+    which is where a low rate shows worst: the eye tracks the head and sees it
+    arrive rather than travel. 10fps was visibly steppy on the published card.
+
+    25fps is the floor that fixed it and the fastest the byte budget affords —
+    the encoder writes near-enough a full frame each time, so file size tracks
+    the frame count almost exactly. Buying the rate meant shortening the loop
+    rather than paying for it, which is why `DURATION` is one dash repeat.
+    """
+    assert build.DELAY_CS <= 4
+
+
 @pytest.mark.parametrize("name", figures.NAMES)
 def test_the_loop_is_the_one_the_drawing_declares(name):
     """The capture duration has to be the figure's own loop, or the GIF cuts

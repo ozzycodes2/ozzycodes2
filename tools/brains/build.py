@@ -16,12 +16,19 @@ from . import capture, encode, figures, parity
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 OUT = ROOT / "gists"
 
-# 36 frames of 10cs is 3.6s exactly, which is the loop `brains.js` declares.
+# 30 frames of 4cs is 1.2s exactly, which is the loop `brains.js` declares.
 # Only 1, 2, 4, 5, 10, 20, 25, 50 and 100 fps come out exact; anything else the
 # player rounds, and the GIF drifts against the animation it was captured from.
-DURATION = 3.6
-DELAY_CS = 10
-FRAMES = 36
+#
+# 25fps because 10 stepped visibly: the comet is a small bright mark and the eye
+# tracks its head, which is the worst case for a low rate. The encoder writes
+# near-enough a full frame per tick — measured, size tracks frame count almost
+# linearly — so the rate was paid for by shortening the loop to a single dash
+# repeat rather than by spending frames. 50fps is the next step up and puts the
+# right half past 250 KB.
+DURATION = 1.2
+DELAY_CS = 4
+FRAMES = 30
 
 
 def title(name):

@@ -192,10 +192,20 @@ def test_a_dashed_edge_carries_no_signal():
     assert not (set(dashed) & lit)
 
 
-def test_motion_is_a_loop_of_at_least_three_seconds(name):
+def test_the_march_is_paced_rather_than_the_loop(name):
+    """What a viewer reads as speed is dash repeats per second, which is the
+    repeats the keyframe walks divided by the period it walks them in. Either
+    number alone says nothing: the loop is as short as it can be because the
+    published GIF spends a frame on every tick of it and the frame rate is
+    bought with its length, and a floor on the period would forbid that while
+    still permitting any speed at all inside it.
+    """
     svg = figures.load(name)
     assert "@keyframes" in svg
-    assert max(float(d) for d in re.findall(r"animation:[^;}]*?(\d+(?:\.\d+)?)s", svg)) >= 3
+    loop = max(float(d) for d in re.findall(r"animation:[^;}]*?(\d+(?:\.\d+)?)s", svg))
+    laps = float(re.search(r"stroke-dashoffset:\s*calc\(-([\d.]+)", svg).group(1))
+    assert laps.is_integer(), f"{laps} repeats a loop leaves a seam"
+    assert laps / loop <= 1, f"{laps / loop:.2f} repeats a second"
 
 
 def test_it_names_where_it_was_generated_from(name):

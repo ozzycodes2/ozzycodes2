@@ -8,11 +8,11 @@
   <desc id="left-brain-d">The left hemisphere: sides of a near-isometric grid drawn by hand, dashed where they only reach, signals firing along them.</desc>
   <style>
     svg#left-brain .signal {
-      animation: brain-signal 3.6s linear infinite;
+      animation: brain-signal 1.2s linear infinite;
     }
     @keyframes brain-signal {
       from { stroke-dashoffset: 0 }
-      to   { stroke-dashoffset: calc(-3 * var(--cycle) * 1px) }
+      to   { stroke-dashoffset: calc(-1 * var(--cycle) * 1px) }
     }
   </style>
   <path d="M1484 32 L1436 4" stroke-width="4" stroke="#ac4704" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
@@ -23,103 +23,103 @@
   <path class="signal" d="M1484 200 L1436 228" stroke-width="8" stroke="#e35e06" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.32s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   <path class="signal" d="M1484 200 L1436 228" stroke-width="9" stroke="#ef6306" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.43s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   <path d="M1484 368 L1436 396" stroke-width="4" stroke="#ac4704" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1484 368 L1436 396" stroke-width="5" stroke="#ba4d05" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -2.22s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1484 368 L1436 396" stroke-width="6" stroke="#c65205" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -2.33s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1484 368 L1436 396" stroke-width="7" stroke="#d55805" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -2.44s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1484 368 L1436 396" stroke-width="8" stroke="#e35e06" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -2.55s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1484 368 L1436 396" stroke-width="9" stroke="#ef6306" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -2.66s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1484 368 L1436 396" stroke-width="5" stroke="#ba4d05" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.74s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1484 368 L1436 396" stroke-width="6" stroke="#c65205" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.85s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1484 368 L1436 396" stroke-width="7" stroke="#d55805" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.96s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1484 368 L1436 396" stroke-width="8" stroke="#e35e06" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -1.07s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1484 368 L1436 396" stroke-width="9" stroke="#ef6306" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -1.17s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   <path d="M1436 4 L1388 32" stroke-width="4" stroke="#ac4704" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1436 4 L1388 32" stroke-width="5" stroke="#ba4d05" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.85s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1436 4 L1388 32" stroke-width="6" stroke="#c65205" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.96s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1436 4 L1388 32" stroke-width="7" stroke="#d55805" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -1.07s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1436 4 L1388 32" stroke-width="8" stroke="#e35e06" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -1.17s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1436 4 L1388 32" stroke-width="9" stroke="#ef6306" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -1.28s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1436 4 L1388 32" stroke-width="5" stroke="#ba4d05" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.28s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1436 4 L1388 32" stroke-width="6" stroke="#c65205" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.39s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1436 4 L1388 32" stroke-width="7" stroke="#d55805" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.50s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1436 4 L1388 32" stroke-width="8" stroke="#e35e06" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.61s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1436 4 L1388 32" stroke-width="9" stroke="#ef6306" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.72s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   <path d="M1436 60 L1388 32" stroke-width="4" stroke="#ac4704" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1436 60 L1388 32" stroke-width="5" stroke="#ba4d05" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -3.07s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1436 60 L1388 32" stroke-width="6" stroke="#c65205" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -3.18s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1436 60 L1388 32" stroke-width="7" stroke="#d55805" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -3.29s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1436 60 L1388 32" stroke-width="8" stroke="#e35e06" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -3.40s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1436 60 L1388 32" stroke-width="9" stroke="#ef6306" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -3.51s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1436 60 L1388 32" stroke-width="5" stroke="#ba4d05" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -1.02s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1436 60 L1388 32" stroke-width="6" stroke="#c65205" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -1.13s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1436 60 L1388 32" stroke-width="7" stroke="#d55805" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -1.24s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1436 60 L1388 32" stroke-width="8" stroke="#e35e06" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -1.35s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1436 60 L1388 32" stroke-width="9" stroke="#ef6306" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -1.46s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   <path d="M1436 116 L1436 172" stroke-width="4" stroke="#ac4704" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   <path d="M1436 116 L1388 88" stroke-width="4" stroke="#ac4704" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   <path d="M1436 172 L1388 200" stroke-width="4" stroke="#ac4704" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   <path d="M1436 284 L1436 340" stroke-width="4" stroke="#ac4704" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   <path d="M1436 284 L1388 256" stroke-width="4" stroke="#ac4704" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   <path d="M1436 396 L1388 368" stroke-width="4" stroke="#ac4704" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1436 396 L1388 368" stroke-width="5" stroke="#ba4d05" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -1.70s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1436 396 L1388 368" stroke-width="6" stroke="#c65205" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -1.81s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1436 396 L1388 368" stroke-width="7" stroke="#d55805" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -1.92s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1436 396 L1388 368" stroke-width="8" stroke="#e35e06" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -2.02s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1436 396 L1388 368" stroke-width="9" stroke="#ef6306" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -2.13s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1436 396 L1388 368" stroke-width="5" stroke="#ba4d05" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.57s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1436 396 L1388 368" stroke-width="6" stroke="#c65205" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.67s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1436 396 L1388 368" stroke-width="7" stroke="#d55805" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.78s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1436 396 L1388 368" stroke-width="8" stroke="#e35e06" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.89s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1436 396 L1388 368" stroke-width="9" stroke="#ef6306" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -1.00s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   <path d="M1388 32 L1340 60" stroke-width="4" stroke="#ac4704" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1388 32 L1340 60" stroke-width="5" stroke="#ba4d05" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.32s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1388 32 L1340 60" stroke-width="6" stroke="#c65205" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.43s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1388 32 L1340 60" stroke-width="7" stroke="#d55805" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.54s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1388 32 L1340 60" stroke-width="8" stroke="#e35e06" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.65s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1388 32 L1340 60" stroke-width="9" stroke="#ef6306" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.76s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1388 32 L1340 60" stroke-width="5" stroke="#ba4d05" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.11s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1388 32 L1340 60" stroke-width="6" stroke="#c65205" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.22s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1388 32 L1340 60" stroke-width="7" stroke="#d55805" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.32s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1388 32 L1340 60" stroke-width="8" stroke="#e35e06" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.43s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1388 32 L1340 60" stroke-width="9" stroke="#ef6306" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.54s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   <path d="M1388 144 L1340 116" stroke-width="4" stroke="#ac4704" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1388 144 L1340 116" stroke-width="5" stroke="#ba4d05" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -2.55s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1388 144 L1340 116" stroke-width="6" stroke="#c65205" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -2.66s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1388 144 L1340 116" stroke-width="7" stroke="#d55805" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -2.77s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1388 144 L1340 116" stroke-width="8" stroke="#e35e06" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -2.87s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1388 144 L1340 116" stroke-width="9" stroke="#ef6306" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -2.98s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1388 144 L1340 116" stroke-width="5" stroke="#ba4d05" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.85s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1388 144 L1340 116" stroke-width="6" stroke="#c65205" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.96s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1388 144 L1340 116" stroke-width="7" stroke="#d55805" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -1.07s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1388 144 L1340 116" stroke-width="8" stroke="#e35e06" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -1.17s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1388 144 L1340 116" stroke-width="9" stroke="#ef6306" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -1.28s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   <path d="M1388 200 L1388 256" stroke-width="4" stroke="#ac4704" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   <path d="M1388 200 L1340 172" stroke-width="4" stroke="#ac4704" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   <path d="M1388 256 L1340 284" stroke-width="4" stroke="#ac4704" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   <path d="M1388 312 L1388 368" stroke-width="4" stroke="#ac4704" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1388 312 L1388 368" stroke-width="5" stroke="#ba4d05" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -1.17s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1388 312 L1388 368" stroke-width="6" stroke="#c65205" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -1.28s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1388 312 L1388 368" stroke-width="7" stroke="#d55805" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -1.39s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1388 312 L1388 368" stroke-width="8" stroke="#e35e06" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -1.50s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1388 312 L1388 368" stroke-width="9" stroke="#ef6306" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -1.61s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1388 312 L1388 368" stroke-width="5" stroke="#ba4d05" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -0.39s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1388 312 L1388 368" stroke-width="6" stroke="#c65205" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -0.50s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1388 312 L1388 368" stroke-width="7" stroke="#d55805" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -0.61s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1388 312 L1388 368" stroke-width="8" stroke="#e35e06" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -0.72s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1388 312 L1388 368" stroke-width="9" stroke="#ef6306" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -0.82s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   <path d="M1388 368 L1340 340" stroke-width="4" stroke="#ac4704" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1388 368 L1340 340" stroke-width="5" stroke="#ba4d05" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -3.40s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1388 368 L1340 340" stroke-width="6" stroke="#c65205" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -3.51s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1388 368 L1340 340" stroke-width="7" stroke="#d55805" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -3.62s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1388 368 L1340 340" stroke-width="8" stroke="#e35e06" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -3.72s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1388 368 L1340 340" stroke-width="9" stroke="#ef6306" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -3.83s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1388 368 L1340 340" stroke-width="5" stroke="#ba4d05" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -1.13s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1388 368 L1340 340" stroke-width="6" stroke="#c65205" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -1.24s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1388 368 L1340 340" stroke-width="7" stroke="#d55805" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -1.35s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1388 368 L1340 340" stroke-width="8" stroke="#e35e06" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -1.46s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1388 368 L1340 340" stroke-width="9" stroke="#ef6306" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -1.57s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   <path d="M1340 60 L1340 116" stroke-width="4" stroke="#ac4704" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1340 60 L1340 116" stroke-width="5" stroke="#ba4d05" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -2.02s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1340 60 L1340 116" stroke-width="6" stroke="#c65205" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -2.13s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1340 60 L1340 116" stroke-width="7" stroke="#d55805" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -2.24s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1340 60 L1340 116" stroke-width="8" stroke="#e35e06" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -2.35s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1340 60 L1340 116" stroke-width="9" stroke="#ef6306" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -2.46s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1340 60 L1340 116" stroke-width="5" stroke="#ba4d05" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -0.67s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1340 60 L1340 116" stroke-width="6" stroke="#c65205" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -0.78s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1340 60 L1340 116" stroke-width="7" stroke="#d55805" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -0.89s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1340 60 L1340 116" stroke-width="8" stroke="#e35e06" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -1.00s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1340 60 L1340 116" stroke-width="9" stroke="#ef6306" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -1.11s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   <path d="M1340 116 L1292 144" stroke-width="4" stroke="#ac4704" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1340 116 L1292 144" stroke-width="5" stroke="#ba4d05" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.65s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1340 116 L1292 144" stroke-width="6" stroke="#c65205" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.76s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1340 116 L1292 144" stroke-width="7" stroke="#d55805" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.87s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1340 116 L1292 144" stroke-width="8" stroke="#e35e06" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.97s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1340 116 L1292 144" stroke-width="9" stroke="#ef6306" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -1.08s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1340 116 L1292 144" stroke-width="5" stroke="#ba4d05" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.22s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1340 116 L1292 144" stroke-width="6" stroke="#c65205" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.32s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1340 116 L1292 144" stroke-width="7" stroke="#d55805" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.43s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1340 116 L1292 144" stroke-width="8" stroke="#e35e06" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.54s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1340 116 L1292 144" stroke-width="9" stroke="#ef6306" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.65s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   <path d="M1340 228 L1292 200" stroke-width="4" stroke="#ac4704" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1340 228 L1292 200" stroke-width="5" stroke="#ba4d05" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -2.87s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1340 228 L1292 200" stroke-width="6" stroke="#c65205" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -2.98s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1340 228 L1292 200" stroke-width="7" stroke="#d55805" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -3.09s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1340 228 L1292 200" stroke-width="8" stroke="#e35e06" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -3.20s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1340 228 L1292 200" stroke-width="9" stroke="#ef6306" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -3.31s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1340 228 L1292 200" stroke-width="5" stroke="#ba4d05" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.96s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1340 228 L1292 200" stroke-width="6" stroke="#c65205" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -1.07s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1340 228 L1292 200" stroke-width="7" stroke="#d55805" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -1.17s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1340 228 L1292 200" stroke-width="8" stroke="#e35e06" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -1.28s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1340 228 L1292 200" stroke-width="9" stroke="#ef6306" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -1.39s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   <path d="M1340 284 L1340 340" stroke-width="4" stroke="#ac4704" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1340 284 L1340 340" stroke-width="5" stroke="#ba4d05" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -1.50s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1340 284 L1340 340" stroke-width="6" stroke="#c65205" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -1.61s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1340 284 L1340 340" stroke-width="7" stroke="#d55805" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -1.72s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1340 284 L1340 340" stroke-width="8" stroke="#e35e06" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -1.82s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1340 284 L1340 340" stroke-width="9" stroke="#ef6306" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -1.93s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1340 284 L1340 340" stroke-width="5" stroke="#ba4d05" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -0.50s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1340 284 L1340 340" stroke-width="6" stroke="#c65205" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -0.61s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1340 284 L1340 340" stroke-width="7" stroke="#d55805" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -0.72s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1340 284 L1340 340" stroke-width="8" stroke="#e35e06" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -0.82s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1340 284 L1340 340" stroke-width="9" stroke="#ef6306" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -0.93s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   <path d="M1340 284 L1292 256" stroke-width="4" stroke="#ac4704" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1340 284 L1292 256" stroke-width="5" stroke="#ba4d05" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.12s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1340 284 L1292 256" stroke-width="6" stroke="#c65205" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.23s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1340 284 L1292 256" stroke-width="7" stroke="#d55805" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.34s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1340 284 L1292 256" stroke-width="8" stroke="#e35e06" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.45s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1340 284 L1292 256" stroke-width="9" stroke="#ef6306" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.56s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1340 284 L1292 256" stroke-width="5" stroke="#ba4d05" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.04s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1340 284 L1292 256" stroke-width="6" stroke="#c65205" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.15s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1340 284 L1292 256" stroke-width="7" stroke="#d55805" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.26s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1340 284 L1292 256" stroke-width="8" stroke="#e35e06" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.37s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1340 284 L1292 256" stroke-width="9" stroke="#ef6306" stroke-dasharray="5.6 50.0" style="--cycle: 55.6; animation-delay: -0.47s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   <path d="M1292 144 L1292 200" stroke-width="4" stroke="#ac4704" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1292 144 L1292 200" stroke-width="5" stroke="#ba4d05" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -2.35s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1292 144 L1292 200" stroke-width="6" stroke="#c65205" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -2.46s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1292 144 L1292 200" stroke-width="7" stroke="#d55805" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -2.56s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1292 144 L1292 200" stroke-width="8" stroke="#e35e06" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -2.67s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1292 144 L1292 200" stroke-width="9" stroke="#ef6306" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -2.78s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1292 144 L1292 200" stroke-width="5" stroke="#ba4d05" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -0.78s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1292 144 L1292 200" stroke-width="6" stroke="#c65205" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -0.89s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1292 144 L1292 200" stroke-width="7" stroke="#d55805" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -1.00s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1292 144 L1292 200" stroke-width="8" stroke="#e35e06" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -1.11s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1292 144 L1292 200" stroke-width="9" stroke="#ef6306" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -1.21s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   <path d="M1292 200 L1292 256" stroke-width="4" stroke="#ac4704" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1292 200 L1292 256" stroke-width="5" stroke="#ba4d05" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -0.97s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1292 200 L1292 256" stroke-width="6" stroke="#c65205" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -1.08s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1292 200 L1292 256" stroke-width="7" stroke="#d55805" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -1.19s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1292 200 L1292 256" stroke-width="8" stroke="#e35e06" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -1.30s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1292 200 L1292 256" stroke-width="9" stroke="#ef6306" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -1.41s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1292 200 L1292 256" stroke-width="5" stroke="#ba4d05" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -0.32s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1292 200 L1292 256" stroke-width="6" stroke="#c65205" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -0.43s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1292 200 L1292 256" stroke-width="7" stroke="#d55805" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -0.54s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1292 200 L1292 256" stroke-width="8" stroke="#e35e06" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -0.65s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1292 200 L1292 256" stroke-width="9" stroke="#ef6306" stroke-dasharray="5.6 50.4" style="--cycle: 56.0; animation-delay: -0.76s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   <circle cx="1484" cy="32" r="4" stroke="#ef6306" stroke-width="2" fill="none"/>
   <circle cx="1436" cy="4" r="4" fill="#ef6306"/>
   <circle cx="1484" cy="200" r="4" fill="#ef6306"/>
