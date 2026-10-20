@@ -19,36 +19,42 @@ def published(request):
     name, path = request.param
     if not path.exists():
         pytest.skip(f"{path.name} has not been built")
-    return path
+    return name, path
 
 
-def test_the_published_card_is_the_accent_on_transparency(published):
-    """The claim the whole design rests on: one painted colour, exactly the
-    accent, and GitHub's own surface showing through the rest on both themes."""
-    table, transparent = encode.palette(published)
+def test_the_published_card_is_the_drawings_own_shades_on_transparency(published):
+    """The claim the whole design rests on: one hue, at the shades the drawing
+    names and no others, with GitHub's own surface showing through the rest on
+    both themes. A file short of any shade has published the figure with its
+    motion flattened, which nothing else here would catch."""
+    name, path = published
+    table, transparent = encode.palette(path)
     assert transparent is not None
-    assert {c for i, c in enumerate(table) if i != transparent} == {figures.accent_rgb()}
+    visible = {c for i, c in enumerate(table) if i != transparent} - {(0, 0, 0)}
+    assert visible == set(figures.paints(name))
+    assert figures.accent_rgb() in visible
 
 
 def test_the_published_card_is_the_size_it_was_drawn_at(published):
-    assert encode.size(published) == (figures.W, figures.H)
+    assert encode.size(published[1]) == (figures.W, figures.H)
 
 
 def test_the_published_card_loops_forever(published):
     """A count of 1 plays once and parks on the last frame, which on a pinned
     card is a drawing that moves for three seconds and then stops for good."""
-    assert encode.loops(published) == 0
+    assert encode.loops(published[1]) == 0
 
 
 def test_the_published_card_runs_at_the_schedule_the_build_declares(published):
-    assert encode.delay(published) == build.DELAY_CS
+    assert encode.delay(published[1]) == build.DELAY_CS
 
 
 def test_the_published_card_fits_the_budget(published):
     """Terkel's reference is 117 KB for 48 frames at this size. Camo is not in
     the path for a gist file, so there is no hard cap — but a card that costs
     more than the page around it is a card drawn wrong."""
-    assert published.stat().st_size < 200_000, f"{published.stat().st_size} bytes"
+    size = published[1].stat().st_size
+    assert size < 200_000, f"{size} bytes"
 
 
 def test_both_hemispheres_are_published():
