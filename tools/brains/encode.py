@@ -1,4 +1,4 @@
-"""PNG frames to a transparent, two-entry, forever-looping GIF.
+"""PNG frames to a transparent, one-hue, forever-looping GIF.
 
 Every constant here was measured against the players that will show it, not
 chosen:
@@ -16,7 +16,12 @@ chosen:
   painted entry to a histogram average, and the browser's antialiased edge pulls
   that average off the accent — measured at `#ed6206` against `#ef6306`, two
   parts in 255, with no way to correct it downstream. So the palette here is
-  built, not measured: the caller names the colour and gets that colour.
+  built, not measured: the caller names the colours and gets those colours.
+
+The drawing paints one hue at several shades, because a signal travelling it
+leaves a trail that decays back to the resting line. Those shades are the whole
+palette: a palette short of any of them snaps the trail flat and the figure
+publishes without the motion it was designed around.
 """
 import re
 import shutil
@@ -57,25 +62,36 @@ def ffmpeg_version():
     return found
 
 
-def palette_pixels(accent):
-    """The 256 RGBA entries, in raster order.
+def palette_pixels(inks):
+    """The 256 RGBA entries, in raster order, for the drawing's colours.
 
-    Every padding entry is the accent rather than black. Black would be a
-    nearest-match target for any dark pixel the drawing acquired, and in the
-    written table it is indistinguishable from the padding ffmpeg adds anyway —
-    so a check on the output could not tell a painted black from an unused slot.
+    The 255 opaque slots are shared out evenly, remainder to the first ink. The
+    share is padding, not weighting — `paletteuse` maps each pixel to its
+    nearest entry and does not count them — so what it has to avoid is being a
+    colour the drawing never paints. Black especially: it is a nearest-match
+    target for any dark pixel the drawing acquired, and in the written table it
+    is indistinguishable from the padding ffmpeg adds anyway, so a check on the
+    output could not tell a painted black from an unused slot.
+
     Transparency goes last because that is where GIF's reserved sentinel lands.
     """
-    return [(*accent, 255)] * (PALETTE_ENTRIES - 1) + [(0, 0, 0, 0)]
+    if not inks:
+        raise ValueError("no inks: a palette with nothing in it cannot name the drawing")
+    slots = PALETTE_ENTRIES - 1
+    px = []
+    for i, ink in enumerate(inks):
+        share = slots // len(inks) + (slots % len(inks) if i == 0 else 0)
+        px += [(*ink, 255)] * share
+    return px + [(0, 0, 0, 0)]
 
 
-def palette_png(accent):
+def palette_png(inks):
     """`palette_pixels` as a 16x16 RGBA PNG, which is what ffmpeg will read.
 
     Written here rather than with an imaging library: the pipeline's only
     dependency is a browser, and this is twelve lines of `zlib`.
     """
-    px = palette_pixels(accent)
+    px = palette_pixels(inks)
     rows = b"".join(
         b"\x00" + b"".join(bytes(p) for p in px[y * PALETTE_SIDE : (y + 1) * PALETTE_SIDE])
         for y in range(PALETTE_SIDE)
@@ -92,13 +108,13 @@ def palette_png(accent):
     )
 
 
-def gif(frames, out, *, delay_cs, accent, version=None):
+def gif(frames, out, *, delay_cs, inks, version=None):
     """Encode `frames` — PNG bytes, in order — to `out`.
 
-    `accent` is an `(r, g, b)` triple and is the only colour the output can
-    carry; there is no default, because a palette the encoder invented is the
-    bug this signature exists to prevent. `version` exists so the floor check is
-    testable without a second ffmpeg on the machine.
+    `inks` is the `(r, g, b)` triples the drawing paints, and is every colour
+    the output can carry; there is no default, because a palette the encoder
+    invented is the bug this signature exists to prevent. `version` exists so
+    the floor check is testable without a second ffmpeg on the machine.
     """
     if not frames:
         raise ValueError("no frames to encode")
@@ -118,7 +134,7 @@ def gif(frames, out, *, delay_cs, accent, version=None):
     # The palette has to be a second input, and the frames already own stdin, so
     # it goes to a file beside the output and is removed either way.
     pal = out.parent / f".{out.stem}.palette.png"
-    pal.write_bytes(palette_png(accent))
+    pal.write_bytes(palette_png(inks))
     try:
         subprocess.run(
             ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y",

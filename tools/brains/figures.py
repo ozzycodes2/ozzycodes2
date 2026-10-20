@@ -18,16 +18,31 @@ NAMES = ("left-brain", "right-brain")
 W, H = 1340, 400
 
 # Theme-invariant by design, so an accent-on-transparent drawing needs no themed
-# pair. 3.31:1 on GitHub light, 5.74:1 on dark — both clear the 3:1 floor for a
-# graphical object.
+# pair. 3.25:1 on GitHub light, 5.82:1 on dark — both clear the 3:1 floor for a
+# graphical object, and nothing lighter clears it on light. The drawing paints
+# this hue at several shades of it, every one of which has to clear the same
+# floor; `test_brains_figures.py` is where that is checked.
 ACCENT = "#ef6306"
 
 _FIELD = re.compile(r"^(?:\s|<!--)*(source|generated):\s*(\S+)\s*$", re.M)
+_PAINT = re.compile(r'(?:fill|stroke)="(#[0-9a-f]{6})"')
 
 
 def accent_rgb():
-    """`ACCENT` as the byte triple the GIF palette is built from."""
+    """`ACCENT` as a byte triple."""
     return tuple(int(ACCENT[i : i + 2], 16) for i in (1, 3, 5))
+
+
+def paints(name):
+    """Every colour the drawing names, brightest first.
+
+    Read off the file rather than listed here, because this is what the GIF
+    palette is built from: a list kept alongside the drawing would go stale the
+    first time a shade changed, and the symptom would be a flattened figure
+    rather than an error.
+    """
+    found = {tuple(int(h[i : i + 2], 16) for i in (1, 3, 5)) for h in _PAINT.findall(load(name))}
+    return sorted(found, key=lambda c: (-sum(c), c))
 
 
 def path(name):

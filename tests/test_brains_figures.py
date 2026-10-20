@@ -34,8 +34,50 @@ def test_the_art_sets_no_type(name):
     assert "<text" not in figures.load(name)
 
 
-def test_the_accent_is_the_only_visible_colour(name):
-    assert paints(figures.load(name)) == {figures.ACCENT}
+def luminance(hex_colour):
+    ch = [int(hex_colour[i : i + 2], 16) / 255 for i in (1, 3, 5)]
+    lin = [(c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4) for c in ch]
+    return 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2]
+
+
+def contrast(a, b):
+    hi, lo = sorted((luminance(a), luminance(b)), reverse=True)
+    return (hi + 0.05) / (lo + 0.05)
+
+
+# The two grounds one image has to work on. GitHub's pinned card paints the
+# drawing straight onto the card surface and strips no alpha, and the cards
+# carry no media query, so there is no themed pair to fall back on.
+GITHUB_DARK, GITHUB_LIGHT = "#0d1117", "#ffffff"
+
+
+def test_every_colour_is_a_shade_of_the_accent(name):
+    """One hue. A second hue would be a second decision about a drawing whose
+    whole vocabulary is the accent, and the GIF palette is built from whatever
+    is in here."""
+    rgb = {tuple(int(c[i : i + 2], 16) for i in (1, 3, 5)) for c in paints(figures.load(name))}
+    accent = figures.accent_rgb()
+    # A scale of one triple: every channel the same fraction of the accent's,
+    # within the rounding a byte costs.
+    for c in rgb:
+        ks = [1 - v / a for v, a in zip(c, accent) if a >= 16]
+        assert max(ks) - min(ks) < 0.02, f"{c} is not the accent scaled"
+
+
+def test_the_accent_itself_is_painted(name):
+    """The lit state. The ramp runs down from the accent because nothing lighter
+    clears 3:1 on a white card, so a drawing that never reaches it is a drawing
+    with no bright end at all."""
+    assert figures.ACCENT in paints(figures.load(name))
+
+
+def test_every_shade_reads_on_both_github_themes(name):
+    """Why the ramp stops where it does. It is one image for both cards, so the
+    darkest step is bounded by the dark card and the lightest by the light one;
+    the accent sits at the top of that band and the trail decays down from it."""
+    for colour in paints(figures.load(name)):
+        on_dark, on_light = contrast(colour, GITHUB_DARK), contrast(colour, GITHUB_LIGHT)
+        assert min(on_dark, on_light) >= 3, f"{colour}: {on_dark:.2f} dark, {on_light:.2f} light"
 
 
 def test_no_ground_is_painted(name):

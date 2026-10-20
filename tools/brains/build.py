@@ -66,7 +66,7 @@ def chrome_missing():
 
 def render(name, out, *, shoot=None):
     frames = capture.frames(figures.load(name), count=FRAMES, duration=DURATION, shoot=shoot)
-    encode.gif(frames, out, delay_cs=DELAY_CS, accent=figures.accent_rgb())
+    encode.gif(frames, out, delay_cs=DELAY_CS, inks=figures.paints(name))
 
 
 def main(argv=None):

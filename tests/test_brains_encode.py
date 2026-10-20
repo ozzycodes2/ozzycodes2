@@ -19,6 +19,8 @@ from tools.brains import encode, figures
 
 FIXTURE = pathlib.Path(__file__).parent / "fixtures" / "two-colour-transparent.gif"
 ACCENT = (0xEF, 0x63, 0x06)
+# Two more steps off the drawing's decay ramp, for the multi-ink cases.
+TRAIL, REST = (0xC6, 0x52, 0x05), (0xAC, 0x47, 0x04)
 needs_ffmpeg = pytest.mark.skipif(shutil.which("ffmpeg") is None, reason="no ffmpeg")
 
 
@@ -70,7 +72,7 @@ def out(tmp_path):
 @pytest.fixture
 def encoded(out):
     # Every consumer carries `needs_ffmpeg`; a mark on a fixture is ignored.
-    encode.gif(pngs(4), out, delay_cs=10, accent=ACCENT)
+    encode.gif(pngs(4), out, delay_cs=10, inks=[ACCENT])
     return out
 
 
@@ -78,13 +80,13 @@ def test_a_delay_below_the_honoured_floor_is_refused(out):
     """0 and 1 are clamped *up* to 100ms by both Chromium and Firefox: asking
     for the fastest frame rate gives you the slowest. 2cs is the real floor."""
     with pytest.raises(ValueError, match="2cs"):
-        encode.gif(pngs(1), out, delay_cs=1, accent=ACCENT)
+        encode.gif(pngs(1), out, delay_cs=1, inks=[ACCENT])
 
 
 def test_the_floor_itself_is_allowed(out):
     """Boundary: 2cs is honoured, so it must not be refused alongside 1."""
     with pytest.raises(RuntimeError):
-        encode.gif(pngs(1), out, delay_cs=2, accent=ACCENT, version=(5, 0))
+        encode.gif(pngs(1), out, delay_cs=2, inks=[ACCENT], version=(5, 0))
 
 
 def test_ffmpeg_below_six_is_refused(out):
@@ -92,20 +94,20 @@ def test_ffmpeg_below_six_is_refused(out):
     dither would silently ship a GIF 25% larger, which is the kind of failure
     nobody notices until the card is already pinned."""
     with pytest.raises(RuntimeError, match=r"6\.0"):
-        encode.gif(pngs(1), out, delay_cs=10, accent=ACCENT, version=(5, 1))
+        encode.gif(pngs(1), out, delay_cs=10, inks=[ACCENT], version=(5, 1))
 
 
 def test_encoding_nothing_is_refused(out):
     with pytest.raises(ValueError, match="no frames"):
-        encode.gif([], out, delay_cs=10, accent=ACCENT)
+        encode.gif([], out, delay_cs=10, inks=[ACCENT])
 
 
 @needs_ffmpeg
 def test_the_encoded_palette_is_the_accent_and_one_transparent_entry(encoded):
     """The whole theme story, and the reason the palette is built rather than
-    measured. One visible entry means the drawing is a single flat tone; the
-    transparent index means GitHub's own surface — light or dark — shows through
-    everywhere else.
+    measured. Asked for one ink the encoder emits one visible entry and not a
+    neighbourhood around it; the transparent index means GitHub's own surface —
+    light or dark — shows through everywhere else.
 
     Which tone it is belongs to the caller, not to a histogram. `pngs` carries
     an antialiased fringe in roughly the proportion a 4x downscale leaves, and
@@ -131,19 +133,53 @@ def test_the_palette_is_the_256_pixels_paletteuse_demands():
     """`paletteuse` refuses any other count outright — "Palette input must
     contain exactly 256 pixels" — from inside the filter graph, where the
     message is easy to miss."""
-    png = encode.palette_png(ACCENT)
+    png = encode.palette_png([ACCENT])
     assert png.startswith(b"\x89PNG\r\n\x1a\n")
     assert struct.unpack(">II", png[16:24]) == (16, 16)
 
 
+def test_the_palette_is_still_256_pixels_with_several_inks():
+    """The shares have to divide 255 exactly or the filter graph refuses the
+    whole input, and 255 divides by almost nothing."""
+    png = encode.palette_png([ACCENT, TRAIL, REST])
+    assert struct.unpack(">II", png[16:24]) == (16, 16)
+
+
 def test_the_palette_holds_no_colour_the_drawing_could_land_on():
-    """Padding entries are the accent too, not black. A black filler is a
-    nearest-match target for every dark pixel and indistinguishable, in the
-    written table, from the padding ffmpeg adds on its own."""
-    px = encode.palette_pixels(ACCENT)
+    """Padding entries are a colour the drawing paints, not black. A black
+    filler is a nearest-match target for every dark pixel and indistinguishable,
+    in the written table, from the padding ffmpeg adds on its own."""
+    px = encode.palette_pixels([ACCENT])
     assert len(px) == 256
     assert set(px[:255]) == {(*ACCENT, 255)}
     assert px[255] == (0, 0, 0, 0)
+
+
+def test_every_ink_the_drawing_paints_reaches_the_palette():
+    """The drawing is one hue at several shades, and a palette short of any of
+    them snaps the trail flat — the figure would publish with its motion gone
+    and no error anywhere."""
+    px = encode.palette_pixels([ACCENT, TRAIL, REST])
+    assert len(px) == 256
+    assert {c[:3] for c in px[:255]} == {ACCENT, TRAIL, REST}
+    assert px[255] == (0, 0, 0, 0)
+
+
+def test_the_inks_share_the_palette_evenly_with_the_remainder_first():
+    """Deterministic, so a palette written twice is written identically. The
+    shares are padding and not weighting — `paletteuse` matches on distance and
+    never counts entries — so what the split has to be is reproducible."""
+    px = [c[:3] for c in encode.palette_pixels([ACCENT, TRAIL, REST])[:255]]
+    assert [px.count(c) for c in (ACCENT, TRAIL, REST)] == [85, 85, 85]
+    px = [c[:3] for c in encode.palette_pixels([ACCENT, TRAIL])[:255]]
+    assert [px.count(c) for c in (ACCENT, TRAIL)] == [128, 127]
+
+
+def test_a_palette_with_no_inks_is_refused():
+    """The signature exists to stop the encoder inventing a palette; an empty
+    list is the same bug with the caller's name on it."""
+    with pytest.raises(ValueError, match="no inks"):
+        encode.palette_pixels([])
 
 
 @needs_ffmpeg
@@ -172,13 +208,13 @@ def test_the_requested_delay_reaches_the_file(out, delay_cs):
     that can be wrong — and at 10cs it is its own fixed point, which hides a
     conversion that does nothing. The values here are the exact ones: 50, 20,
     10 and 4 fps."""
-    encode.gif(pngs(2), out, delay_cs=delay_cs, accent=ACCENT)
+    encode.gif(pngs(2), out, delay_cs=delay_cs, inks=[ACCENT])
     assert encode.delay(out) == delay_cs
 
 
 @needs_ffmpeg
 def test_the_frames_are_the_size_they_were_drawn_at(out):
-    encode.gif(pngs(2), out, delay_cs=10, accent=ACCENT)
+    encode.gif(pngs(2), out, delay_cs=10, inks=[ACCENT])
     assert encode.size(out) == (32, 32)
 
 

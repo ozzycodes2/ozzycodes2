@@ -84,16 +84,21 @@ def test_the_loop_is_the_one_the_drawing_declares(name):
 
 @needs_browser
 @pytest.mark.parametrize("name", figures.NAMES)
-def test_the_built_card_is_the_accent_on_transparency(tmp_path, name):
-    """The assertion `test_brains_encode.py` cannot make: that this drawing's
-    one visible colour is the accent, and that GitHub's own surface shows
-    through the rest on both themes."""
+def test_the_built_card_is_the_drawings_own_shades_on_transparency(tmp_path, name):
+    """The assertion `test_brains_encode.py` cannot make: that the colours this
+    drawing paints are the colours that reach the file, and that GitHub's own
+    surface shows through the rest on both themes.
+
+    Every shade matters. The signal's trail decays through them, so a palette
+    that lost one would publish the figure with its motion flattened and
+    nothing anywhere would report it."""
     out = tmp_path / f"{build.title(name)}.gif"
     build.render(name, out)
     table, transparent = encode.palette(out)
-    accent = tuple(int(figures.ACCENT[i : i + 2], 16) for i in (1, 3, 5))
     assert transparent is not None
-    assert {c for i, c in enumerate(table) if i != transparent} - {(0, 0, 0)} == {accent}
+    visible = {c for i, c in enumerate(table) if i != transparent} - {(0, 0, 0)}
+    assert visible == set(figures.paints(name))
+    assert figures.accent_rgb() in visible
     assert encode.size(out) == (figures.W, figures.H)
     assert encode.loops(out) == 0
 

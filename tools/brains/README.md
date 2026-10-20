@@ -129,6 +129,27 @@ Nothing stands behind either half — no grid, no field, nothing drifting. The
 card's own surface is the ground, and the only thing that moves is the dash
 marching along the lines already drawn.
 
+## Why the trail decays downward
+
+A signal is a short bright head with a trail behind it, and the trail decays
+back to the resting line rather than out to the card. Two constraints fix the
+direction.
+
+One bit of alpha: a half-opaque pixel is simply absent, so a trail that
+dissolved into the ground would blink out instead of fading. Every step of the
+decay is therefore fully opaque, and what changes along it is shade and weight.
+
+One image for both themes: the accent is already the brightest a pinned figure
+can be. `#ef6306` is 3.25:1 on a white card against a 3:1 floor, and the next
+step lighter is 2.70:1. So the drawing rests below the accent — `#ac4704`, which
+is 3.30:1 on the dark card, the other end of the same band — and the signal is
+the accent itself. Brightness is a step up from rest, not a step past it.
+
+Those shades are the GIF palette. `figures.paints` reads them off the vendored
+SVG and `encode.palette_pixels` shares the 255 opaque slots between them; a
+palette short of any one of them snaps the trail flat, and nothing downstream
+reports it.
+
 A run is the maximal chain of contiguous arcs around one circle, emitted as one
 path so it carries no seam where two of its arcs meet. Nodes are not emitted:
 both halves derive them from the graph, so a mark cannot outlive the stroke it
