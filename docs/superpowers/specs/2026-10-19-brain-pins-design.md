@@ -116,6 +116,13 @@ not change. Its clock is `--motion-fast: 160ms`, `--motion-step: 480ms`,
 `--motion-hold: 720ms`, with a loop of at least 3s and travel capped at 24px.
 Terkel's loop is 5.54s across 48 frames.
 
+The cap buys a loop that reads the same joined at any point. A field of marks
+repeating every *p* and translated by exactly *p* buys that outright — every
+mark lands where its neighbour stood, so the last frame is the first — and so
+travels its own period instead of 24px. It may travel no other distance: capped
+it wobbles, mistuned it shunts once per loop. What replaces the cap is an
+assertion on the tiling, laid a period past both edges.
+
 Nothing may animate in. A GIF's first frame is what a static renderer, a
 reduced-motion viewer, and GitHub's mobile apps will show, so frame zero must
 be the complete drawing. Motion only ever subtracts from it.

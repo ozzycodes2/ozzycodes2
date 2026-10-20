@@ -78,6 +78,8 @@ def keyframe_declarations(svg):
 # hold — without the unlit copy, a marching dash is a draw-on.
 ANIMATABLE = {"stroke-dashoffset", "transform"}
 TRANSFORMS = {"translate", "translateX", "translateY"}
+# How a value reaches a transform, not a transform applied to the element.
+VALUE_FNS = {"calc", "var"}
 
 
 def test_motion_touches_only_properties_that_cannot_hide_the_drawing(name):
@@ -86,14 +88,43 @@ def test_motion_touches_only_properties_that_cannot_hide_the_drawing(name):
     assert {p for p, _ in declared} <= ANIMATABLE
 
 
-def test_any_transform_is_a_translate_inside_the_budget(name):
+def test_any_transform_is_a_translate_inside_the_stated_budget(name):
+    """The 24px cap governs travel a keyframe states outright. The field's
+    drift is stated as its own period instead, so it contributes no literal
+    here — what the cap was protecting is asserted below."""
     svg = figures.load(name)
-    functions = re.findall(r"([A-Za-z]+)\(([^)]*)\)", "".join(
-        v for p, v in keyframe_declarations(svg) if p == "transform"
-    ))
-    assert {f for f, _ in functions} <= TRANSFORMS
-    moves = [abs(float(v)) for _, a in functions for v in re.findall(r"-?\d+(?:\.\d+)?", a)]
-    assert all(m <= 24 for m in moves)
+    transforms = "".join(v for p, v in keyframe_declarations(svg) if p == "transform")
+    assert {f for f in re.findall(r"([A-Za-z]+)\(", transforms)} - VALUE_FNS <= TRANSFORMS
+    moves = re.findall(r"translate[XY]?\(([^)]*)\)", transforms)
+    assert all(abs(float(v)) <= 24 for a in moves for v in re.findall(r"-?\d+(?:\.\d+)?", a))
+
+
+def drifting_dots(svg):
+    """`(period, [(cx, cy, r), …])` for the field group, or `None`."""
+    g = re.search(r'<g class="drift" style="--drift: ([\d.]+)">(.*?)</g>', svg, re.S)
+    if not g:
+        return None
+    dots = re.findall(r'<circle cx="(-?[\d.]+)" cy="(-?[\d.]+)" r="([\d.]+)"', g[2])
+    return float(g[1]), [tuple(float(v) for v in d) for d in dots]
+
+
+def test_the_field_drifts_by_exactly_its_own_period(name):
+    """The whole licence for travelling further than the budget. Every dot the
+    drift carries onto the canvas stands where its neighbour stood, so nothing
+    enters, leaves or jumps when the loop restarts. A period that missed the
+    spacing would shunt the field once every three and a half seconds."""
+    field = drifting_dots(figures.load(name))
+    assert field, "the figure declares no drifting field"
+    period, dots = field
+    assert period > 0
+    at = {(round(x, 1), y, r) for x, y, r in dots}
+    assert all(
+        (round(x - period, 1), y, r) in at
+        for x, y, r in dots
+        if 0 <= x <= figures.W
+    )
+    # Tiled past both edges, or the replacement arrives from nowhere.
+    assert min(x for x, _, _ in dots) < 0 < figures.W < max(x for x, _, _ in dots)
 
 
 def test_a_marching_dash_is_drawn_over_a_copy_that_is_always_painted(name):
@@ -101,8 +132,8 @@ def test_a_marching_dash_is_drawn_over_a_copy_that_is_always_painted(name):
     beneath it reads, at frame zero, as a broken line — which is an element
     animating in by another name."""
     svg = figures.load(name)
-    lit = re.findall(r'<path[^>]*class="trace"[^>]*\sd="([^"]*)"', svg)
-    base = set(re.findall(r'<path(?![^>]*class="trace")[^>]*\sd="([^"]*)"', svg))
+    lit = re.findall(r'<path[^>]*class="signal"[^>]*\sd="([^"]*)"', svg)
+    base = set(re.findall(r'<path(?![^>]*class="signal")[^>]*\sd="([^"]*)"', svg))
     assert lit
     assert set(lit) <= base
 
