@@ -149,6 +149,26 @@ def test_a_marching_dash_is_drawn_over_a_copy_that_is_always_painted(name):
     assert set(lit) <= base
 
 
+def test_neither_half_closes_a_shape(name):
+    """No hemisphere is outlined. The left is a honeycomb and the right a
+    cluster of open arcs, and in both the mass is what implies the shape — a
+    closed path is an outline drawn around a construction, which is the badge
+    the reference was taken without."""
+    assert not re.search(r'<path[^>]*\sd="[^"]*[Zz]"', figures.load(name))
+
+
+def test_a_dashed_edge_carries_no_signal():
+    """The left lattice dashes the edges facing the other half: a connection
+    reached for rather than made. A signal travelling one would assert the
+    connection the dash denies, and would fill the gaps while it passed."""
+    svg = figures.load("left-brain")
+    dashed = re.findall(r'<path(?![^>]*class="signal")[^>]*stroke-dasharray[^>]*\sd="([^"]*)"', svg)
+    dashed += re.findall(r'<path(?![^>]*class="signal")[^>]*\sd="([^"]*)"[^>]*stroke-dasharray', svg)
+    lit = set(re.findall(r'<path[^>]*class="signal"[^>]*\sd="([^"]*)"', svg))
+    assert dashed, "the lattice draws no dashed edge"
+    assert not (set(dashed) & lit)
+
+
 def test_motion_is_a_loop_of_at_least_three_seconds(name):
     svg = figures.load(name)
     assert "@keyframes" in svg

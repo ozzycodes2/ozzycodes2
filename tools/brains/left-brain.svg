@@ -5,7 +5,7 @@
      `python -m tools.brains.parity --write left-brain`. -->
 <svg xmlns="http://www.w3.org/2000/svg" id="left-brain" viewBox="0 0 1340 400" width="1340" height="400" role="img" aria-labelledby="left-brain-t left-brain-d">
   <title id="left-brain-t">Left Brain</title>
-  <desc id="left-brain-d">The left hemisphere: shell and fissures drawn dimetric on the 4px grid, signals firing along them.</desc>
+  <desc id="left-brain-d">The left hemisphere: a dimetric honeycomb on the 4px grid, solid where it connects and dashed where it only reaches, signals firing along it.</desc>
   <style>
     svg#left-brain .signal {
       animation: brain-signal 3.6s linear infinite;
@@ -22,20 +22,74 @@
       to   { transform: translateX(calc(var(--drift) * 1px)) }
     }
   </style>
-  <path d="M1328 92 C1328 64 1292 56 1260 68 C1232 44 1188 48 1168 76 C1140 56 1096 68 1084 104 C1048 116 1024 148 1032 180 C1016 208 1032 248 1064 260 C1076 296 1116 316 1148 304 C1164 292 1168 284 1180 284 C1224 296 1280 300 1328 280 Z" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1328 92 C1328 64 1292 56 1260 68 C1232 44 1188 48 1168 76 C1140 56 1096 68 1084 104 C1048 116 1024 148 1032 180 C1016 208 1032 248 1064 260 C1076 296 1116 316 1148 304 C1164 292 1168 284 1180 284 C1224 296 1280 300 1328 280 Z" stroke-width="7" stroke-dasharray="9.7 51.0" style="--cycle: 60.7;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M1328 112 L1272 92 L1204 88 L1136 104 L1084 140 L1068 192 L1080 236" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1328 112 L1272 92 L1204 88 L1136 104 L1084 140 L1068 192 L1080 236" stroke-width="7" stroke-dasharray="9.6 50.5" style="--cycle: 60.1; animation-delay: -1.12s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M1328 160 L1268 144 L1200 144 L1144 164 L1108 200 L1100 240" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1328 160 L1268 144 L1200 144 L1144 164 L1108 200 L1100 240" stroke-width="7" stroke-dasharray="9.0 47.3" style="--cycle: 56.3; animation-delay: -2.23s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M1328 212 L1268 204 L1212 212 L1168 240 L1156 268" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1328 212 L1268 204 L1212 212 L1168 240 L1156 268" stroke-width="7" stroke-dasharray="8.0 41.9" style="--cycle: 49.9; animation-delay: -0.61s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <circle cx="1328" cy="112" r="4" fill="#ef6306"/>
-  <circle cx="1080" cy="236" r="4" fill="#ef6306"/>
-  <circle cx="1328" cy="160" r="4" fill="#ef6306"/>
-  <circle cx="1100" cy="240" r="4" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="1328" cy="212" r="4" fill="#ef6306"/>
-  <circle cx="1156" cy="268" r="4" fill="#ef6306"/>
+  <path d="M1232 20 L1176 48" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1232 20 L1176 48" stroke-width="7" stroke-dasharray="10.0 52.6" style="--cycle: 62.6;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1176 48 L1176 104" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1176 48 L1176 104" stroke-width="7" stroke-dasharray="9.0 47.0" style="--cycle: 56.0; animation-delay: -2.22s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1176 104 L1232 132" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1176 104 L1232 132" stroke-width="7" stroke-dasharray="10.0 52.6" style="--cycle: 62.6; animation-delay: -0.85s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1232 132 L1288 104" stroke-width="4" stroke="#ef6306" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1288 104 L1288 48" stroke-width="4" stroke="#ef6306" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1288 48 L1232 20" stroke-width="4" stroke="#ef6306" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1176 104 L1120 132" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1176 104 L1120 132" stroke-width="7" stroke-dasharray="10.0 52.6" style="--cycle: 62.6; animation-delay: -3.07s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1120 132 L1120 188" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1120 132 L1120 188" stroke-width="7" stroke-dasharray="9.0 47.0" style="--cycle: 56.0; animation-delay: -1.70s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1120 188 L1176 216" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1120 188 L1176 216" stroke-width="7" stroke-dasharray="10.0 52.6" style="--cycle: 62.6; animation-delay: -0.32s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1176 216 L1232 188" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1176 216 L1232 188" stroke-width="7" stroke-dasharray="10.0 52.6" style="--cycle: 62.6; animation-delay: -2.55s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1232 188 L1232 132" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1232 188 L1232 132" stroke-width="7" stroke-dasharray="9.0 47.0" style="--cycle: 56.0; animation-delay: -1.17s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1176 216 L1176 272" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1176 216 L1176 272" stroke-width="7" stroke-dasharray="9.0 47.0" style="--cycle: 56.0; animation-delay: -3.40s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1176 272 L1232 300" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1176 272 L1232 300" stroke-width="7" stroke-dasharray="10.0 52.6" style="--cycle: 62.6; animation-delay: -2.02s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1232 300 L1288 272" stroke-width="4" stroke="#ef6306" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1288 272 L1288 216" stroke-width="4" stroke="#ef6306" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1288 216 L1232 188" stroke-width="4" stroke="#ef6306" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1176 272 L1120 300" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1176 272 L1120 300" stroke-width="7" stroke-dasharray="10.0 52.6" style="--cycle: 62.6; animation-delay: -0.65s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1120 300 L1120 356" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1120 300 L1120 356" stroke-width="7" stroke-dasharray="9.0 47.0" style="--cycle: 56.0; animation-delay: -2.87s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1120 356 L1176 384" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1120 356 L1176 384" stroke-width="7" stroke-dasharray="10.0 52.6" style="--cycle: 62.6; animation-delay: -1.50s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1176 384 L1232 356" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1176 384 L1232 356" stroke-width="7" stroke-dasharray="10.0 52.6" style="--cycle: 62.6; animation-delay: -0.12s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1232 356 L1232 300" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1232 356 L1232 300" stroke-width="7" stroke-dasharray="9.0 47.0" style="--cycle: 56.0; animation-delay: -2.35s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1120 188 L1064 216" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1120 188 L1064 216" stroke-width="7" stroke-dasharray="10.0 52.6" style="--cycle: 62.6; animation-delay: -0.97s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1064 216 L1064 272" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1064 216 L1064 272" stroke-width="7" stroke-dasharray="9.0 47.0" style="--cycle: 56.0; animation-delay: -3.20s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1064 272 L1120 300" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1064 272 L1120 300" stroke-width="7" stroke-dasharray="10.0 52.6" style="--cycle: 62.6; animation-delay: -1.82s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1288 48 L1328 48" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1288 48 L1328 48" stroke-width="7" stroke-dasharray="6.4 33.6" style="--cycle: 40.0; animation-delay: -0.45s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1288 272 L1328 272" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1288 272 L1328 272" stroke-width="7" stroke-dasharray="6.4 33.6" style="--cycle: 40.0; animation-delay: -2.67s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="1232" cy="20" r="4" fill="#ef6306"/>
+  <circle cx="1176" cy="48" r="4" fill="#ef6306"/>
+  <circle cx="1176" cy="104" r="8" fill="#ef6306"/>
+  <circle cx="1232" cy="132" r="8" fill="#ef6306"/>
+  <circle cx="1288" cy="104" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
+  <circle cx="1288" cy="48" r="8" fill="#ef6306"/>
+  <circle cx="1120" cy="132" r="4" fill="#ef6306"/>
+  <circle cx="1120" cy="188" r="8" fill="#ef6306"/>
+  <circle cx="1176" cy="216" r="8" fill="#ef6306"/>
+  <circle cx="1232" cy="188" r="8" fill="#ef6306"/>
+  <circle cx="1176" cy="272" r="8" fill="#ef6306"/>
+  <circle cx="1232" cy="300" r="8" fill="#ef6306"/>
+  <circle cx="1288" cy="272" r="8" fill="#ef6306"/>
+  <circle cx="1288" cy="216" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
+  <circle cx="1120" cy="300" r="8" fill="#ef6306"/>
+  <circle cx="1120" cy="356" r="4" fill="#ef6306"/>
+  <circle cx="1176" cy="384" r="4" fill="#ef6306"/>
+  <circle cx="1232" cy="356" r="4" fill="#ef6306"/>
+  <circle cx="1064" cy="216" r="4" fill="#ef6306"/>
+  <circle cx="1064" cy="272" r="4" fill="#ef6306"/>
+  <circle cx="1328" cy="48" r="4" fill="#ef6306"/>
+  <circle cx="1328" cy="272" r="4" fill="#ef6306"/>
   <g class="drift" style="--drift: -672">
   <circle cx="-656" cy="52" r="4" fill="#ef6306"/>
   <circle cx="-628" cy="212" r="4" fill="#ef6306"/>
