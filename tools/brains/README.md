@@ -13,9 +13,18 @@ Design: `docs/superpowers/specs/2026-10-19-brain-pins-design.md`.
 .venv/bin/python -m tools.brains.build left-brain # one
 ```
 
-Output lands in `gists/`, named `Left Brain.gif` and `Right Brain.gif` — the
-gist filename is the only label the pinned card carries, so the spaces and the
-capitals are load-bearing.
+Output lands in `gists/`, named `Left Brain.gif` and `Right Brain.gif`.
+
+The label on the pinned card is the gist's **description**, not the filename —
+set it to exactly `Left Brain` or `Right Brain` and nothing more, because GitHub
+truncates the heading at about 40 characters mid-word. The filename appears
+nowhere on the card, but it has to keep a raster extension or the card renders
+source instead of an image, and it is what identifies the published file, so the
+spaces and the capitals stay as they are.
+
+```
+gh api -X PATCH gists/<id> -f description="Left Brain"
+```
 
 ## Dependencies, and why they are not in CI
 

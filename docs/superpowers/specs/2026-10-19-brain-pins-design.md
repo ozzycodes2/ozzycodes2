@@ -62,9 +62,12 @@ Height is pinned at 100px. Displayed width follows from the aspect ratio.
 Terkel's 1340×400 therefore paints at 335×100.
 
 There is no `<img>`, so no `alt`, no `width`, no link on the image itself, and
-no hover. The only link is the card title, which is **the gist's filename** —
-`Left Brain.gif` renders as the card heading, extension included, in GitHub's
-own theme-aware colour.
+no hover. The only link is the card title, which is **the gist's description**,
+truncated to about 40 characters with an ellipsis and repeated in full in a
+`tool-tip`, in GitHub's own theme-aware colour. The filename appears nowhere on
+the card; it only has to keep a raster extension so the card renders an image at
+all. So the description is the label, and it should be exactly the label —
+anything appended to it is thrown away mid-word.
 
 ### SVG cannot be used here
 
@@ -95,7 +98,7 @@ theme-invariant by construction.
 
 The consequence is that **the art carries no type**. Mine Final forbids the
 accent from setting type at any size in either theme, and a transparent
-two-colour image has no ink to set it in. The gist filename is the label. This
+two-colour image has no ink to set it in. The gist description is the label. This
 is a constraint, not a limitation to work around.
 
 ### 1-bit alpha, resolved by supersampling
@@ -202,7 +205,7 @@ Taken by the designer, open to reversal:
 
 - Transparent background with the accent as the only visible colour, rather than
   a themed pair of files.
-- No type inside the art; the gist filename does the labelling.
+- No type inside the art; the gist description does the labelling.
 - 1340×400 source art, matching Terkel's 4× ratio.
 - **Capture tool is Python with Playwright**, run by hand, absent from CI. The
   repo is Python, the coverage bar is pytest, and the workflow's `paths:` filter

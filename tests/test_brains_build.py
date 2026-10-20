@@ -12,10 +12,12 @@ needs_browser = pytest.mark.skipif(
 )
 
 
-def test_the_gist_filename_is_the_card_title():
-    """GitHub shows a pinned gist's filename as the card heading, extension
-    included, and there is no `alt`, no link on the image and no hover. The
-    filename is the only label the drawing carries."""
+def test_the_gist_filename_matches_the_description_the_card_shows():
+    """The card heading is the gist's *description*, not its filename — the
+    filename appears nowhere on the card and only has to keep a raster
+    extension for the image to render at all. Keeping the two the same is what
+    makes the published file identifiable from the card, so the spaces and the
+    capitals are still load-bearing."""
     assert build.title("left-brain") == "Left Brain"
     assert build.title("right-brain") == "Right Brain"
 

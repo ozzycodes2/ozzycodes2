@@ -1,5 +1,5 @@
 <!-- source: site/assets/brains.js
-     generated: 2026-10-19
+     generated: 2026-10-20
      Vendored from design-preview, system mine-final. Never hand-edit:
      change the preview, look at it, then run
      `python -m tools.brains.parity --write left-brain`. -->
@@ -36,7 +36,7 @@
   <circle cx="1100" cy="240" r="4" stroke="#ef6306" stroke-width="4" fill="none"/>
   <circle cx="1328" cy="212" r="4" fill="#ef6306"/>
   <circle cx="1156" cy="268" r="4" fill="#ef6306"/>
-  <g class="drift" style="--drift: 672">
+  <g class="drift" style="--drift: -672">
   <circle cx="-656" cy="52" r="4" fill="#ef6306"/>
   <circle cx="-628" cy="212" r="4" fill="#ef6306"/>
   <circle cx="-600" cy="332" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
