@@ -58,8 +58,18 @@ bare div:
             background-position-y: top; overflow: hidden;"></div>
 ```
 
-Height is pinned at 100px. Displayed width follows from the aspect ratio.
-Terkel's 1340×400 therefore paints at 335×100.
+Height is pinned at 100px, and the box's width is the column's: 374px wherever
+the viewport is wide enough, narrower below about 1280. `contain` fits whichever
+axis is tighter and leaves the slack on the other, and `background-position`
+puts that slack at the right and the bottom.
+
+Which of the two it is decides where the drawing can be anchored. Terkel's
+1340×400 is 3.35:1 against the box's 3.74:1, so it fits by height, paints at
+335×100, and leaves 39px of bare card down the right — fatal for a half anchored
+to the inner edge, because that slack is the gutter. **The art is therefore
+1496×400**, the box's own ratio: no slack in either axis at full width, and at
+narrower widths it fits by width and the slack falls harmlessly underneath. The
+fit factor is 0.25 either way, so the drawing paints the same size regardless.
 
 There is no `<img>`, so no `alt`, no `width`, no link on the image itself, and
 no hover. The only link is the card title, which is **the gist's description**,
@@ -206,7 +216,9 @@ Taken by the designer, open to reversal:
 - Transparent background with the accent as the only visible colour, rather than
   a themed pair of files.
 - No type inside the art; the gist description does the labelling.
-- 1340×400 source art, matching Terkel's 4× ratio.
+- 1496×400 source art, matching the card box's 3.74:1 rather than Terkel's 4:1.
+  A half anchored to the inner edge needs the image to reach that edge, and
+  under `contain` only an exact ratio match guarantees it.
 - **Capture tool is Python with Playwright**, run by hand, absent from CI. The
   repo is Python, the coverage bar is pytest, and the workflow's `paths:` filter
   and `git add` list already exclude a new tool directory. Browser-dependent code

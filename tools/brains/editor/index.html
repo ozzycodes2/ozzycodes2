@@ -83,7 +83,11 @@
    them do it. */
 const COL = 48, ROW = 28, RISE = 56;
 const ORIGIN = [104, 20];
-const W = 1340, H = 400;
+/* The published card: 3.74:1, which is the box GitHub fits the image into.
+   Only the crop below and the gutter line are drawn from it — a shape is saved
+   in local `u, v` and `shape.py` is what places it — so a drift here misleads
+   the eye without moving the drawing. */
+const W = 1496, H = 400;
 /* How far out from the midline the grid reaches. The hemisphere lives in the
    first 320 or so; the rest of the card is empty. */
 const U_MAX = 560;
@@ -92,7 +96,7 @@ const U_MAX = 560;
    two sizes. A suggestion, not a boundary — the generator places what is drawn
    and the readout in the header measures it. */
 const EXTENT = { u0: 56, v0: 20, u1: 248, v1: 384 };
-const MIDLINE = { left: 1336, right: 4 };
+const MIDLINE = { left: W - 4, right: 4 };
 
 const key = (p) => p.join(",");
 const mapTo = (side) => ([u, v]) => [side === "left" ? MIDLINE.left - u : MIDLINE.right + u, v];
@@ -307,8 +311,8 @@ let pending = null;
 function draw() {
   const z = Number(document.getElementById("zoom").value);
   const map = mapTo(side);
-  // The card is 1340 wide and the hemisphere lives in the 560 nearest the
-  // gutter; the rest is empty. The view is cropped to that band so zoom 2 fits
+  // The hemisphere lives in the 560 nearest the gutter and
+  // the rest of the card is empty. The view is cropped to that band so zoom 2 fits
   // a screen instead of scrolling off one.
   const x0 = side === "left" ? W - U_MAX : 0;
   const svg = el("svg", { width: U_MAX * z, height: H * z, viewBox: `${x0} 0 ${U_MAX} ${H}` });

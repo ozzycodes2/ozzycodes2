@@ -28,6 +28,20 @@ def test_the_art_is_the_published_size(name):
     assert f'viewBox="0 0 {figures.W} {figures.H}"' in figures.load(name)
 
 
+def test_the_art_is_at_least_as_wide_as_the_card_box():
+    """The card fits the image with `background-size: contain` from the top
+    left. `contain` drops the slack on whichever axis fits loosest, and from the
+    top left that slack lands at the right and the bottom.
+
+    Only the right matters. The left hemisphere is anchored to the image's right
+    edge, so slack there is a gap between it and the gutter and the pair stops
+    reading as one brain; slack at the bottom falls on transparent ground and
+    costs nothing. So the image must be no narrower for its height than the
+    widest box it can be handed — 374 x 100, where the profile column tops out.
+    """
+    assert figures.W / figures.H >= 374 / 100
+
+
 def test_the_art_sets_no_type(name):
     """The accent may not set type in either theme, and a transparent
     two-colour image has no ink to set it in. The gist description is the label."""
@@ -83,7 +97,7 @@ def test_every_shade_reads_on_both_github_themes(name):
 def test_no_ground_is_painted(name):
     """GIF alpha is one bit and the card carries no media query, so a painted
     ground would be an opaque slab on whichever GitHub theme it did not match."""
-    assert not re.search(r'<rect[^>]*width="(?:100%|1340)"[^>]*fill=', figures.load(name))
+    assert not re.search(rf'<rect[^>]*width="(?:100%|{figures.W})"[^>]*fill=', figures.load(name))
 
 
 def test_nothing_animates_in(name):

@@ -15,7 +15,13 @@ NAMES = ("left-brain", "right-brain")
 # GitHub paints a pinned image at 100 CSS px tall, so this is the 4x master the
 # browser downscales. The downscale is also the only antialiasing the drawing
 # gets: GIF alpha is one bit, and GitHub strips density descriptors from srcset.
-W, H = 1340, 400
+#
+# The width is the card's, not the drawing's: 374 CSS px is where the profile
+# column tops out, and the card fits the image into that box with
+# `background-size: contain` from the top left. Anything narrower for its height
+# leaves bare card down the right, which is the edge the left hemisphere is
+# anchored to.
+W, H = 1496, 400
 
 # Theme-invariant by design, so an accent-on-transparent drawing needs no themed
 # pair. 3.25:1 on GitHub light, 5.82:1 on dark — both clear the 3:1 floor for a

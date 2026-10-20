@@ -3,7 +3,7 @@
      Vendored from design-preview, system mine-final. Never hand-edit:
      change the preview, look at it, then run
      `python -m tools.brains.parity --write right-brain`. -->
-<svg xmlns="http://www.w3.org/2000/svg" id="right-brain" viewBox="0 0 1340 400" width="1340" height="400" role="img" aria-labelledby="right-brain-t right-brain-d">
+<svg xmlns="http://www.w3.org/2000/svg" id="right-brain" viewBox="0 0 1496 400" width="1496" height="400" role="img" aria-labelledby="right-brain-t right-brain-d">
   <title id="right-brain-t">Right Brain</title>
   <desc id="right-brain-d">The right hemisphere: arcs of circles hung off the same grid&#39;s vertices, converging where they meet, signals firing along them.</desc>
   <style>
