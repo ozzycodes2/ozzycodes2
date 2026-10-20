@@ -117,14 +117,66 @@ def test_as_js_refuses_a_side_that_is_not_on_the_grid():
         shape.as_js(state({"104,20|200,76": "solid"}))
 
 
+def circled(right):
+    return {"left": {}, "right": right}
+
+
+def test_circles_reads_a_centre_and_its_arcs():
+    c = circled({"152,160": "101100"})
+    assert shape.circles(c, "right") == [((152, 160), "101100")]
+
+
+def test_circles_orders_itself():
+    """Stable, for the same reason the sides are: a regenerated figure differs
+    only where the drawing did. The editor's JSON is keyed by insertion."""
+    a = shape.circles(circled({"200,132": shape.FULL, "152,160": shape.FULL}), "right")
+    b = shape.circles(circled({"152,160": shape.FULL, "200,132": shape.FULL}), "right")
+    assert a == b == [((152, 160), shape.FULL), ((200, 132), shape.FULL)]
+
+
+def test_a_half_with_no_circles_has_none():
+    assert shape.circles(state(), "right") == []
+
+
+@pytest.mark.parametrize(
+    "mask, why",
+    [
+        ("11111", "five arcs, not six"),
+        ("1111111", "seven"),
+        ("000000", "a circle with nothing drawn on it"),
+        ("11x111", "not a flag"),
+    ],
+)
+def test_a_circle_the_editor_could_not_have_saved_is_a_stray(mask, why):
+    assert shape.odd_circles(circled({"152,160": mask}), "right") == [((152, 160), mask)], why
+
+
+def test_a_circle_hangs_off_a_triangle_tip():
+    """Any other centre puts the six arcs across triangles they do not divide,
+    and the arc ends land nowhere on the construction."""
+    assert shape.odd_circles(circled({"152,160": shape.FULL}), "right") == []
+    assert shape.odd_circles(circled({"152,188": shape.FULL}), "right") == [((152, 188), shape.FULL)]
+
+
+def test_an_arc_spans_one_triangle():
+    """Arc `k` runs from the spoke toward neighbour `k` to the next one round,
+    so it begins and ends on the construction rather than somewhere by eye."""
+    ends = [shape.spoke((152, 160), k) for k in range(shape.SECTORS)]
+    assert ends[0] == pytest.approx((152, 112))  # straight up, R from the tip
+    assert all(
+        abs(complex(*e) - complex(152, 160)) == pytest.approx(shape.R) for e in ends
+    )
+
+
 def test_the_saved_drawing_is_on_the_grid_and_fits():
-    """The real file, as the editor left it."""
+    """The real file, as the editor left it. The halves are drawn in different
+    things — sides on the left, circles on the right — and checked as such."""
     s = shape.load()
-    for side in ("left", "right"):
-        assert shape.strays(s, side) == []
-        sides = shape.sides(s, side)
-        if sides:
-            shape.shift(sides)  # raises if it cannot be placed
+    assert shape.strays(s, "left") == []
+    assert shape.odd_circles(s, "right") == []
+    drawn = shape.sides(s, "left")
+    if drawn:
+        shape.shift(drawn)  # raises if it cannot be placed
 
 
 def test_load_reads_the_editor_state(tmp_path):
@@ -140,3 +192,13 @@ def test_load_of_a_missing_file_is_an_empty_board(tmp_path):
 def test_main_prints_the_literal(capsys):
     assert shape.main([]) == 0
     assert "const BRAIN_EDGES" in capsys.readouterr().out
+
+
+def test_main_says_when_a_drawn_circle_is_not_in_the_output(capsys, tmp_path):
+    """Otherwise the literal looks complete, gets pasted, and the right half
+    quietly keeps the arcs it already had."""
+    p = tmp_path / "state.json"
+    p.write_text(json.dumps(circled({"152,160": shape.FULL})))
+    assert shape.main(["--state", str(p)]) == 0
+    assert "2 circles" not in (err := capsys.readouterr().err)
+    assert "1 circle" in err and "right" in err

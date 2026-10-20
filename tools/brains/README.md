@@ -83,17 +83,26 @@ three different positions. Explicit seek gives byte-identical frames across
 repeats, which was verified before this pipeline was written and is worth
 re-checking if the frames ever start to shimmer.
 
-## The left half is drawn by hand, in a browser
+## Both halves are drawn by hand, in a browser
 
-The left hemisphere is not produced by a rule. It is a composition: which sides
-of the construction grid the figure draws, picked one at a time.
+Neither hemisphere is produced by a rule. Each is a composition: what the figure
+draws off the construction grid, picked one mark at a time.
 
 ```
 .venv/bin/python -m tools.brains.editor.server    # http://127.0.0.1:8732/
 ```
 
-Click a triangle side to draw it, click again to erase it, double-click to make
-it dashed. Every change autosaves to `editor/state.json`. Then:
+**Left half — sides.** Click a triangle side to draw it, click again to erase
+it, double-click to make it dashed.
+
+**Right half — circles.** Click a triangle tip for the circle inscribed in the
+six triangles that meet there, radius 48. Those triangles cut it into six arcs;
+click an arc to cut it away, and the last one takes the circle with it. Clicking
+a tip that already has a circle gives the whole thing up.
+
+Every change autosaves to `editor/state.json`, which holds the two halves in the
+two shapes they are drawn in — `"u,v|u,v": "solid"` for a side, `"u,v":
+"101101"` for a circle and its arcs. Then:
 
 ```
 .venv/bin/python -m tools.brains.shape            # the BRAIN_EDGES literal
@@ -104,6 +113,10 @@ drawing placed inside the card — `shape.py` translates it vertically, because
 the editor's grid deliberately runs past the bottom so a shape can be drawn
 without also being positioned. It refuses to emit a chord or an off-grid
 endpoint rather than publishing one as if it were a drawing decision.
+
+Only the left half is emitted so far; the right is still the hand-tuned
+`BRAIN_ARCS`, and `shape.py` says on stderr when circles are drawn that it is
+not carrying through.
 
 Edit the drawing, never the numbers. A hand-edited literal is lost the next
 time the editor saves.

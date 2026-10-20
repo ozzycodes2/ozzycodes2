@@ -3,10 +3,15 @@
     python -m tools.brains.shape
 
 Prints the `BRAIN_EDGES` literal for `design-preview/site/assets/brains.js`.
-The editor at `tools/brains/editor/` is where the left hemisphere is drawn —
-click a triangle side to draw it, double-click to dash it — and this is the
-only thing between that file and the published figure. Which is why the
-invariants live here: on the grid, a side and not a chord, inside the card.
+The editor at `tools/brains/editor/` is where both hemispheres are drawn, and
+this is the only thing between that file and the published figure. Which is why
+the invariants live here: on the grid, a side and not a chord, inside the card.
+
+The two halves are drawn in different things and read by different functions.
+The left is triangle sides — `sides`, validated by `strays`. The right is
+circles inscribed in the six triangles around a tip, each cut into six arcs —
+`circles`, validated by `odd_circles`. Only the left is emitted as a literal so
+far; the right half's figure is still the hand-tuned `BRAIN_ARCS`.
 
 The vertical shift is this module's one liberty. The editor's grid runs past
 the bottom of the card so that a shape can be drawn without also being placed;
@@ -15,7 +20,9 @@ lattice.
 """
 import argparse
 import json
+import math
 import pathlib
+import sys
 
 HERE = pathlib.Path(__file__).parent
 STATE = HERE / "editor" / "state.json"
@@ -26,8 +33,17 @@ STATE = HERE / "editor" / "state.json"
 # run against a 28 rise is 28√3 = 48.497.
 COL, ROW, RISE = 48, 28, 56
 ORIGIN = (104, 20)
-# The six neighbours a side may join.
-STEPS = ((0, RISE), (0, -RISE), (COL, ROW), (COL, -ROW), (-COL, ROW), (-COL, -ROW))
+# The six neighbours a side may join, in order of angle from straight up. A
+# circle's arcs are numbered off this order, so it is not arbitrary.
+NEIGHBOURS = ((0, -RISE), (COL, -ROW), (COL, ROW), (0, RISE), (-COL, ROW), (-COL, -ROW))
+STEPS = tuple(sorted(NEIGHBOURS))
+
+# A circle is inscribed in the hexagon the six triangles around a tip form:
+# radius COL clears its vertical sides exactly and its slanted ones by a third
+# of a pixel. The triangles cut it into six arcs, one per wedge.
+SECTORS = len(NEIGHBOURS)
+R = COL
+FULL = "1" * SECTORS
 
 H = 400
 # Clearance at the card's edges for a 4px stroke and the small node on it.
@@ -82,6 +98,35 @@ def strays(state, side):
     return bad
 
 
+def circles(state, side):
+    """`[(centre, mask), …]` for one half, ordered by centre.
+
+    The mask is one flag per arc, in `NEIGHBOURS` order: arc `k` spans the wedge
+    from the spoke toward neighbour `k` to the next one round.
+    """
+    return sorted((_point(k), v) for k, v in state.get(side, {}).items())
+
+
+def odd_circles(state, side):
+    """Circles the editor could not have saved: a centre off the grid, a mask
+    that is not six flags, or a circle with every arc cut away — which the
+    editor deletes rather than keeping as an invisible centre."""
+    bad = []
+    for centre, mask in circles(state, side):
+        if not on_grid(centre) or set(mask) - {"0", "1"} or len(mask) != SECTORS or "1" not in mask:
+            bad.append((centre, mask))
+    return bad
+
+
+def spoke(centre, k):
+    """Where spoke `k` leaves the circle around `centre`. The arc ends here, so
+    it begins and ends on the construction rather than somewhere chosen by eye.
+    """
+    du, dv = NEIGHBOURS[k % SECTORS]
+    h = math.hypot(du, dv)
+    return (centre[0] + R * du / h, centre[1] + R * dv / h)
+
+
 def extent(drawn):
     """`(u0, v0, u1, v1)` of what is drawn, or `None`. Both halves have to
     occupy one extent or the pinned pair reads as two drawings at two sizes."""
@@ -115,10 +160,13 @@ def as_js(state):
     """The `BRAIN_EDGES` literal, placed and ready to paste into `brains.js`."""
     blocks = []
     for side in SIDES:
-        bad = strays(state, side)
+        # Only the left half is drawn in sides. The right half's own drawing is
+        # circles, which this does not emit, so its edge list is empty — not a
+        # placeholder for sides nobody has drawn yet.
+        bad = strays(state, side) if side == "left" else []
         if bad:
             raise ValueError(f"{side}: not a triangle side: {bad}")
-        drawn = shifted(s := sides(state, side), shift(s))
+        drawn = shifted(s := sides(state, side), shift(s)) if side == "left" else []
         rows = "".join(
             f"\n    [[{a[0]}, {a[1]}], [{b[0]}, {b[1]}], {int(d)}]," for a, b, d in drawn
         )
@@ -136,7 +184,17 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--state", type=pathlib.Path, default=STATE)
     args = ap.parse_args(argv)
-    print(as_js(load(args.state)), end="")
+    state = load(args.state)
+    print(as_js(state), end="")
+    drawn = circles(state, "right")
+    if drawn:
+        # The literal would otherwise look complete, get pasted, and leave the
+        # right half with whatever arcs it already had.
+        print(
+            f"note: {len(drawn)} circle{'s' * (len(drawn) != 1)} drawn on the right half,"
+            " which this does not emit",
+            file=sys.stderr,
+        )
     return 0
 
 

@@ -1,8 +1,9 @@
 <!doctype html>
 <meta charset="utf-8">
 <title>brain grid</title>
-<!-- Click a triangle side to draw it. Click again to erase. Double-click a
-     drawn side to make it dashed. Every change is saved to state.json. -->
+<!-- Left half: click a triangle side to draw it, again to erase, double-click to
+     dash it. Right half: click a triangle tip for a circle inscribed in the six
+     triangles around it, click an arc to cut it away. Saves to state.json. -->
 <style>
   :root { color-scheme: dark; }
   body {
@@ -26,12 +27,22 @@
   svg { display: block; }
   /* The grid is construction: thin, dim, and never the thing being drawn. */
   .grid line { stroke: #ef6306; stroke-opacity: .22; stroke-width: 1; }
-  .hit { stroke: transparent; stroke-width: 16; cursor: pointer; }
+  .hit { fill: none; stroke: transparent; stroke-width: 16; cursor: pointer; }
   .hit:hover { stroke: #ef630633; }
+  /* Narrower than a side's: the perimeter passes 8px from the six neighbouring
+     tips, whose own hit areas sit on top of it. */
+  .hit.arc { stroke-width: 10; }
+  /* A disc, not a ring — `fill: none` would leave only its edge clickable. */
+  .hit.tip { fill: #ef630600; stroke-width: 0; }
+  .hit.tip:hover { fill: #ef630655; }
   .on { stroke: #ef6306; stroke-width: 4; stroke-linecap: round; pointer-events: none; }
   .on.dash { stroke-dasharray: 8 12; }
+  .on.arc { fill: none; }
   .node { fill: #ef6306; pointer-events: none; }
   .node.ring { fill: none; stroke: #ef6306; stroke-width: 4; }
+  /* Which tip a circle hangs off. Construction, like the grid — the figure has
+     no mark at the centre. */
+  .anchor { fill: #ef6306; fill-opacity: .4; pointer-events: none; }
   /* The published extent, so a shape can be held to the size the other half
      is tuned to. Not drawn in the figure. */
   .extent { fill: none; stroke: #58a6ff; stroke-opacity: .5; stroke-width: 1; stroke-dasharray: 4 4; }
@@ -106,10 +117,58 @@ function sides() {
 const SIDES = sides();
 const sideId = ([a, b]) => [key(a), key(b)].sort().join("|");
 
+/** Every lattice vertex in range, as a tip a circle can hang off. */
+function tips() {
+  const out = [];
+  const [ou, ov] = ORIGIN;
+  for (let p = Math.floor(-ou / COL); ou + p * COL <= U_MAX; p++) {
+    for (let q = Math.floor(-ov / ROW); ov + q * ROW <= H; q++) {
+      if (((p % 2) + 2) % 2 !== ((q % 2) + 2) % 2) continue;
+      out.push([ou + p * COL, ov + q * ROW]);
+    }
+  }
+  return out;
+}
+const TIPS = tips();
+
+/* ------------------------------------------------------------- the circles */
+
+/* The right half is drawn in circles, not lines. A tip is the centre of six
+   triangles that meet there and form a hexagon, and the circle is the one
+   inscribed in it: radius COL, which clears the hexagon's vertical sides
+   exactly and its slanted ones by a third of a pixel.
+
+   The six triangles cut the circle into six arcs, each spanning the wedge
+   between two neighbouring tips — 60.5° or 59.7°, the same angles the triangles
+   have. Those are what is drawn and cut away, so an arc always begins and ends
+   on a spoke of the construction and never somewhere chosen by eye. */
+const NEIGHBOURS = [[0, -RISE], [COL, -ROW], [COL, ROW], [0, RISE], [-COL, ROW], [-COL, -ROW]];
+const R = COL;
+const SECTORS = NEIGHBOURS.length;
+const FULL = "1".repeat(SECTORS);
+
+/** Where spoke `k` leaves the circle around `c`, in the local frame. */
+function spoke(c, k) {
+  const [du, dv] = NEIGHBOURS[((k % SECTORS) + SECTORS) % SECTORS];
+  const h = Math.hypot(du, dv);
+  return [c[0] + (R * du) / h, c[1] + (R * dv) / h];
+}
+
+/** Arc `k` of the circle around `c`, as an SVG path in screen coordinates.
+    Mirroring the left half reverses the sweep; the arc is the same arc. */
+function arcPath(c, k, map) {
+  const [a, b] = [map(spoke(c, k)), map(spoke(c, k + 1))];
+  const sweep = side === "left" ? 0 : 1;
+  const n = (x) => x.toFixed(2);
+  return `M${n(a[0])} ${n(a[1])} A${R} ${R} 0 0 ${sweep} ${n(b[0])} ${n(b[1])}`;
+}
+
 /* ------------------------------------------------------------------ state */
 
-/* `{left: {id: "solid"|"dashed"}, right: {...}}`. The id is the side's two
-   endpoints, so it survives a change of zoom, pan or grid extent. */
+/* `{left: {"u,v|u,v": "solid"|"dashed"}, right: {"u,v": "101101"}}`. The two
+   halves are drawn in different things and stored as different things: a side
+   keyed by its two endpoints, a circle keyed by its centre with one flag per
+   arc. Both keys are grid coordinates, so neither depends on zoom or pan. */
 let state = { left: {}, right: {} };
 const history = [];
 let side = "left";
@@ -144,7 +203,10 @@ function push() {
 /* Derived from the drawn graph, exactly as the figure derives them: a vertex
    three or more sides leave is a junction and takes the large dot, one reached
    only by dashed sides is a terminal and takes the ring, the rest take the
-   small dot. Shown live so what is clicked is what publishes. */
+   small dot. Shown live so what is clicked is what publishes.
+
+   Left half only — the right half's nodes sit at the ends of an arc run and are
+   derived when the figure is generated, not here. */
 function nodes() {
   const deg = new Map(), solid = new Set();
   for (const [id, kind] of Object.entries(state[side])) {
@@ -202,6 +264,14 @@ function draw() {
     width: Math.abs(ex[1][0] - ex[0][0]), height: Math.abs(ex[1][1] - ex[0][1]),
   }));
 
+  if (side === "left") drawSides(svg, map);
+  else drawCircles(svg, map);
+
+  board.replaceChildren(svg);
+  document.getElementById("stat").textContent = readout();
+}
+
+function drawSides(svg, map) {
   for (const [id, kind] of Object.entries(state[side])) {
     const [p, q] = id.split("|").map((k) => map(k.split(",").map(Number)));
     svg.append(el("line", {
@@ -232,18 +302,59 @@ function draw() {
     });
     svg.append(hit);
   }
+}
 
-  board.replaceChildren(svg);
-  const all = Object.values(state[side]);
+function drawCircles(svg, map) {
+  for (const [id, mask] of Object.entries(state[side])) {
+    const c = id.split(",").map(Number);
+    const a = map(c);
+    svg.append(el("circle", { class: "anchor", cx: a[0], cy: a[1], r: 3 }));
+    for (let k = 0; k < SECTORS; k++) {
+      if (mask[k] !== "1") continue;
+      svg.append(el("path", { class: "on arc", d: arcPath(c, k, map) }));
+    }
+  }
+
+  /* Arc hits before tip hits: a spoke ends 8px short of the neighbouring tip,
+     so the two overlap there, and a click that close to a tip is a click on the
+     tip. The middle of an arc is what you aim at to cut it. */
+  for (const [id, mask] of Object.entries(state[side])) {
+    const c = id.split(",").map(Number);
+    for (let k = 0; k < SECTORS; k++) {
+      if (mask[k] !== "1") continue;
+      const hit = el("path", { class: "hit arc", d: arcPath(c, k, map) });
+      hit.addEventListener("click", () => cut(id, k));
+      svg.append(hit);
+    }
+  }
+  for (const c of TIPS) {
+    const p = map(c);
+    const hit = el("circle", { class: "hit tip", cx: p[0], cy: p[1], r: 7 });
+    hit.addEventListener("click", () => circle(key(c)));
+    svg.append(hit);
+  }
+}
+
+function readout() {
+  const vals = Object.values(state[side]);
+  if (side === "right") {
+    const arcs = vals.join("").split("").filter((c) => c === "1").length;
+    const pts = Object.keys(state[side]).flatMap((id) => {
+      const c = id.split(",").map(Number);
+      return [[c[0] - R, c[1] - R], [c[0] + R, c[1] + R]];
+    });
+    return `${vals.length} circles, ${arcs} arcs${box(pts)}`;
+  }
   const pts = Object.keys(state[side]).flatMap((id) => id.split("|").map((k) => k.split(",").map(Number)));
-  const box = pts.length
-    ? ` · ${Math.max(...pts.map((p) => p[0])) - Math.min(...pts.map((p) => p[0]))}×` +
-      `${Math.max(...pts.map((p) => p[1])) - Math.min(...pts.map((p) => p[1]))}` +
-      ` (u ${Math.min(...pts.map((p) => p[0]))}–${Math.max(...pts.map((p) => p[0]))},` +
-      ` v ${Math.min(...pts.map((p) => p[1]))}–${Math.max(...pts.map((p) => p[1]))})`
-    : "";
-  document.getElementById("stat").textContent =
-    `${all.length} sides, ${all.filter((k) => k === "dashed").length} dashed${box}`;
+  return `${vals.length} sides, ${vals.filter((k) => k === "dashed").length} dashed${box(pts)}`;
+}
+
+/** What is drawn, measured — the extent guide is a suggestion, this is fact. */
+function box(pts) {
+  if (!pts.length) return "";
+  const [us, vs] = [pts.map((p) => p[0]), pts.map((p) => p[1])];
+  const [u0, u1, v0, v1] = [Math.min(...us), Math.max(...us), Math.min(...vs), Math.max(...vs)];
+  return ` · ${u1 - u0}×${v1 - v0} (u ${u0}–${u1}, v ${v0}–${v1})`;
 }
 
 function toggle(id) {
@@ -257,6 +368,27 @@ function toggle(id) {
 function dash(id) {
   push();
   state[side][id] = state[side][id] === "dashed" ? "solid" : "dashed";
+  save();
+  draw();
+}
+
+/** A tip with no circle takes a whole one; a tip with one gives it up. */
+function circle(id) {
+  push();
+  if (state[side][id]) delete state[side][id];
+  else state[side][id] = FULL;
+  save();
+  draw();
+}
+
+/** Cut arc `k` away. The last arc takes the circle with it, so a cleared
+    circle leaves no centre behind to be clicked a second time. */
+function cut(id, k) {
+  push();
+  const mask = state[side][id].split("");
+  mask[k] = "0";
+  if (mask.includes("1")) state[side][id] = mask.join("");
+  else delete state[side][id];
   save();
   draw();
 }
