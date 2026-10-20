@@ -89,9 +89,6 @@ def test_motion_touches_only_properties_that_cannot_hide_the_drawing(name):
 
 
 def test_any_transform_is_a_translate_inside_the_stated_budget(name):
-    """The 24px cap governs travel a keyframe states outright. The field's
-    drift is stated as its own period instead, so it contributes no literal
-    here — what the cap was protecting is asserted below."""
     svg = figures.load(name)
     transforms = "".join(v for p, v in keyframe_declarations(svg) if p == "transform")
     assert {f for f in re.findall(r"([A-Za-z]+)\(", transforms)} - VALUE_FNS <= TRANSFORMS
@@ -99,43 +96,13 @@ def test_any_transform_is_a_translate_inside_the_stated_budget(name):
     assert all(abs(float(v)) <= 24 for a in moves for v in re.findall(r"-?\d+(?:\.\d+)?", a))
 
 
-def drifting_dots(svg):
-    """`(drift, [(cx, cy, r), …])` for the field group, or `None`. The drift is
-    signed: it is the per-loop travel, and its sign is the direction."""
-    g = re.search(r'<g class="drift" style="--drift: (-?[\d.]+)">(.*?)</g>', svg, re.S)
-    if not g:
-        return None
-    dots = re.findall(r'<circle cx="(-?[\d.]+)" cy="(-?[\d.]+)" r="([\d.]+)"', g[2])
-    return float(g[1]), [tuple(float(v) for v in d) for d in dots]
-
-
-def test_the_field_drifts_away_from_the_midline(name):
-    """The brain is anchored at the midline — the right edge of the left card,
-    the left edge of the right one — so the pair radiates outward from the
-    gutter they share. Drifting the same way on both cards instead reads as one
-    current sweeping across them."""
-    drift, _ = drifting_dots(figures.load(name))
-    assert drift < 0 if name == "left-brain" else drift > 0
-
-
-def test_the_field_drifts_by_exactly_its_own_period(name):
-    """The whole licence for travelling further than the budget. Every dot the
-    drift carries onto the canvas stands where its neighbour stood, so nothing
-    enters, leaves or jumps when the loop restarts. Travel that missed the
-    spacing would shunt the field once every three and a half seconds."""
-    field = drifting_dots(figures.load(name))
-    assert field, "the figure declares no drifting field"
-    drift, dots = field
-    assert drift
-    at = {(round(x, 1), y, r) for x, y, r in dots}
-    # `x - drift` is the dot upstream of this one, whichever way upstream is.
-    assert all(
-        (round(x - drift, 1), y, r) in at
-        for x, y, r in dots
-        if 0 <= x <= figures.W
-    )
-    # Tiled past both edges, or the replacement arrives from nowhere.
-    assert min(x for x, _, _ in dots) < 0 < figures.W < max(x for x, _, _ in dots)
+def test_nothing_stands_behind_the_drawing(name):
+    """The reference's grid is construction: both halves are picked off it and
+    then it is deleted, and nothing replaces it. A ground layer would also be
+    the one thing in the figure that no click in the editor produced."""
+    svg = figures.load(name)
+    assert '<g class="drift"' not in svg
+    assert "pnl-pin-grid" not in svg
 
 
 def test_a_marching_dash_is_drawn_over_a_copy_that_is_always_painted(name):

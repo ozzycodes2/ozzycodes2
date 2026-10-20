@@ -2,8 +2,8 @@
 <meta charset="utf-8">
 <title>brain grid</title>
 <!-- Left half: click a triangle side to draw it, again to erase, double-click to
-     dash it. Right half: click a triangle tip for a circle inscribed in the six
-     triangles around it, click an arc to cut it away. Saves to state.json. -->
+     dash it. Right half: click a triangle tip for the circle through the six
+     tips around it, click an arc to cut it away. Saves to state.json. -->
 <style>
   :root { color-scheme: dark; }
   body {
@@ -29,8 +29,8 @@
   .grid line { stroke: #ef6306; stroke-opacity: .22; stroke-width: 1; }
   .hit { fill: none; stroke: transparent; stroke-width: 16; cursor: pointer; }
   .hit:hover { stroke: #ef630633; }
-  /* Narrower than a side's: the perimeter passes 8px from the six neighbouring
-     tips, whose own hit areas sit on top of it. */
+  /* Narrower than a side's: an arc now ends exactly on a tip, whose own hit
+     area sits on top of it. */
   .hit.arc { stroke-width: 10; }
   /* A disc, not a ring — `fill: none` would leave only its edge clickable. */
   .hit.tip { fill: #ef630600; stroke-width: 0; }
@@ -39,7 +39,10 @@
   .on.dash { stroke-dasharray: 8 12; }
   .on.arc { fill: none; }
   .node { fill: #ef6306; pointer-events: none; }
-  .node.ring { fill: none; stroke: #ef6306; stroke-width: 4; }
+  /* A terminal is smaller than a junction and hollow: a line that stops is a
+     lighter mark than one that meets another. The stroke is half the radius, so
+     the hole is half the ring whatever size the mark is. */
+  .node.ring { fill: none; stroke: #ef6306; stroke-width: 2; }
   /* Which tip a circle hangs off. Construction, like the grid — the figure has
      no mark at the centre. */
   .anchor { fill: #ef6306; fill-opacity: .4; pointer-events: none; }
@@ -82,13 +85,12 @@ const COL = 48, ROW = 28, RISE = 56;
 const ORIGIN = [104, 20];
 const W = 1340, H = 400;
 /* How far out from the midline the grid reaches. The hemisphere lives in the
-   first 320 or so; the rest of the card carries only drifting field dots. */
+   first 320 or so; the rest of the card is empty. */
 const U_MAX = 560;
 /* A size guide, on grid vertices: four columns wide by thirteen rows tall.
    Both halves have to occupy one extent or the pair reads as two drawings at
-   two sizes, and the right half's arcs get tuned to whatever is drawn here —
-   so this is a suggestion, not a boundary. The readout in the header measures
-   what is actually drawn. */
+   two sizes. A suggestion, not a boundary — the generator places what is drawn
+   and the readout in the header measures it. */
 const EXTENT = { u0: 56, v0: 20, u1: 248, v1: 384 };
 const MIDLINE = { left: 1336, right: 4 };
 
@@ -133,34 +135,66 @@ const TIPS = tips();
 
 /* ------------------------------------------------------------- the circles */
 
-/* The right half is drawn in circles, not lines. A tip is the centre of six
-   triangles that meet there and form a hexagon, and the circle is the one
-   inscribed in it: radius COL, which clears the hexagon's vertical sides
-   exactly and its slanted ones by a third of a pixel.
+/* The right half is drawn in circles, not lines. A tip and its six neighbours
+   are the centre and the corners of a hexagon of six triangles, and the circle
+   is the one through those corners — radius RISE, so each sixth of it begins
+   and ends on a tip.
 
-   The six triangles cut the circle into six arcs, each spanning the wedge
-   between two neighbouring tips — 60.5° or 59.7°, the same angles the triangles
-   have. Those are what is drawn and cut away, so an arc always begins and ends
-   on a spoke of the construction and never somewhere chosen by eye. */
+   Which is what lets the drawing join up. Two circles on neighbouring tips
+   cross at exactly the two tips they both border, so arcs from different
+   circles share an endpoint rather than crossing somewhere between vertices:
+   where two runs touch they already meet at a point, and the shorter simply
+   ends on the longer. A circle inscribed in the hexagon instead (radius COL)
+   keeps every arc inside its own triangle, but then nothing meets anything —
+   arcs that should join land 4px apart, which is what the first pass drew.
+
+   The slant neighbours sit 55.57 out against the vertical 56, so an arc that
+   ends on both its tips is not quite a sixth of one circle. The ends win: they
+   are where the drawing joins, and the 0.2px it costs the middle is nothing. */
 const NEIGHBOURS = [[0, -RISE], [COL, -ROW], [COL, ROW], [0, RISE], [-COL, ROW], [-COL, -ROW]];
-const R = COL;
+const R = RISE;
 const SECTORS = NEIGHBOURS.length;
 const FULL = "1".repeat(SECTORS);
+const mod = (k) => ((k % SECTORS) + SECTORS) % SECTORS;
 
-/** Where spoke `k` leaves the circle around `c`, in the local frame. */
-function spoke(c, k) {
-  const [du, dv] = NEIGHBOURS[((k % SECTORS) + SECTORS) % SECTORS];
-  const h = Math.hypot(du, dv);
-  return [c[0] + (R * du) / h, c[1] + (R * dv) / h];
+/** The tip arc `k` runs to: a vertex of the grid, and where arcs meet. */
+const tip = (c, k) => [c[0] + NEIGHBOURS[mod(k)][0], c[1] + NEIGHBOURS[mod(k)][1]];
+
+/** The maximal chains of contiguous arcs around one circle, as `[k, n]` — `n`
+    sixths from spoke `k`. A whole circle is one chain of six. */
+function runs(mask) {
+  const on = [...mask].map((c) => c === "1");
+  if (on.every(Boolean)) return [[0, SECTORS]];
+  const out = [];
+  for (let k = 0; k < SECTORS; k++) {
+    // Start only where a chain starts: this sixth drawn, the one before not.
+    if (!on[k] || on[mod(k - 1)]) continue;
+    let n = 0;
+    while (on[mod(k + n)]) n++;
+    out.push([k, n]);
+  }
+  return out;
 }
 
-/** Arc `k` of the circle around `c`, as an SVG path in screen coordinates.
-    Mirroring the left half reverses the sweep; the arc is the same arc. */
-function arcPath(c, k, map) {
-  const [a, b] = [map(spoke(c, k)), map(spoke(c, k + 1))];
+/** Every drawn run as `{c, k, n}`. A run is one stroke: the arcs inside it
+    converge into a single path, so it has no seam where two of them meet. */
+function drawnRuns() {
+  const out = [];
+  for (const [id, mask] of Object.entries(state[side])) {
+    const c = id.split(",").map(Number);
+    for (const [k, n] of runs(mask)) out.push({ c, k, n });
+  }
+  return out;
+}
+
+/** `n` sixths of the circle on `c` from spoke `k`, in screen coordinates.
+    Mirroring the left half reverses the sweep, not the arc. */
+function runPath(c, k, n, map) {
   const sweep = side === "left" ? 0 : 1;
-  const n = (x) => x.toFixed(2);
-  return `M${n(a[0])} ${n(a[1])} A${R} ${R} 0 0 ${sweep} ${n(b[0])} ${n(b[1])}`;
+  const at = (j) => map(tip(c, k + j)).map((x) => x.toFixed(2)).join(" ");
+  let d = `M${at(0)}`;
+  for (let j = 1; j <= n; j++) d += ` A${R} ${R} 0 0 ${sweep} ${at(j)}`;
+  return d;
 }
 
 /* ------------------------------------------------------------------ state */
@@ -218,9 +252,44 @@ function nodes() {
   return [...deg].map(([k, d]) => {
     const p = k.split(",").map(Number);
     if (d >= 3) return [p, 8, true];
-    if (!solid.has(k)) return [p, 8, false];
+    if (!solid.has(k)) return [p, 4, false];
     return [p, 4, true];
   });
+}
+
+/* The right half's, read off the arcs the same way — what a mark means is the
+   same on both sides of the gutter, only the thing it sits on differs.
+
+   A junction is where a run was clipped into another and takes the large solid
+   dot. A free end of a run takes the small ring. Two arcs meeting inside one
+   circle take nothing: the left half's degree-2 vertex is a corner and a mark
+   there reads as a joint, but the same join on a circle is smooth and a mark on
+   it reads as a bead on a wire. */
+function arcNodes(drawn) {
+  const met = new Map();
+  for (const { c, k, n } of drawn) {
+    for (let j = 0; j <= n; j++) {
+      // A whole circle closes on itself, so its first tip is not an end.
+      if (n === SECTORS && j === SECTORS) continue;
+      const t = key(tip(c, k + j));
+      const slot = met.get(t) || { circles: new Set(), ends: 0 };
+      slot.circles.add(key(c));
+      if (j === 0 || j === n) slot.ends++;
+      met.set(t, slot);
+    }
+  }
+
+  const junctions = [], terminals = [];
+  for (const [t, { circles, ends }] of met) {
+    const p = t.split(",").map(Number);
+    // Two circles at one tip is a convergence however they arrive — a run
+    // ending on another's body is as much a junction as two ends meeting.
+    if (circles.size > 1) junctions.push(p);
+    // One circle: an end is where the drawing stops, and anything else is the
+    // smooth middle of a run, which takes no mark at all.
+    else if (ends) terminals.push(p);
+  }
+  return { junctions, terminals };
 }
 
 /* ---------------------------------------------------------------- drawing */
@@ -239,8 +308,8 @@ function draw() {
   const z = Number(document.getElementById("zoom").value);
   const map = mapTo(side);
   // The card is 1340 wide and the hemisphere lives in the 560 nearest the
-  // gutter; the rest carries only drifting field dots. The view is cropped to
-  // that band so zoom 2 fits a screen instead of scrolling off one.
+  // gutter; the rest is empty. The view is cropped to that band so zoom 2 fits
+  // a screen instead of scrolling off one.
   const x0 = side === "left" ? W - U_MAX : 0;
   const svg = el("svg", { width: U_MAX * z, height: H * z, viewBox: `${x0} 0 ${U_MAX} ${H}` });
   // The gutter the pair is anchored on: u = 0 is where the other half begins.
@@ -281,7 +350,7 @@ function drawSides(svg, map) {
   }
   for (const [p, r, filled] of nodes()) {
     const c = map(p);
-    svg.append(el("circle", { class: filled ? "node" : "node ring", cx: c[0], cy: c[1], r: filled ? r : r - 2 }));
+    svg.append(el("circle", { class: filled ? "node" : "node ring", cx: c[0], cy: c[1], r }));
   }
 
   // Hit areas last, so a side is clickable even where a drawn line covers it.
@@ -305,24 +374,33 @@ function drawSides(svg, map) {
 }
 
 function drawCircles(svg, map) {
-  for (const [id, mask] of Object.entries(state[side])) {
-    const c = id.split(",").map(Number);
-    const a = map(c);
+  const drawn = drawnRuns();
+  const { junctions, terminals } = arcNodes(drawn);
+
+  for (const id of Object.keys(state[side])) {
+    const a = map(id.split(",").map(Number));
     svg.append(el("circle", { class: "anchor", cx: a[0], cy: a[1], r: 3 }));
-    for (let k = 0; k < SECTORS; k++) {
-      if (mask[k] !== "1") continue;
-      svg.append(el("path", { class: "on arc", d: arcPath(c, k, map) }));
-    }
+  }
+  for (const { c, k, n } of drawn) {
+    svg.append(el("path", { class: "on arc", d: runPath(c, k, n, map) }));
+  }
+  for (const p of junctions) {
+    const q = map(p);
+    svg.append(el("circle", { class: "node", cx: q[0], cy: q[1], r: 8 }));
+  }
+  for (const p of terminals) {
+    const q = map(p);
+    svg.append(el("circle", { class: "node ring", cx: q[0], cy: q[1], r: 4 }));
   }
 
-  /* Arc hits before tip hits: a spoke ends 8px short of the neighbouring tip,
-     so the two overlap there, and a click that close to a tip is a click on the
-     tip. The middle of an arc is what you aim at to cut it. */
+  /* Hit areas per sixth, not per run, so cutting stays an arc at a time. Arcs
+     before tips: an arc now ends exactly on a tip, so a click at the end of one
+     is a click on the tip, and the middle of an arc is what you aim at. */
   for (const [id, mask] of Object.entries(state[side])) {
     const c = id.split(",").map(Number);
     for (let k = 0; k < SECTORS; k++) {
       if (mask[k] !== "1") continue;
-      const hit = el("path", { class: "hit arc", d: arcPath(c, k, map) });
+      const hit = el("path", { class: "hit arc", d: runPath(c, k, 1, map) });
       hit.addEventListener("click", () => cut(id, k));
       svg.append(hit);
     }

@@ -5,147 +5,62 @@
      `python -m tools.brains.parity --write right-brain`. -->
 <svg xmlns="http://www.w3.org/2000/svg" id="right-brain" viewBox="0 0 1340 400" width="1340" height="400" role="img" aria-labelledby="right-brain-t right-brain-d">
   <title id="right-brain-t">Right Brain</title>
-  <desc id="right-brain-d">The right hemisphere: open arcs and nested curls, no straight line and no grid, signals firing along them.</desc>
+  <desc id="right-brain-d">The right hemisphere: arcs of circles hung off the same grid&#39;s vertices, converging where they meet, signals firing along them.</desc>
   <style>
     svg#right-brain .signal {
       animation: brain-signal 3.6s linear infinite;
-    }
-    svg#right-brain .drift {
-      animation: brain-drift 3.6s linear infinite;
     }
     @keyframes brain-signal {
       from { stroke-dashoffset: 0 }
       to   { stroke-dashoffset: calc(-1 * var(--cycle) * 1px) }
     }
-    @keyframes brain-drift {
-      from { transform: translateX(0) }
-      to   { transform: translateX(calc(var(--drift) * 1px)) }
-    }
   </style>
-  <path d="M96.8 122.6 A62 62 0 0 1 98.8 8.5" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M96.8 122.6 A62 62 0 0 1 98.8 8.5" stroke-width="7" stroke-dasharray="11.6 60.9" style="--cycle: 72.5;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M103.7 250.4 A55 55 0 0 1 105.6 143.2" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M103.7 250.4 A55 55 0 0 1 105.6 143.2" stroke-width="7" stroke-dasharray="11.8 62.1" style="--cycle: 73.9; animation-delay: -2.22s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M93.4 390.6 A63 63 0 0 1 95.4 278.4" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M93.4 390.6 A63 63 0 0 1 95.4 278.4" stroke-width="7" stroke-dasharray="11.1 58.2" style="--cycle: 69.3; animation-delay: -0.85s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M152.6 9.6 A60 60 0 1 1 172.8 123.8" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M152.6 9.6 A60 60 0 1 1 172.8 123.8" stroke-width="7" stroke-dasharray="8.8 46.2" style="--cycle: 55.0; animation-delay: -3.07s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M178 137.6 A65 65 0 1 1 158.5 260.4" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M178 137.6 A65 65 0 1 1 158.5 260.4" stroke-width="7" stroke-dasharray="9.7 51.0" style="--cycle: 60.7; animation-delay: -1.70s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M144.3 288.8 A58 58 0 1 1 177 396" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M144.3 288.8 A58 58 0 1 1 177 396" stroke-width="7" stroke-dasharray="8.5 44.6" style="--cycle: 53.1; animation-delay: -0.32s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M179.9 64.4 A26 26 0 1 1 171 14" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M179.9 64.4 A26 26 0 1 1 171 14" stroke-width="7" stroke-dasharray="7.3 38.1" style="--cycle: 45.4; animation-delay: -2.55s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M153.1 247.5 A34 34 0 1 1 173.9 183.4" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M153.1 247.5 A34 34 0 1 1 173.9 183.4" stroke-width="7" stroke-dasharray="9.3 48.8" style="--cycle: 58.2; animation-delay: -1.17s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M188.7 372.4 A21 21 0 1 1 174.1 334.2" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M188.7 372.4 A21 21 0 1 1 174.1 334.2" stroke-width="7" stroke-dasharray="12.1 63.4" style="--cycle: 75.5; animation-delay: -3.40s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <circle cx="96.8" cy="122.6" r="4" fill="#ef6306"/>
-  <circle cx="98.8" cy="8.5" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="103.7" cy="250.4" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="105.6" cy="143.2" r="4" fill="#ef6306"/>
-  <circle cx="93.4" cy="390.6" r="4" fill="#ef6306"/>
-  <circle cx="95.4" cy="278.4" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="152.6" cy="9.6" r="8" fill="#ef6306"/>
-  <circle cx="172.8" cy="123.8" r="4" fill="#ef6306"/>
-  <circle cx="178" cy="137.6" r="4" fill="#ef6306"/>
-  <circle cx="158.5" cy="260.4" r="8" fill="#ef6306"/>
-  <circle cx="144.3" cy="288.8" r="8" fill="#ef6306"/>
-  <circle cx="177" cy="396" r="4" fill="#ef6306"/>
-  <circle cx="179.9" cy="64.4" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="171" cy="14" r="4" fill="#ef6306"/>
-  <circle cx="153.1" cy="247.5" r="4" fill="#ef6306"/>
-  <circle cx="173.9" cy="183.4" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="188.7" cy="372.4" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="174.1" cy="334.2" r="4" fill="#ef6306"/>
-  <g class="drift" style="--drift: 672">
-  <circle cx="-654.7" cy="53.3" r="4" fill="#ef6306"/>
-  <circle cx="-626.7" cy="213.3" r="4" fill="#ef6306"/>
-  <circle cx="-598.7" cy="333.3" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="-574.7" cy="125.3" r="4" fill="#ef6306"/>
-  <circle cx="-538.7" cy="269.3" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="-510.7" cy="69.3" r="4" fill="#ef6306"/>
-  <circle cx="-482.7" cy="197.3" r="4" fill="#ef6306"/>
-  <circle cx="-454.7" cy="357.3" r="4" fill="#ef6306"/>
-  <circle cx="-426.7" cy="105.3" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="-394.7" cy="241.3" r="4" fill="#ef6306"/>
-  <circle cx="-362.7" cy="161.3" r="4" fill="#ef6306"/>
-  <circle cx="-330.7" cy="45.3" r="4" fill="#ef6306"/>
-  <circle cx="-302.7" cy="297.3" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="-270.7" cy="181.3" r="4" fill="#ef6306"/>
-  <circle cx="-234.7" cy="85.3" r="4" fill="#ef6306"/>
-  <circle cx="-206.7" cy="253.3" r="4" fill="#ef6306"/>
-  <circle cx="-174.7" cy="141.3" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="-142.7" cy="321.3" r="4" fill="#ef6306"/>
-  <circle cx="-110.7" cy="61.3" r="4" fill="#ef6306"/>
-  <circle cx="-74.7" cy="221.3" r="4" fill="#ef6306"/>
-  <circle cx="-42.7" cy="117.3" r="4" fill="#ef6306"/>
-  <circle cx="-14.7" cy="285.3" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="17.3" cy="53.3" r="4" fill="#ef6306"/>
-  <circle cx="45.3" cy="213.3" r="4" fill="#ef6306"/>
-  <circle cx="73.3" cy="333.3" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="97.3" cy="125.3" r="4" fill="#ef6306"/>
-  <circle cx="133.3" cy="269.3" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="161.3" cy="69.3" r="4" fill="#ef6306"/>
-  <circle cx="189.3" cy="197.3" r="4" fill="#ef6306"/>
-  <circle cx="217.3" cy="357.3" r="4" fill="#ef6306"/>
-  <circle cx="245.3" cy="105.3" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="277.3" cy="241.3" r="4" fill="#ef6306"/>
-  <circle cx="309.3" cy="161.3" r="4" fill="#ef6306"/>
-  <circle cx="341.3" cy="45.3" r="4" fill="#ef6306"/>
-  <circle cx="369.3" cy="297.3" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="401.3" cy="181.3" r="4" fill="#ef6306"/>
-  <circle cx="437.3" cy="85.3" r="4" fill="#ef6306"/>
-  <circle cx="465.3" cy="253.3" r="4" fill="#ef6306"/>
-  <circle cx="497.3" cy="141.3" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="529.3" cy="321.3" r="4" fill="#ef6306"/>
-  <circle cx="561.3" cy="61.3" r="4" fill="#ef6306"/>
-  <circle cx="597.3" cy="221.3" r="4" fill="#ef6306"/>
-  <circle cx="629.3" cy="117.3" r="4" fill="#ef6306"/>
-  <circle cx="657.3" cy="285.3" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="689.3" cy="53.3" r="4" fill="#ef6306"/>
-  <circle cx="717.3" cy="213.3" r="4" fill="#ef6306"/>
-  <circle cx="745.3" cy="333.3" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="769.3" cy="125.3" r="4" fill="#ef6306"/>
-  <circle cx="805.3" cy="269.3" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="833.3" cy="69.3" r="4" fill="#ef6306"/>
-  <circle cx="861.3" cy="197.3" r="4" fill="#ef6306"/>
-  <circle cx="889.3" cy="357.3" r="4" fill="#ef6306"/>
-  <circle cx="917.3" cy="105.3" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="949.3" cy="241.3" r="4" fill="#ef6306"/>
-  <circle cx="981.3" cy="161.3" r="4" fill="#ef6306"/>
-  <circle cx="1013.3" cy="45.3" r="4" fill="#ef6306"/>
-  <circle cx="1041.3" cy="297.3" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="1073.3" cy="181.3" r="4" fill="#ef6306"/>
-  <circle cx="1109.3" cy="85.3" r="4" fill="#ef6306"/>
-  <circle cx="1137.3" cy="253.3" r="4" fill="#ef6306"/>
-  <circle cx="1169.3" cy="141.3" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="1201.3" cy="321.3" r="4" fill="#ef6306"/>
-  <circle cx="1233.3" cy="61.3" r="4" fill="#ef6306"/>
-  <circle cx="1269.3" cy="221.3" r="4" fill="#ef6306"/>
-  <circle cx="1301.3" cy="117.3" r="4" fill="#ef6306"/>
-  <circle cx="1329.3" cy="285.3" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="1361.3" cy="53.3" r="4" fill="#ef6306"/>
-  <circle cx="1389.3" cy="213.3" r="4" fill="#ef6306"/>
-  <circle cx="1417.3" cy="333.3" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="1441.3" cy="125.3" r="4" fill="#ef6306"/>
-  <circle cx="1477.3" cy="269.3" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="1505.3" cy="69.3" r="4" fill="#ef6306"/>
-  <circle cx="1533.3" cy="197.3" r="4" fill="#ef6306"/>
-  <circle cx="1561.3" cy="357.3" r="4" fill="#ef6306"/>
-  <circle cx="1589.3" cy="105.3" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="1621.3" cy="241.3" r="4" fill="#ef6306"/>
-  <circle cx="1653.3" cy="161.3" r="4" fill="#ef6306"/>
-  <circle cx="1685.3" cy="45.3" r="4" fill="#ef6306"/>
-  <circle cx="1713.3" cy="297.3" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="1745.3" cy="181.3" r="4" fill="#ef6306"/>
-  <circle cx="1781.3" cy="85.3" r="4" fill="#ef6306"/>
-  <circle cx="1809.3" cy="253.3" r="4" fill="#ef6306"/>
-  <circle cx="1841.3" cy="141.3" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="1873.3" cy="321.3" r="4" fill="#ef6306"/>
-  <circle cx="1905.3" cy="61.3" r="4" fill="#ef6306"/>
-  <circle cx="1941.3" cy="221.3" r="4" fill="#ef6306"/>
-  <circle cx="1973.3" cy="117.3" r="4" fill="#ef6306"/>
-  <circle cx="2001.3" cy="285.3" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  </g>
+  <path d="M108 88 A56 56 0 0 1 60 116" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M108 88 A56 56 0 0 1 60 116" stroke-width="7" stroke-dasharray="9.3 48.8" style="--cycle: 58.1;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M12 88 A56 56 0 0 1 12 32 A56 56 0 0 1 60 4 A56 56 0 0 1 108 32" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M12 88 A56 56 0 0 1 12 32 A56 56 0 0 1 60 4 A56 56 0 0 1 108 32" stroke-width="7" stroke-dasharray="9.3 49.0" style="--cycle: 58.3; animation-delay: -2.22s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M60 228 A56 56 0 0 1 12 200 A56 56 0 0 1 12 144" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M60 228 A56 56 0 0 1 12 200 A56 56 0 0 1 12 144" stroke-width="7" stroke-dasharray="9.3 49.1" style="--cycle: 58.4; animation-delay: -0.85s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M60 172 A56 56 0 0 1 108 200" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M60 172 A56 56 0 0 1 108 200" stroke-width="7" stroke-dasharray="9.3 48.8" style="--cycle: 58.1; animation-delay: -3.07s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M12 256 A56 56 0 0 1 12 200" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M12 256 A56 56 0 0 1 12 200" stroke-width="7" stroke-dasharray="9.4 49.3" style="--cycle: 58.6; animation-delay: -1.70s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M108 312 A56 56 0 0 1 108 368 A56 56 0 0 1 60 396 A56 56 0 0 1 12 368 A56 56 0 0 1 12 312" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M108 312 A56 56 0 0 1 108 368 A56 56 0 0 1 60 396 A56 56 0 0 1 12 368 A56 56 0 0 1 12 312" stroke-width="7" stroke-dasharray="9.3 49.1" style="--cycle: 58.4; animation-delay: -0.32s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M60 60 A56 56 0 0 1 108 32 A56 56 0 0 1 156 60 A56 56 0 0 1 156 116 A56 56 0 0 1 108 144" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M60 60 A56 56 0 0 1 108 32 A56 56 0 0 1 156 60 A56 56 0 0 1 156 116 A56 56 0 0 1 108 144" stroke-width="7" stroke-dasharray="9.3 48.9" style="--cycle: 58.3; animation-delay: -2.55s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M156 172 A56 56 0 0 1 108 200" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M156 172 A56 56 0 0 1 108 200" stroke-width="7" stroke-dasharray="9.3 48.8" style="--cycle: 58.1; animation-delay: -1.17s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M60 172 A56 56 0 0 1 60 116" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M60 172 A56 56 0 0 1 60 116" stroke-width="7" stroke-dasharray="9.4 49.3" style="--cycle: 58.6; animation-delay: -3.40s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M156 284 A56 56 0 0 1 156 340 A56 56 0 0 1 108 368" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M156 284 A56 56 0 0 1 156 340 A56 56 0 0 1 108 368" stroke-width="7" stroke-dasharray="9.3 49.1" style="--cycle: 58.4; animation-delay: -2.02s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M60 340 A56 56 0 0 1 60 284 A56 56 0 0 1 108 256" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M60 340 A56 56 0 0 1 60 284 A56 56 0 0 1 108 256" stroke-width="7" stroke-dasharray="9.3 49.1" style="--cycle: 58.4; animation-delay: -0.65s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M156 116 A56 56 0 0 1 204 144 A56 56 0 0 1 204 200 A56 56 0 0 1 156 228" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M156 116 A56 56 0 0 1 204 144 A56 56 0 0 1 204 200 A56 56 0 0 1 156 228" stroke-width="7" stroke-dasharray="9.3 49.0" style="--cycle: 58.3; animation-delay: -2.87s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M204 200 A56 56 0 0 1 204 256 A56 56 0 0 1 156 284 A56 56 0 0 1 108 256 A56 56 0 0 1 108 200" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M204 200 A56 56 0 0 1 204 256 A56 56 0 0 1 156 284 A56 56 0 0 1 108 256 A56 56 0 0 1 108 200" stroke-width="7" stroke-dasharray="9.3 49.1" style="--cycle: 58.4; animation-delay: -1.50s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="108" cy="88" r="4" stroke="#ef6306" stroke-width="2" fill="none"/>
+  <circle cx="60" cy="116" r="8" fill="#ef6306"/>
+  <circle cx="12" cy="88" r="4" stroke="#ef6306" stroke-width="2" fill="none"/>
+  <circle cx="108" cy="32" r="8" fill="#ef6306"/>
+  <circle cx="60" cy="228" r="4" stroke="#ef6306" stroke-width="2" fill="none"/>
+  <circle cx="12" cy="200" r="8" fill="#ef6306"/>
+  <circle cx="12" cy="144" r="4" stroke="#ef6306" stroke-width="2" fill="none"/>
+  <circle cx="60" cy="172" r="8" fill="#ef6306"/>
+  <circle cx="108" cy="200" r="8" fill="#ef6306"/>
+  <circle cx="12" cy="256" r="4" stroke="#ef6306" stroke-width="2" fill="none"/>
+  <circle cx="108" cy="312" r="4" stroke="#ef6306" stroke-width="2" fill="none"/>
+  <circle cx="108" cy="368" r="8" fill="#ef6306"/>
+  <circle cx="12" cy="312" r="4" stroke="#ef6306" stroke-width="2" fill="none"/>
+  <circle cx="60" cy="60" r="4" stroke="#ef6306" stroke-width="2" fill="none"/>
+  <circle cx="156" cy="116" r="8" fill="#ef6306"/>
+  <circle cx="108" cy="144" r="4" stroke="#ef6306" stroke-width="2" fill="none"/>
+  <circle cx="156" cy="172" r="4" stroke="#ef6306" stroke-width="2" fill="none"/>
+  <circle cx="156" cy="284" r="8" fill="#ef6306"/>
+  <circle cx="60" cy="340" r="4" stroke="#ef6306" stroke-width="2" fill="none"/>
+  <circle cx="108" cy="256" r="8" fill="#ef6306"/>
+  <circle cx="204" cy="200" r="8" fill="#ef6306"/>
+  <circle cx="156" cy="228" r="4" stroke="#ef6306" stroke-width="2" fill="none"/>
 </svg>

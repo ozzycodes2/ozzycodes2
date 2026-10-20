@@ -10,174 +10,77 @@
     svg#left-brain .signal {
       animation: brain-signal 3.6s linear infinite;
     }
-    svg#left-brain .drift {
-      animation: brain-drift 3.6s linear infinite;
-    }
     @keyframes brain-signal {
       from { stroke-dashoffset: 0 }
       to   { stroke-dashoffset: calc(-1 * var(--cycle) * 1px) }
     }
-    @keyframes brain-drift {
-      from { transform: translateX(0) }
-      to   { transform: translateX(calc(var(--drift) * 1px)) }
-    }
   </style>
-  <path d="M1280 32 L1232 4" stroke-width="4" stroke="#ef6306" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M1280 200 L1232 228" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1280 200 L1232 228" stroke-width="7" stroke-dasharray="8.9 46.7" style="--cycle: 55.6;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M1280 368 L1232 396" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1280 368 L1232 396" stroke-width="7" stroke-dasharray="8.9 46.7" style="--cycle: 55.6; animation-delay: -2.22s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M1232 4 L1184 32" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1232 4 L1184 32" stroke-width="7" stroke-dasharray="8.9 46.7" style="--cycle: 55.6; animation-delay: -0.85s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M1232 60 L1184 32" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1232 60 L1184 32" stroke-width="7" stroke-dasharray="8.9 46.7" style="--cycle: 55.6; animation-delay: -3.07s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M1232 116 L1232 172" stroke-width="4" stroke="#ef6306" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M1232 116 L1184 88" stroke-width="4" stroke="#ef6306" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M1232 172 L1184 200" stroke-width="4" stroke="#ef6306" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M1232 284 L1232 340" stroke-width="4" stroke="#ef6306" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M1232 284 L1184 256" stroke-width="4" stroke="#ef6306" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M1232 396 L1184 368" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1232 396 L1184 368" stroke-width="7" stroke-dasharray="8.9 46.7" style="--cycle: 55.6; animation-delay: -1.70s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M1184 32 L1136 60" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1184 32 L1136 60" stroke-width="7" stroke-dasharray="8.9 46.7" style="--cycle: 55.6; animation-delay: -0.32s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M1184 144 L1136 116" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1184 144 L1136 116" stroke-width="7" stroke-dasharray="8.9 46.7" style="--cycle: 55.6; animation-delay: -2.55s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M1184 200 L1184 256" stroke-width="4" stroke="#ef6306" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M1184 200 L1136 172" stroke-width="4" stroke="#ef6306" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M1184 256 L1136 284" stroke-width="4" stroke="#ef6306" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M1184 312 L1184 368" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1184 312 L1184 368" stroke-width="7" stroke-dasharray="9.0 47.0" style="--cycle: 56.0; animation-delay: -1.17s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M1184 368 L1136 340" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1184 368 L1136 340" stroke-width="7" stroke-dasharray="8.9 46.7" style="--cycle: 55.6; animation-delay: -3.40s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M1136 60 L1136 116" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1136 60 L1136 116" stroke-width="7" stroke-dasharray="9.0 47.0" style="--cycle: 56.0; animation-delay: -2.02s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M1136 116 L1088 144" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1136 116 L1088 144" stroke-width="7" stroke-dasharray="8.9 46.7" style="--cycle: 55.6; animation-delay: -0.65s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M1136 228 L1088 200" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1136 228 L1088 200" stroke-width="7" stroke-dasharray="8.9 46.7" style="--cycle: 55.6; animation-delay: -2.87s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M1136 284 L1136 340" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1136 284 L1136 340" stroke-width="7" stroke-dasharray="9.0 47.0" style="--cycle: 56.0; animation-delay: -1.50s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M1136 284 L1088 256" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1136 284 L1088 256" stroke-width="7" stroke-dasharray="8.9 46.7" style="--cycle: 55.6; animation-delay: -0.12s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M1088 144 L1088 200" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1088 144 L1088 200" stroke-width="7" stroke-dasharray="9.0 47.0" style="--cycle: 56.0; animation-delay: -2.35s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M1088 200 L1088 256" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path class="signal" d="M1088 200 L1088 256" stroke-width="7" stroke-dasharray="9.0 47.0" style="--cycle: 56.0; animation-delay: -0.97s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <circle cx="1280" cy="32" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="1232" cy="4" r="4" fill="#ef6306"/>
-  <circle cx="1280" cy="200" r="4" fill="#ef6306"/>
-  <circle cx="1232" cy="228" r="4" fill="#ef6306"/>
-  <circle cx="1280" cy="368" r="4" fill="#ef6306"/>
-  <circle cx="1232" cy="396" r="4" fill="#ef6306"/>
-  <circle cx="1184" cy="32" r="8" fill="#ef6306"/>
-  <circle cx="1232" cy="60" r="4" fill="#ef6306"/>
-  <circle cx="1232" cy="116" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="1232" cy="172" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="1184" cy="88" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="1184" cy="200" r="8" fill="#ef6306"/>
-  <circle cx="1232" cy="284" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="1232" cy="340" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="1184" cy="256" r="8" fill="#ef6306"/>
-  <circle cx="1184" cy="368" r="8" fill="#ef6306"/>
-  <circle cx="1136" cy="60" r="4" fill="#ef6306"/>
-  <circle cx="1184" cy="144" r="4" fill="#ef6306"/>
-  <circle cx="1136" cy="116" r="8" fill="#ef6306"/>
-  <circle cx="1136" cy="172" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="1136" cy="284" r="8" fill="#ef6306"/>
-  <circle cx="1184" cy="312" r="4" fill="#ef6306"/>
-  <circle cx="1136" cy="340" r="4" fill="#ef6306"/>
-  <circle cx="1088" cy="144" r="4" fill="#ef6306"/>
-  <circle cx="1136" cy="228" r="4" fill="#ef6306"/>
-  <circle cx="1088" cy="200" r="8" fill="#ef6306"/>
-  <circle cx="1088" cy="256" r="4" fill="#ef6306"/>
-  <g class="drift" style="--drift: -672">
-  <circle cx="-656" cy="52" r="4" fill="#ef6306"/>
-  <circle cx="-628" cy="212" r="4" fill="#ef6306"/>
-  <circle cx="-600" cy="332" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="-576" cy="124" r="4" fill="#ef6306"/>
-  <circle cx="-540" cy="268" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="-512" cy="68" r="4" fill="#ef6306"/>
-  <circle cx="-484" cy="196" r="4" fill="#ef6306"/>
-  <circle cx="-456" cy="356" r="4" fill="#ef6306"/>
-  <circle cx="-428" cy="104" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="-396" cy="240" r="4" fill="#ef6306"/>
-  <circle cx="-364" cy="160" r="4" fill="#ef6306"/>
-  <circle cx="-332" cy="44" r="4" fill="#ef6306"/>
-  <circle cx="-304" cy="296" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="-272" cy="180" r="4" fill="#ef6306"/>
-  <circle cx="-236" cy="84" r="4" fill="#ef6306"/>
-  <circle cx="-208" cy="252" r="4" fill="#ef6306"/>
-  <circle cx="-176" cy="140" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="-144" cy="320" r="4" fill="#ef6306"/>
-  <circle cx="-112" cy="60" r="4" fill="#ef6306"/>
-  <circle cx="-76" cy="220" r="4" fill="#ef6306"/>
-  <circle cx="-44" cy="116" r="4" fill="#ef6306"/>
-  <circle cx="-16" cy="284" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="16" cy="52" r="4" fill="#ef6306"/>
-  <circle cx="44" cy="212" r="4" fill="#ef6306"/>
-  <circle cx="72" cy="332" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="96" cy="124" r="4" fill="#ef6306"/>
-  <circle cx="132" cy="268" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="160" cy="68" r="4" fill="#ef6306"/>
-  <circle cx="188" cy="196" r="4" fill="#ef6306"/>
-  <circle cx="216" cy="356" r="4" fill="#ef6306"/>
-  <circle cx="244" cy="104" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="276" cy="240" r="4" fill="#ef6306"/>
-  <circle cx="308" cy="160" r="4" fill="#ef6306"/>
-  <circle cx="340" cy="44" r="4" fill="#ef6306"/>
-  <circle cx="368" cy="296" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="400" cy="180" r="4" fill="#ef6306"/>
-  <circle cx="436" cy="84" r="4" fill="#ef6306"/>
-  <circle cx="464" cy="252" r="4" fill="#ef6306"/>
-  <circle cx="496" cy="140" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="528" cy="320" r="4" fill="#ef6306"/>
-  <circle cx="560" cy="60" r="4" fill="#ef6306"/>
-  <circle cx="596" cy="220" r="4" fill="#ef6306"/>
-  <circle cx="628" cy="116" r="4" fill="#ef6306"/>
-  <circle cx="656" cy="284" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="688" cy="52" r="4" fill="#ef6306"/>
-  <circle cx="716" cy="212" r="4" fill="#ef6306"/>
-  <circle cx="744" cy="332" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="768" cy="124" r="4" fill="#ef6306"/>
-  <circle cx="804" cy="268" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="832" cy="68" r="4" fill="#ef6306"/>
-  <circle cx="860" cy="196" r="4" fill="#ef6306"/>
-  <circle cx="888" cy="356" r="4" fill="#ef6306"/>
-  <circle cx="916" cy="104" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="948" cy="240" r="4" fill="#ef6306"/>
-  <circle cx="980" cy="160" r="4" fill="#ef6306"/>
-  <circle cx="1012" cy="44" r="4" fill="#ef6306"/>
-  <circle cx="1040" cy="296" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="1072" cy="180" r="4" fill="#ef6306"/>
-  <circle cx="1108" cy="84" r="4" fill="#ef6306"/>
-  <circle cx="1136" cy="252" r="4" fill="#ef6306"/>
-  <circle cx="1168" cy="140" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="1200" cy="320" r="4" fill="#ef6306"/>
-  <circle cx="1232" cy="60" r="4" fill="#ef6306"/>
-  <circle cx="1268" cy="220" r="4" fill="#ef6306"/>
-  <circle cx="1300" cy="116" r="4" fill="#ef6306"/>
-  <circle cx="1328" cy="284" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="1360" cy="52" r="4" fill="#ef6306"/>
-  <circle cx="1388" cy="212" r="4" fill="#ef6306"/>
-  <circle cx="1416" cy="332" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="1440" cy="124" r="4" fill="#ef6306"/>
-  <circle cx="1476" cy="268" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="1504" cy="68" r="4" fill="#ef6306"/>
-  <circle cx="1532" cy="196" r="4" fill="#ef6306"/>
-  <circle cx="1560" cy="356" r="4" fill="#ef6306"/>
-  <circle cx="1588" cy="104" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="1620" cy="240" r="4" fill="#ef6306"/>
-  <circle cx="1652" cy="160" r="4" fill="#ef6306"/>
-  <circle cx="1684" cy="44" r="4" fill="#ef6306"/>
-  <circle cx="1712" cy="296" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="1744" cy="180" r="4" fill="#ef6306"/>
-  <circle cx="1780" cy="84" r="4" fill="#ef6306"/>
-  <circle cx="1808" cy="252" r="4" fill="#ef6306"/>
-  <circle cx="1840" cy="140" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  <circle cx="1872" cy="320" r="4" fill="#ef6306"/>
-  <circle cx="1904" cy="60" r="4" fill="#ef6306"/>
-  <circle cx="1940" cy="220" r="4" fill="#ef6306"/>
-  <circle cx="1972" cy="116" r="4" fill="#ef6306"/>
-  <circle cx="2000" cy="284" r="8" stroke="#ef6306" stroke-width="4" fill="none"/>
-  </g>
+  <path d="M1328 32 L1280 4" stroke-width="4" stroke="#ef6306" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1328 200 L1280 228" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1328 200 L1280 228" stroke-width="7" stroke-dasharray="8.9 46.7" style="--cycle: 55.6;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1328 368 L1280 396" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1328 368 L1280 396" stroke-width="7" stroke-dasharray="8.9 46.7" style="--cycle: 55.6; animation-delay: -2.22s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1280 4 L1232 32" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1280 4 L1232 32" stroke-width="7" stroke-dasharray="8.9 46.7" style="--cycle: 55.6; animation-delay: -0.85s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1280 60 L1232 32" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1280 60 L1232 32" stroke-width="7" stroke-dasharray="8.9 46.7" style="--cycle: 55.6; animation-delay: -3.07s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1280 116 L1280 172" stroke-width="4" stroke="#ef6306" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1280 116 L1232 88" stroke-width="4" stroke="#ef6306" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1280 172 L1232 200" stroke-width="4" stroke="#ef6306" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1280 284 L1280 340" stroke-width="4" stroke="#ef6306" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1280 284 L1232 256" stroke-width="4" stroke="#ef6306" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1280 396 L1232 368" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1280 396 L1232 368" stroke-width="7" stroke-dasharray="8.9 46.7" style="--cycle: 55.6; animation-delay: -1.70s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1232 32 L1184 60" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1232 32 L1184 60" stroke-width="7" stroke-dasharray="8.9 46.7" style="--cycle: 55.6; animation-delay: -0.32s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1232 144 L1184 116" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1232 144 L1184 116" stroke-width="7" stroke-dasharray="8.9 46.7" style="--cycle: 55.6; animation-delay: -2.55s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1232 200 L1232 256" stroke-width="4" stroke="#ef6306" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1232 200 L1184 172" stroke-width="4" stroke="#ef6306" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1232 256 L1184 284" stroke-width="4" stroke="#ef6306" stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1232 312 L1232 368" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1232 312 L1232 368" stroke-width="7" stroke-dasharray="9.0 47.0" style="--cycle: 56.0; animation-delay: -1.17s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1232 368 L1184 340" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1232 368 L1184 340" stroke-width="7" stroke-dasharray="8.9 46.7" style="--cycle: 55.6; animation-delay: -3.40s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1184 60 L1184 116" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1184 60 L1184 116" stroke-width="7" stroke-dasharray="9.0 47.0" style="--cycle: 56.0; animation-delay: -2.02s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1184 116 L1136 144" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1184 116 L1136 144" stroke-width="7" stroke-dasharray="8.9 46.7" style="--cycle: 55.6; animation-delay: -0.65s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1184 228 L1136 200" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1184 228 L1136 200" stroke-width="7" stroke-dasharray="8.9 46.7" style="--cycle: 55.6; animation-delay: -2.87s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1184 284 L1184 340" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1184 284 L1184 340" stroke-width="7" stroke-dasharray="9.0 47.0" style="--cycle: 56.0; animation-delay: -1.50s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1184 284 L1136 256" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1184 284 L1136 256" stroke-width="7" stroke-dasharray="8.9 46.7" style="--cycle: 55.6; animation-delay: -0.12s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1136 144 L1136 200" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1136 144 L1136 200" stroke-width="7" stroke-dasharray="9.0 47.0" style="--cycle: 56.0; animation-delay: -2.35s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M1136 200 L1136 256" stroke-width="4" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path class="signal" d="M1136 200 L1136 256" stroke-width="7" stroke-dasharray="9.0 47.0" style="--cycle: 56.0; animation-delay: -0.97s;" stroke="#ef6306" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="1328" cy="32" r="4" stroke="#ef6306" stroke-width="2" fill="none"/>
+  <circle cx="1280" cy="4" r="4" fill="#ef6306"/>
+  <circle cx="1328" cy="200" r="4" fill="#ef6306"/>
+  <circle cx="1280" cy="228" r="4" fill="#ef6306"/>
+  <circle cx="1328" cy="368" r="4" fill="#ef6306"/>
+  <circle cx="1280" cy="396" r="4" fill="#ef6306"/>
+  <circle cx="1232" cy="32" r="8" fill="#ef6306"/>
+  <circle cx="1280" cy="60" r="4" fill="#ef6306"/>
+  <circle cx="1280" cy="116" r="4" stroke="#ef6306" stroke-width="2" fill="none"/>
+  <circle cx="1280" cy="172" r="4" stroke="#ef6306" stroke-width="2" fill="none"/>
+  <circle cx="1232" cy="88" r="4" stroke="#ef6306" stroke-width="2" fill="none"/>
+  <circle cx="1232" cy="200" r="8" fill="#ef6306"/>
+  <circle cx="1280" cy="284" r="4" stroke="#ef6306" stroke-width="2" fill="none"/>
+  <circle cx="1280" cy="340" r="4" stroke="#ef6306" stroke-width="2" fill="none"/>
+  <circle cx="1232" cy="256" r="8" fill="#ef6306"/>
+  <circle cx="1232" cy="368" r="8" fill="#ef6306"/>
+  <circle cx="1184" cy="60" r="4" fill="#ef6306"/>
+  <circle cx="1232" cy="144" r="4" fill="#ef6306"/>
+  <circle cx="1184" cy="116" r="8" fill="#ef6306"/>
+  <circle cx="1184" cy="172" r="4" stroke="#ef6306" stroke-width="2" fill="none"/>
+  <circle cx="1184" cy="284" r="8" fill="#ef6306"/>
+  <circle cx="1232" cy="312" r="4" fill="#ef6306"/>
+  <circle cx="1184" cy="340" r="4" fill="#ef6306"/>
+  <circle cx="1136" cy="144" r="4" fill="#ef6306"/>
+  <circle cx="1184" cy="228" r="4" fill="#ef6306"/>
+  <circle cx="1136" cy="200" r="8" fill="#ef6306"/>
+  <circle cx="1136" cy="256" r="4" fill="#ef6306"/>
 </svg>

@@ -66,33 +66,50 @@ def test_shift_brings_the_drawing_inside_the_canvas():
     """The editor's grid runs past the bottom of the card on purpose — a shape
     is easier to draw than to place. The shift is what places it."""
     sides = shape.sides(state({"104,20|152,48": "solid", "104,384|152,412": "solid"}), "left")
-    dv = shape.shift(sides)
+    dv = shape.shift(shape.side_points(sides))
     assert dv == -16
-    vs = [p[1] for a, b, _ in shape.shifted(sides, dv) for p in (a, b)]
+    vs = [p[1] for a, b, _ in shape.shifted(sides, 0, dv) for p in (a, b)]
     assert min(vs) == shape.PAD
     assert max(vs) <= shape.H - shape.PAD
 
 
 def test_shift_stays_on_the_4px_grid():
-    """Every coordinate in the left half is a multiple of four, which is the
-    one thing the right half is allowed to break and this one is not."""
+    """Every coordinate the editor can emit is a multiple of four, and placing
+    the drawing may not be what takes it off."""
     sides = shape.sides(state({"104,48|152,76": "solid"}), "left")
-    assert shape.shift(sides) % 4 == 0
+    assert shape.shift(shape.side_points(sides)) % 4 == 0
 
 
 def test_a_drawing_taller_than_the_card_is_an_error():
     sides = shape.sides(state({"104,0|104,56": "solid", "104,0|152,420": "solid"}), "left")
     with pytest.raises(ValueError, match="taller than the card"):
-        shape.shift(sides)
+        shape.shift(shape.side_points(sides))
 
 
 def test_shift_of_nothing_is_nothing():
     assert shape.shift([]) == 0
 
 
+@pytest.mark.parametrize(
+    "u0, expected, why",
+    [
+        (56, -48, "one empty column comes off"),
+        (8, 0, "already up against the midline"),
+        (200, -192, "four empty columns come off"),
+        (4, 0, "at the pad, and a column inward would cross the midline"),
+    ],
+)
+def test_the_drawing_is_brought_up_to_the_midline_by_whole_columns(u0, expected, why):
+    assert shape.column_shift([(u0, 20), (248, 384)]) == expected, why
+
+
+def test_column_shift_of_nothing_is_nothing():
+    assert shape.column_shift([]) == 0
+
+
 def test_extent_measures_the_box_the_drawing_occupies():
     sides = shape.sides(state({"104,20|152,48": "solid", "200,76|248,104": "solid"}), "left")
-    assert shape.extent(sides) == (104, 20, 248, 104)
+    assert shape.extent(shape.side_points(sides)) == (104, 20, 248, 104)
 
 
 def test_extent_of_nothing_is_nothing():
@@ -105,8 +122,8 @@ def test_as_js_emits_a_literal_naming_every_side():
     assert "const BRAIN_EDGES = {" in js
     # Generated, and says so where the next reader of brains.js will see it.
     assert "tools.brains.shape" in js
-    assert "[[104, 4], [152, 32], 0]" in js
-    assert "[[56, 32], [104, 4], 1]" in js
+    assert "[[56, 4], [104, 32], 0]" in js
+    assert "[[8, 32], [56, 4], 1]" in js
     assert js.rstrip().endswith("};")
 
 
@@ -158,14 +175,93 @@ def test_a_circle_hangs_off_a_triangle_tip():
     assert shape.odd_circles(circled({"152,188": shape.FULL}), "right") == [((152, 188), shape.FULL)]
 
 
-def test_an_arc_spans_one_triangle():
-    """Arc `k` runs from the spoke toward neighbour `k` to the next one round,
-    so it begins and ends on the construction rather than somewhere by eye."""
-    ends = [shape.spoke((152, 160), k) for k in range(shape.SECTORS)]
-    assert ends[0] == pytest.approx((152, 112))  # straight up, R from the tip
-    assert all(
-        abs(complex(*e) - complex(152, 160)) == pytest.approx(shape.R) for e in ends
-    )
+def test_an_arc_begins_and_ends_on_a_grid_vertex():
+    """Which is what lets the drawing join up: two circles on neighbouring tips
+    cross at exactly the two tips they both border, so arcs from different
+    circles share an endpoint instead of near-missing between vertices."""
+    ends = [shape.tip((152, 160), k) for k in range(shape.SECTORS)]
+    assert ends[0] == (152, 104)  # straight up, one RISE from the centre
+    assert all(shape.on_grid(e) for e in ends)
+
+
+def test_an_arc_wraps_round_the_circle():
+    assert shape.tip((152, 160), shape.SECTORS) == shape.tip((152, 160), 0)
+
+
+@pytest.mark.parametrize(
+    "mask, expected, why",
+    [
+        ("100000", [(0, 1)], "one arc is a run of one"),
+        ("111000", [(0, 3)], "three in a row are one run"),
+        ("111111", [(0, 6)], "a whole circle is one run and has no ends"),
+        ("101000", [(0, 1), (2, 1)], "a gap splits the runs"),
+        ("100011", [(4, 3)], "a run wraps past the last sextant"),
+    ],
+)
+def test_runs_are_the_maximal_chains_of_contiguous_arcs(mask, expected, why):
+    """A run is one stroke. Emitting a path per arc instead leaves a seam at
+    every tip a run passes through, which the node grammar then has to hide."""
+    assert shape.runs(mask) == expected, why
+
+
+def test_arc_runs_collects_every_circle_in_one_order():
+    drawn = shape.arc_runs(circled({"200,132": "100100", "152,160": "110000"}), "right")
+    assert drawn == [((152, 160), 0, 2), ((200, 132), 0, 1), ((200, 132), 3, 1)]
+
+
+def test_a_run_reaches_the_tips_it_spans():
+    assert shape.run_points((152, 160), 1, 2) == [(200, 132), (200, 188), (152, 216)]
+
+
+def test_a_whole_circle_reaches_all_six_tips_once():
+    pts = shape.run_points((152, 160), 0, shape.SECTORS)
+    assert len(pts) == len(set(pts)) == shape.SECTORS
+
+
+def test_the_tips_bound_the_drawing_vertically():
+    """What makes placing the right half a question about tips rather than about
+    sweeps. An arc's extremes in `u` fall mid-sweep, but 90° and 270° — the
+    lowest and highest points of a circle — are themselves tips, so no arc ever
+    reaches above or below the tips of the run it belongs to."""
+    pts = shape.run_points((152, 160), 0, shape.SECTORS)
+    assert min(p[1] for p in pts) == 160 - shape.R
+    assert max(p[1] for p in pts) == 160 + shape.R
+
+
+def test_as_js_emits_a_literal_naming_every_run():
+    js = shape.as_js(circled({"152,160": "110000"}))
+    assert "const BRAIN_RUNS = {" in js
+    # Placed: the run reaches u 152..200 and v 104..188, so it comes in three
+    # columns and up by PAD - 104.
+    assert "[8, 60, 0, 2]," in js
+    assert "  left: [\n  ]," in js  # the left half is not drawn in arcs
+
+
+def test_as_js_refuses_a_circle_the_editor_could_not_have_saved():
+    with pytest.raises(ValueError, match="not a circle"):
+        shape.as_js(circled({"152,188": "111111"}))
+
+
+def test_as_js_refuses_a_circle_with_every_arc_drawn():
+    """A closed shape is an outline, which is the thing neither half has. It is
+    also unrenderable: an `A` to the point the path already stands on is a
+    zero-length segment, which SVG skips, so the last sixth would vanish."""
+    with pytest.raises(ValueError, match="closes"):
+        shape.as_js(circled({"152,160": shape.FULL}))
+
+
+def test_both_halves_are_placed_at_one_corner():
+    """One extent against one gutter, which is the only thing that makes the
+    pinned pair read as one brain rather than as two drawings at two sizes."""
+    s = shape.load()
+    corners = []
+    for drawn, pts in (
+        (shape.sides(s, "left"), shape.side_points),
+        (shape.arc_runs(s, "right"), shape.arc_points),
+    ):
+        u0, v0, _, _ = shape.extent(pts(drawn))
+        corners.append((u0 + shape.column_shift(pts(drawn)), v0 + shape.shift(pts(drawn))))
+    assert corners == [(8, shape.PAD), (8, shape.PAD)]
 
 
 def test_the_saved_drawing_is_on_the_grid_and_fits():
@@ -174,9 +270,12 @@ def test_the_saved_drawing_is_on_the_grid_and_fits():
     s = shape.load()
     assert shape.strays(s, "left") == []
     assert shape.odd_circles(s, "right") == []
-    drawn = shape.sides(s, "left")
-    if drawn:
-        shape.shift(drawn)  # raises if it cannot be placed
+    for drawn, pts in (
+        (shape.sides(s, "left"), shape.side_points),
+        (shape.arc_runs(s, "right"), shape.arc_points),
+    ):
+        if drawn:
+            shape.shift(pts(drawn))  # raises if it cannot be placed
 
 
 def test_load_reads_the_editor_state(tmp_path):
@@ -189,16 +288,7 @@ def test_load_of_a_missing_file_is_an_empty_board(tmp_path):
     assert shape.load(tmp_path / "nope.json") == {"left": {}, "right": {}}
 
 
-def test_main_prints_the_literal(capsys):
+def test_main_prints_both_literals(capsys):
     assert shape.main([]) == 0
-    assert "const BRAIN_EDGES" in capsys.readouterr().out
-
-
-def test_main_says_when_a_drawn_circle_is_not_in_the_output(capsys, tmp_path):
-    """Otherwise the literal looks complete, gets pasted, and the right half
-    quietly keeps the arcs it already had."""
-    p = tmp_path / "state.json"
-    p.write_text(json.dumps(circled({"152,160": shape.FULL})))
-    assert shape.main(["--state", str(p)]) == 0
-    assert "2 circles" not in (err := capsys.readouterr().err)
-    assert "1 circle" in err and "right" in err
+    out = capsys.readouterr().out
+    assert "const BRAIN_EDGES" in out and "const BRAIN_RUNS" in out

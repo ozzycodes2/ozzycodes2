@@ -95,28 +95,44 @@ draws off the construction grid, picked one mark at a time.
 **Left half — sides.** Click a triangle side to draw it, click again to erase
 it, double-click to make it dashed.
 
-**Right half — circles.** Click a triangle tip for the circle inscribed in the
-six triangles that meet there, radius 48. Those triangles cut it into six arcs;
-click an arc to cut it away, and the last one takes the circle with it. Clicking
-a tip that already has a circle gives the whole thing up.
+**Right half — circles.** Click a triangle tip for the circle through the six
+tips around it, radius 56. The triangles cut it into six arcs; click an arc to
+cut it away, and the last one takes the circle with it. Clicking a tip that
+already has a circle gives the whole thing up.
+
+The radius is what makes the right half join up. Two circles on neighbouring
+tips cross at exactly the two tips they both border, so arcs from different
+circles share an endpoint rather than crossing somewhere between vertices, and
+where two runs touch the shorter ends on the longer. A circle inscribed in the
+hexagon instead, radius 48, keeps every arc inside its own triangle and nothing
+meets anything: arcs that should join land 4px apart.
 
 Every change autosaves to `editor/state.json`, which holds the two halves in the
 two shapes they are drawn in — `"u,v|u,v": "solid"` for a side, `"u,v":
 "101101"` for a circle and its arcs. Then:
 
 ```
-.venv/bin/python -m tools.brains.shape            # the BRAIN_EDGES literal
+.venv/bin/python -m tools.brains.shape            # both literals
 ```
 
-Paste that over `BRAIN_EDGES` in the preview's `brains.js`. The literal is the
-drawing placed inside the card — `shape.py` translates it vertically, because
-the editor's grid deliberately runs past the bottom so a shape can be drawn
-without also being positioned. It refuses to emit a chord or an off-grid
-endpoint rather than publishing one as if it were a drawing decision.
+Paste those over `BRAIN_EDGES` and `BRAIN_RUNS` in the preview's `brains.js`.
+They are the drawing placed inside the card: the editor's grid deliberately runs
+past the bottom and leaves room at the midline, so a shape can be drawn without
+also being positioned, and `shape.py` translates each half to the corner. Down
+the card it goes to the pad exactly; in from the midline it goes by whole
+columns, because a fraction of a column would buy a few pixels at the cost of
+taking every vertex off the construction. It refuses to emit a chord, an
+off-grid endpoint or a closed circle rather than publishing one as if it were a
+drawing decision.
 
-Only the left half is emitted so far; the right is still the hand-tuned
-`BRAIN_ARCS`, and `shape.py` says on stderr when circles are drawn that it is
-not carrying through.
+Nothing stands behind either half — no grid, no field, nothing drifting. The
+card's own surface is the ground, and the only thing that moves is the dash
+marching along the lines already drawn.
+
+A run is the maximal chain of contiguous arcs around one circle, emitted as one
+path so it carries no seam where two of its arcs meet. Nodes are not emitted:
+both halves derive them from the graph, so a mark cannot outlive the stroke it
+sits on.
 
 Edit the drawing, never the numbers. A hand-edited literal is lost the next
 time the editor saves.
