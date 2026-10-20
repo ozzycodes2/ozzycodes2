@@ -1,0 +1,281 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>brain grid</title>
+<!-- Click a triangle side to draw it. Click again to erase. Double-click a
+     drawn side to make it dashed. Every change is saved to state.json. -->
+<style>
+  :root { color-scheme: dark; }
+  body {
+    margin: 0; background: #0d1117; color: #c9d1d9;
+    font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  header {
+    position: sticky; top: 0; z-index: 2; display: flex; gap: 1.5rem;
+    align-items: center; padding: .6rem 1rem; background: #0d1117;
+    border-bottom: 1px solid #21262d;
+  }
+  header b { color: #ef6306; font-weight: 600; }
+  button, select {
+    font: inherit; color: inherit; background: #161b22;
+    border: 1px solid #30363d; border-radius: 4px; padding: .2rem .6rem;
+  }
+  button:hover { border-color: #ef6306; }
+  #saved { color: #3fb950; }
+  #saved[data-dirty] { color: #d29922; }
+  main { padding: 1rem; overflow: auto; }
+  svg { display: block; }
+  /* The grid is construction: thin, dim, and never the thing being drawn. */
+  .grid line { stroke: #ef6306; stroke-opacity: .22; stroke-width: 1; }
+  .hit { stroke: transparent; stroke-width: 16; cursor: pointer; }
+  .hit:hover { stroke: #ef630633; }
+  .on { stroke: #ef6306; stroke-width: 4; stroke-linecap: round; pointer-events: none; }
+  .on.dash { stroke-dasharray: 8 12; }
+  .node { fill: #ef6306; pointer-events: none; }
+  .node.ring { fill: none; stroke: #ef6306; stroke-width: 4; }
+  /* The published extent, so a shape can be held to the size the other half
+     is tuned to. Not drawn in the figure. */
+  .extent { fill: none; stroke: #58a6ff; stroke-opacity: .5; stroke-width: 1; stroke-dasharray: 4 4; }
+</style>
+
+<header>
+  <b>brain grid</b>
+  <label>half
+    <select id="side"><option value="left">left</option><option value="right">right</option></select>
+  </label>
+  <label>zoom
+    <select id="zoom"><option>1</option><option selected>2</option><option>3</option></select>
+  </label>
+  <button id="undo">undo</button>
+  <button id="clear">clear half</button>
+  <span id="stat"></span>
+  <span id="saved">saved</span>
+</header>
+<main><div id="board"></div></main>
+
+<script type="module">
+/* The construction grid. Vertices at {(48p, 28q) : p ≡ q (mod 2)} offset from
+   a lattice origin; a triangle side joins a vertex to one of its six
+   neighbours, (0, ±56) or (±48, ±28).
+
+   Those sides are 56 and 55.57, and the angles 60.5° / 59.7° / 59.7° — a
+   balanced triangle to within half a degree, which is as close as this gets.
+   True isometric wants a run of 28√3 = 48.497 against the 28 rise, and no
+   multiple of four expresses it; the whole system is drawn on a 4px grid, so
+   the half-degree is the price of staying on it.
+
+   The cell this builds is 96 wide by 112 tall. It is not the 2:1 dimetric cube
+   the isometric console is drawn in, which is square at 112 × 112 — the
+   reference's cells read taller than wide and a balanced grid is what makes
+   them do it. */
+const COL = 48, ROW = 28, RISE = 56;
+const ORIGIN = [104, 20];
+const W = 1340, H = 400;
+/* How far out from the midline the grid reaches. The hemisphere lives in the
+   first 320 or so; the rest of the card carries only drifting field dots. */
+const U_MAX = 560;
+/* A size guide, on grid vertices: four columns wide by thirteen rows tall.
+   Both halves have to occupy one extent or the pair reads as two drawings at
+   two sizes, and the right half's arcs get tuned to whatever is drawn here —
+   so this is a suggestion, not a boundary. The readout in the header measures
+   what is actually drawn. */
+const EXTENT = { u0: 56, v0: 20, u1: 248, v1: 384 };
+const MIDLINE = { left: 1336, right: 4 };
+
+const key = (p) => p.join(",");
+const mapTo = (side) => ([u, v]) => [side === "left" ? MIDLINE.left - u : MIDLINE.right + u, v];
+
+/** Every triangle side in range, each once, as `[a, b]` in the local frame. */
+function sides() {
+  const out = [];
+  const [ou, ov] = ORIGIN;
+  for (let p = Math.floor(-ou / COL); ou + p * COL <= U_MAX; p++) {
+    for (let q = Math.floor((-ov - RISE) / ROW); ov + q * ROW <= H + RISE; q++) {
+      if (((p % 2) + 2) % 2 !== ((q % 2) + 2) % 2) continue;
+      const a = [ou + p * COL, ov + q * ROW];
+      // Three of the six neighbours, so each side is enumerated once.
+      for (const d of [[0, RISE], [COL, ROW], [COL, -ROW]]) {
+        const b = [a[0] + d[0], a[1] + d[1]];
+        if (b[0] > U_MAX || b[0] < 0) continue;
+        if (Math.max(a[1], b[1]) < 0 || Math.min(a[1], b[1]) > H) continue;
+        out.push([a, b]);
+      }
+    }
+  }
+  return out;
+}
+const SIDES = sides();
+const sideId = ([a, b]) => [key(a), key(b)].sort().join("|");
+
+/* ------------------------------------------------------------------ state */
+
+/* `{left: {id: "solid"|"dashed"}, right: {...}}`. The id is the side's two
+   endpoints, so it survives a change of zoom, pan or grid extent. */
+let state = { left: {}, right: {} };
+const history = [];
+let side = "left";
+
+async function load() {
+  const r = await fetch("state.json", { cache: "no-store" });
+  if (r.ok) {
+    const s = await r.json();
+    state = { left: s.left || {}, right: s.right || {} };
+  }
+}
+
+let timer;
+function save() {
+  document.getElementById("saved").dataset.dirty = "1";
+  document.getElementById("saved").textContent = "saving…";
+  clearTimeout(timer);
+  timer = setTimeout(async () => {
+    await fetch("state.json", { method: "PUT", body: JSON.stringify(state, null, 1) });
+    delete document.getElementById("saved").dataset.dirty;
+    document.getElementById("saved").textContent = "saved";
+  }, 250);
+}
+
+function push() {
+  history.push(JSON.stringify(state));
+  if (history.length > 200) history.shift();
+}
+
+/* --------------------------------------------------------------- the nodes */
+
+/* Derived from the drawn graph, exactly as the figure derives them: a vertex
+   three or more sides leave is a junction and takes the large dot, one reached
+   only by dashed sides is a terminal and takes the ring, the rest take the
+   small dot. Shown live so what is clicked is what publishes. */
+function nodes() {
+  const deg = new Map(), solid = new Set();
+  for (const [id, kind] of Object.entries(state[side])) {
+    for (const k of id.split("|")) {
+      deg.set(k, (deg.get(k) || 0) + 1);
+      if (kind !== "dashed") solid.add(k);
+    }
+  }
+  return [...deg].map(([k, d]) => {
+    const p = k.split(",").map(Number);
+    if (d >= 3) return [p, 8, true];
+    if (!solid.has(k)) return [p, 8, false];
+    return [p, 4, true];
+  });
+}
+
+/* ---------------------------------------------------------------- drawing */
+
+const board = document.getElementById("board");
+const svgns = "http://www.w3.org/2000/svg";
+const el = (n, attrs) => {
+  const e = document.createElementNS(svgns, n);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+};
+
+let pending = null;
+
+function draw() {
+  const z = Number(document.getElementById("zoom").value);
+  const map = mapTo(side);
+  // The card is 1340 wide and the hemisphere lives in the 560 nearest the
+  // gutter; the rest carries only drifting field dots. The view is cropped to
+  // that band so zoom 2 fits a screen instead of scrolling off one.
+  const x0 = side === "left" ? W - U_MAX : 0;
+  const svg = el("svg", { width: U_MAX * z, height: H * z, viewBox: `${x0} 0 ${U_MAX} ${H}` });
+  // The gutter the pair is anchored on: u = 0 is where the other half begins.
+  const m = MIDLINE[side] + (side === "left" ? 4 : -4);
+  svg.append(el("line", {
+    x1: m, y1: 0, x2: m, y2: H,
+    stroke: "#58a6ff", "stroke-opacity": ".6", "stroke-width": 2,
+  }));
+
+  const grid = el("g", { class: "grid" });
+  for (const [a, b] of SIDES) {
+    const [p, q] = [map(a), map(b)];
+    grid.append(el("line", { x1: p[0], y1: p[1], x2: q[0], y2: q[1] }));
+  }
+  svg.append(grid);
+
+  const ex = [[EXTENT.u0, EXTENT.v0], [EXTENT.u1, EXTENT.v1]].map(map);
+  svg.append(el("rect", {
+    class: "extent",
+    x: Math.min(ex[0][0], ex[1][0]), y: Math.min(ex[0][1], ex[1][1]),
+    width: Math.abs(ex[1][0] - ex[0][0]), height: Math.abs(ex[1][1] - ex[0][1]),
+  }));
+
+  for (const [id, kind] of Object.entries(state[side])) {
+    const [p, q] = id.split("|").map((k) => map(k.split(",").map(Number)));
+    svg.append(el("line", {
+      class: kind === "dashed" ? "on dash" : "on",
+      x1: p[0], y1: p[1], x2: q[0], y2: q[1],
+    }));
+  }
+  for (const [p, r, filled] of nodes()) {
+    const c = map(p);
+    svg.append(el("circle", { class: filled ? "node" : "node ring", cx: c[0], cy: c[1], r: filled ? r : r - 2 }));
+  }
+
+  // Hit areas last, so a side is clickable even where a drawn line covers it.
+  for (const [a, b] of SIDES) {
+    const [p, q] = [map(a), map(b)];
+    const hit = el("line", { class: "hit", x1: p[0], y1: p[1], x2: q[0], y2: q[1] });
+    const id = sideId([a, b]);
+    // A double-click fires two clicks first. Defer the toggle long enough to
+    // find out which it was, or dashing a side would also erase it.
+    hit.addEventListener("click", () => {
+      clearTimeout(pending);
+      pending = setTimeout(() => { toggle(id); pending = null; }, 220);
+    });
+    hit.addEventListener("dblclick", () => {
+      clearTimeout(pending);
+      pending = null;
+      dash(id);
+    });
+    svg.append(hit);
+  }
+
+  board.replaceChildren(svg);
+  const all = Object.values(state[side]);
+  const pts = Object.keys(state[side]).flatMap((id) => id.split("|").map((k) => k.split(",").map(Number)));
+  const box = pts.length
+    ? ` · ${Math.max(...pts.map((p) => p[0])) - Math.min(...pts.map((p) => p[0]))}×` +
+      `${Math.max(...pts.map((p) => p[1])) - Math.min(...pts.map((p) => p[1]))}` +
+      ` (u ${Math.min(...pts.map((p) => p[0]))}–${Math.max(...pts.map((p) => p[0]))},` +
+      ` v ${Math.min(...pts.map((p) => p[1]))}–${Math.max(...pts.map((p) => p[1]))})`
+    : "";
+  document.getElementById("stat").textContent =
+    `${all.length} sides, ${all.filter((k) => k === "dashed").length} dashed${box}`;
+}
+
+function toggle(id) {
+  push();
+  if (state[side][id]) delete state[side][id];
+  else state[side][id] = "solid";
+  save();
+  draw();
+}
+
+function dash(id) {
+  push();
+  state[side][id] = state[side][id] === "dashed" ? "solid" : "dashed";
+  save();
+  draw();
+}
+
+document.getElementById("side").onchange = (e) => { side = e.target.value; draw(); };
+document.getElementById("zoom").onchange = draw;
+document.getElementById("undo").onclick = () => {
+  if (!history.length) return;
+  state = JSON.parse(history.pop());
+  save();
+  draw();
+};
+document.getElementById("clear").onclick = () => {
+  push();
+  state[side] = {};
+  save();
+  draw();
+};
+
+await load();
+draw();
+</script>

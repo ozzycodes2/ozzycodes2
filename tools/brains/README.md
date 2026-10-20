@@ -83,6 +83,31 @@ three different positions. Explicit seek gives byte-identical frames across
 repeats, which was verified before this pipeline was written and is worth
 re-checking if the frames ever start to shimmer.
 
+## The left half is drawn by hand, in a browser
+
+The left hemisphere is not produced by a rule. It is a composition: which sides
+of the construction grid the figure draws, picked one at a time.
+
+```
+.venv/bin/python -m tools.brains.editor.server    # http://127.0.0.1:8732/
+```
+
+Click a triangle side to draw it, click again to erase it, double-click to make
+it dashed. Every change autosaves to `editor/state.json`. Then:
+
+```
+.venv/bin/python -m tools.brains.shape            # the BRAIN_EDGES literal
+```
+
+Paste that over `BRAIN_EDGES` in the preview's `brains.js`. The literal is the
+drawing placed inside the card — `shape.py` translates it vertically, because
+the editor's grid deliberately runs past the bottom so a shape can be drawn
+without also being positioned. It refuses to emit a chord or an off-grid
+endpoint rather than publishing one as if it were a drawing decision.
+
+Edit the drawing, never the numbers. A hand-edited literal is lost the next
+time the editor saves.
+
 ## The drawing lives somewhere else
 
 `left-brain.svg` and `right-brain.svg` are generated. The drawing is authored in
