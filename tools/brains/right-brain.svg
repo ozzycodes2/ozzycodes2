@@ -1,20 +1,1317 @@
 <!-- source: site/assets/brains.js
-     generated: 2026-10-20
+     generated: 2026-10-21
      Vendored from design-preview, system mine-final. Never hand-edit:
      change the preview, look at it, then run
      `python -m tools.brains.parity --write right-brain`. -->
 <svg xmlns="http://www.w3.org/2000/svg" id="right-brain" viewBox="0 0 1496 400" width="1496" height="400" role="img" aria-labelledby="right-brain-t right-brain-d">
   <title id="right-brain-t">Right Brain</title>
-  <desc id="right-brain-d">The right hemisphere: arcs of circles hung off the same grid&#39;s vertices, converging where they meet, signals firing along them.</desc>
+  <desc id="right-brain-d">The right hemisphere: arcs of circles hung off the same grid&#39;s vertices, converging where they meet, signals firing along them, and marks of music, drawing and making — an eighth note, a beamed pair, a pencil, a brush, a cube, a palette, a wave, a pen nib, an ink drop, a spark, a triangle, a star, an open sketchbook and a bulb — thrown out of its contour along six lanes, each flung clear at its own angle and carried off by the wind, shrinking as they go.</desc>
   <style>
     svg#right-brain .signal {
       animation: brain-signal 1.2s linear infinite;
+    }
+    svg#right-brain .throw {
+      animation-duration: 1.2s;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
     }
     @keyframes brain-signal {
       from { stroke-dashoffset: 0 }
       to   { stroke-dashoffset: calc(-1 * var(--cycle) * 1px) }
     }
+    @keyframes right-brain-wander-0 {
+      0% { transform: translate(0.0000px, 0.0000px) }
+      2.0833% { transform: translate(0.0425px, -0.4838px) }
+      4.1667% { transform: translate(0.1024px, -0.7981px) }
+      6.25% { transform: translate(0.1788px, -0.9631px) }
+      8.3333% { transform: translate(0.2698px, -1.0000px) }
+      10.4167% { transform: translate(0.3716px, -0.9307px) }
+      12.5% { transform: translate(0.4796px, -0.7785px) }
+      14.5833% { transform: translate(0.5883px, -0.5677px) }
+      16.6667% { transform: translate(0.6923px, -0.3236px) }
+      18.75% { transform: translate(0.7863px, -0.0725px) }
+      20.8333% { transform: translate(0.8658px, 0.1592px) }
+      22.9167% { transform: translate(0.9278px, 0.3448px) }
+      25% { transform: translate(0.9707px, 0.4581px) }
+      27.0833% { transform: translate(0.9943px, 0.5225px) }
+      29.1667% { transform: translate(1.0000px, 0.5775px) }
+      31.25% { transform: translate(0.9903px, 0.6221px) }
+      33.3333% { transform: translate(0.9685px, 0.6562px) }
+      35.4167% { transform: translate(0.9381px, 0.6805px) }
+      37.5% { transform: translate(0.9025px, 0.6966px) }
+      39.5833% { transform: translate(0.8647px, 0.7061px) }
+      41.6667% { transform: translate(0.8266px, 0.7110px) }
+      43.75% { transform: translate(0.7894px, 0.7127px) }
+      45.8333% { transform: translate(0.7534px, 0.7125px) }
+      47.9167% { transform: translate(0.7179px, 0.7110px) }
+      50% { transform: translate(0.6819px, 0.7082px) }
+      52.0833% { transform: translate(0.6442px, 0.7038px) }
+      54.1667% { transform: translate(0.6038px, 0.6969px) }
+      56.25% { transform: translate(0.5600px, 0.6867px) }
+      58.3333% { transform: translate(0.5129px, 0.6725px) }
+      60.4167% { transform: translate(0.4629px, 0.6537px) }
+      62.5% { transform: translate(0.4113px, 0.6303px) }
+      64.5833% { transform: translate(0.3595px, 0.6026px) }
+      66.6667% { transform: translate(0.3094px, 0.5714px) }
+      68.75% { transform: translate(0.2625px, 0.5377px) }
+      70.8333% { transform: translate(0.2198px, 0.5028px) }
+      72.9167% { transform: translate(0.1821px, 0.4676px) }
+      75% { transform: translate(0.1493px, 0.4331px) }
+      77.0833% { transform: translate(0.1209px, 0.3996px) }
+      79.1667% { transform: translate(0.0958px, 0.3672px) }
+      81.25% { transform: translate(0.0727px, 0.3353px) }
+      83.3333% { transform: translate(0.0508px, 0.3031px) }
+      85.4167% { transform: translate(0.0294px, 0.2699px) }
+      87.5% { transform: translate(0.0086px, 0.2346px) }
+      89.5833% { transform: translate(-0.0106px, 0.1969px) }
+      91.6667% { transform: translate(-0.0264px, 0.1569px) }
+      93.75% { transform: translate(-0.0362px, 0.1153px) }
+      95.8333% { transform: translate(-0.0371px, 0.0737px) }
+      97.9167% { transform: translate(-0.0259px, 0.0344px) }
+      100% { transform: translate(0.0000px, -0.0000px) }
+    }
+    @keyframes right-brain-tumble-0 {
+      0% { transform: rotate(-12.041deg) }
+      2.0833% { transform: rotate(-8.384deg) }
+      4.1667% { transform: rotate(-3.682deg) }
+      6.25% { transform: rotate(1.825deg) }
+      8.3333% { transform: rotate(7.785deg) }
+      10.4167% { transform: rotate(13.769deg) }
+      12.5% { transform: rotate(19.323deg) }
+      14.5833% { transform: rotate(24.017deg) }
+      16.6667% { transform: rotate(27.496deg) }
+      18.75% { transform: rotate(29.522deg) }
+      20.8333% { transform: rotate(30.000deg) }
+      22.9167% { transform: rotate(28.984deg) }
+      25% { transform: rotate(26.670deg) }
+      27.0833% { transform: rotate(23.365deg) }
+      29.1667% { transform: rotate(19.444deg) }
+      31.25% { transform: rotate(15.305deg) }
+      33.3333% { transform: rotate(11.315deg) }
+      35.4167% { transform: rotate(7.773deg) }
+      37.5% { transform: rotate(4.872deg) }
+      39.5833% { transform: rotate(2.690deg) }
+      41.6667% { transform: rotate(1.191deg) }
+      43.75% { transform: rotate(0.242deg) }
+      45.8333% { transform: rotate(-0.355deg) }
+      47.9167% { transform: rotate(-0.821deg) }
+      50% { transform: rotate(-1.367deg) }
+      52.0833% { transform: rotate(-2.152deg) }
+      54.1667% { transform: rotate(-3.265deg) }
+      56.25% { transform: rotate(-4.710deg) }
+      58.3333% { transform: rotate(-6.410deg) }
+      60.4167% { transform: rotate(-8.229deg) }
+      62.5% { transform: rotate(-9.995deg) }
+      64.5833% { transform: rotate(-11.537deg) }
+      66.6667% { transform: rotate(-12.714deg) }
+      68.75% { transform: rotate(-13.446deg) }
+      70.8333% { transform: rotate(-13.725deg) }
+      72.9167% { transform: rotate(-13.619deg) }
+      75% { transform: rotate(-13.263deg) }
+      77.0833% { transform: rotate(-12.829deg) }
+      79.1667% { transform: rotate(-12.497deg) }
+      81.25% { transform: rotate(-12.421deg) }
+      83.3333% { transform: rotate(-12.690deg) }
+      85.4167% { transform: rotate(-13.313deg) }
+      87.5% { transform: rotate(-14.200deg) }
+      89.5833% { transform: rotate(-15.171deg) }
+      91.6667% { transform: rotate(-15.973deg) }
+      93.75% { transform: rotate(-16.318deg) }
+      95.8333% { transform: rotate(-15.921deg) }
+      97.9167% { transform: rotate(-14.544deg) }
+      100% { transform: rotate(-12.041deg) }
+    }
+    @keyframes right-brain-wander-1 {
+      0% { transform: translate(0.0000px, 0.0000px) }
+      2.0833% { transform: translate(0.0562px, -0.7072px) }
+      4.1667% { transform: translate(0.0987px, -1.0000px) }
+      6.25% { transform: translate(0.1230px, -0.9963px) }
+      8.3333% { transform: translate(0.1256px, -0.7996px) }
+      10.4167% { transform: translate(0.1047px, -0.4984px) }
+      12.5% { transform: translate(0.0597px, -0.1657px) }
+      14.5833% { transform: translate(-0.0077px, 0.1417px) }
+      16.6667% { transform: translate(-0.0943px, 0.3841px) }
+      18.75% { transform: translate(-0.1953px, 0.5384px) }
+      20.8333% { transform: translate(-0.3052px, 0.5989px) }
+      22.9167% { transform: translate(-0.4179px, 0.5767px) }
+      25% { transform: translate(-0.5275px, 0.4992px) }
+      27.0833% { transform: translate(-0.6290px, 0.4018px) }
+      29.1667% { transform: translate(-0.7186px, 0.2975px) }
+      31.25% { transform: translate(-0.7938px, 0.1924px) }
+      33.3333% { transform: translate(-0.8539px, 0.0914px) }
+      35.4167% { transform: translate(-0.8995px, -0.0019px) }
+      37.5% { transform: translate(-0.9323px, -0.0855px) }
+      39.5833% { transform: translate(-0.9550px, -0.1590px) }
+      41.6667% { transform: translate(-0.9701px, -0.2233px) }
+      43.75% { transform: translate(-0.9804px, -0.2800px) }
+      45.8333% { transform: translate(-0.9878px, -0.3316px) }
+      47.9167% { transform: translate(-0.9935px, -0.3801px) }
+      50% { transform: translate(-0.9977px, -0.4272px) }
+      52.0833% { transform: translate(-1.0000px, -0.4737px) }
+      54.1667% { transform: translate(-0.9992px, -0.5197px) }
+      56.25% { transform: translate(-0.9938px, -0.5640px) }
+      58.3333% { transform: translate(-0.9825px, -0.6052px) }
+      60.4167% { transform: translate(-0.9640px, -0.6412px) }
+      62.5% { transform: translate(-0.9381px, -0.6700px) }
+      64.5833% { transform: translate(-0.9048px, -0.6899px) }
+      66.6667% { transform: translate(-0.8651px, -0.7002px) }
+      68.75% { transform: translate(-0.8205px, -0.7007px) }
+      70.8333% { transform: translate(-0.7728px, -0.6921px) }
+      72.9167% { transform: translate(-0.7239px, -0.6760px) }
+      75% { transform: translate(-0.6752px, -0.6541px) }
+      77.0833% { transform: translate(-0.6276px, -0.6284px) }
+      79.1667% { transform: translate(-0.5813px, -0.6002px) }
+      81.25% { transform: translate(-0.5357px, -0.5703px) }
+      83.3333% { transform: translate(-0.4897px, -0.5387px) }
+      85.4167% { transform: translate(-0.4415px, -0.5041px) }
+      87.5% { transform: translate(-0.3897px, -0.4645px) }
+      89.5833% { transform: translate(-0.3330px, -0.4174px) }
+      91.6667% { transform: translate(-0.2709px, -0.3602px) }
+      93.75% { transform: translate(-0.2042px, -0.2904px) }
+      95.8333% { transform: translate(-0.1346px, -0.2068px) }
+      97.9167% { transform: translate(-0.0652px, -0.1095px) }
+      100% { transform: translate(-0.0000px, -0.0000px) }
+    }
+    @keyframes right-brain-tumble-1 {
+      0% { transform: rotate(28.190deg) }
+      2.0833% { transform: rotate(29.787deg) }
+      4.1667% { transform: rotate(30.000deg) }
+      6.25% { transform: rotate(28.599deg) }
+      8.3333% { transform: rotate(25.508deg) }
+      10.4167% { transform: rotate(20.825deg) }
+      12.5% { transform: rotate(14.817deg) }
+      14.5833% { transform: rotate(7.893deg) }
+      16.6667% { transform: rotate(0.561deg) }
+      18.75% { transform: rotate(-6.633deg) }
+      20.8333% { transform: rotate(-13.166deg) }
+      22.9167% { transform: rotate(-18.596deg) }
+      25% { transform: rotate(-22.613deg) }
+      27.0833% { transform: rotate(-25.069deg) }
+      29.1667% { transform: rotate(-25.984deg) }
+      31.25% { transform: rotate(-25.536deg) }
+      33.3333% { transform: rotate(-24.023deg) }
+      35.4167% { transform: rotate(-21.822deg) }
+      37.5% { transform: rotate(-19.327deg) }
+      39.5833% { transform: rotate(-16.898deg) }
+      41.6667% { transform: rotate(-14.815deg) }
+      43.75% { transform: rotate(-13.246deg) }
+      45.8333% { transform: rotate(-12.236deg) }
+      47.9167% { transform: rotate(-11.712deg) }
+      50% { transform: rotate(-11.509deg) }
+      52.0833% { transform: rotate(-11.405deg) }
+      54.1667% { transform: rotate(-11.170deg) }
+      56.25% { transform: rotate(-10.604deg) }
+      58.3333% { transform: rotate(-9.575deg) }
+      60.4167% { transform: rotate(-8.039deg) }
+      62.5% { transform: rotate(-6.050deg) }
+      64.5833% { transform: rotate(-3.742deg) }
+      66.6667% { transform: rotate(-1.309deg) }
+      68.75% { transform: rotate(1.037deg) }
+      70.8333% { transform: rotate(3.103deg) }
+      72.9167% { transform: rotate(4.752deg) }
+      75% { transform: rotate(5.932deg) }
+      77.0833% { transform: rotate(6.687deg) }
+      79.1667% { transform: rotate(7.154deg) }
+      81.25% { transform: rotate(7.541deg) }
+      83.3333% { transform: rotate(8.090deg) }
+      85.4167% { transform: rotate(9.037deg) }
+      87.5% { transform: rotate(10.560deg) }
+      89.5833% { transform: rotate(12.747deg) }
+      91.6667% { transform: rotate(15.563deg) }
+      93.75% { transform: rotate(18.842deg) }
+      95.8333% { transform: rotate(22.299deg) }
+      97.9167% { transform: rotate(25.556deg) }
+      100% { transform: rotate(28.190deg) }
+    }
+    @keyframes right-brain-wander-2 {
+      0% { transform: translate(0.0000px, 0.0000px) }
+      2.0833% { transform: translate(-0.1292px, 0.8335px) }
+      4.1667% { transform: translate(-0.2762px, 1.0000px) }
+      6.25% { transform: translate(-0.4328px, 0.8199px) }
+      8.3333% { transform: translate(-0.5886px, 0.5000px) }
+      10.4167% { transform: translate(-0.7324px, 0.1626px) }
+      12.5% { transform: translate(-0.8531px, -0.1306px) }
+      14.5833% { transform: translate(-0.9416px, -0.3576px) }
+      16.6667% { transform: translate(-0.9915px, -0.5198px) }
+      18.75% { transform: translate(-1.0000px, -0.6294px) }
+      20.8333% { transform: translate(-0.9683px, -0.7003px) }
+      22.9167% { transform: translate(-0.9013px, -0.7430px) }
+      25% { transform: translate(-0.8068px, -0.7630px) }
+      27.0833% { transform: translate(-0.6945px, -0.7625px) }
+      29.1667% { transform: translate(-0.5748px, -0.7441px) }
+      31.25% { transform: translate(-0.4575px, -0.7116px) }
+      33.3333% { transform: translate(-0.3503px, -0.6698px) }
+      35.4167% { transform: translate(-0.2583px, -0.6236px) }
+      37.5% { transform: translate(-0.1837px, -0.5775px) }
+      39.5833% { transform: translate(-0.1252px, -0.5352px) }
+      41.6667% { transform: translate(-0.0791px, -0.4991px) }
+      43.75% { transform: translate(-0.0400px, -0.4702px) }
+      45.8333% { transform: translate(-0.0019px, -0.4482px) }
+      47.9167% { transform: translate(0.0409px, -0.4318px) }
+      50% { transform: translate(0.0925px, -0.4190px) }
+      52.0833% { transform: translate(0.1547px, -0.4075px) }
+      54.1667% { transform: translate(0.2268px, -0.3953px) }
+      56.25% { transform: translate(0.3059px, -0.3810px) }
+      58.3333% { transform: translate(0.3867px, -0.3637px) }
+      60.4167% { transform: translate(0.4631px, -0.3436px) }
+      62.5% { transform: translate(0.5287px, -0.3217px) }
+      64.5833% { transform: translate(0.5781px, -0.2992px) }
+      66.6667% { transform: translate(0.6076px, -0.2777px) }
+      68.75% { transform: translate(0.6158px, -0.2586px) }
+      70.8333% { transform: translate(0.6039px, -0.2427px) }
+      72.9167% { transform: translate(0.5753px, -0.2301px) }
+      75% { transform: translate(0.5354px, -0.2202px) }
+      77.0833% { transform: translate(0.4901px, -0.2114px) }
+      79.1667% { transform: translate(0.4453px, -0.2020px) }
+      81.25% { transform: translate(0.4055px, -0.1899px) }
+      83.3333% { transform: translate(0.3733px, -0.1735px) }
+      85.4167% { transform: translate(0.3487px, -0.1518px) }
+      87.5% { transform: translate(0.3291px, -0.1249px) }
+      89.5833% { transform: translate(0.3097px, -0.0942px) }
+      91.6667% { transform: translate(0.2840px, -0.0621px) }
+      93.75% { transform: translate(0.2453px, -0.0324px) }
+      95.8333% { transform: translate(0.1874px, -0.0093px) }
+      97.9167% { transform: translate(0.1061px, 0.0028px) }
+      100% { transform: translate(0.0000px, 0.0000px) }
+    }
+    @keyframes right-brain-tumble-2 {
+      0% { transform: rotate(-3.563deg) }
+      2.0833% { transform: rotate(-9.441deg) }
+      4.1667% { transform: rotate(-15.487deg) }
+      6.25% { transform: rotate(-21.105deg) }
+      8.3333% { transform: rotate(-25.709deg) }
+      10.4167% { transform: rotate(-28.793deg) }
+      12.5% { transform: rotate(-30.000deg) }
+      14.5833% { transform: rotate(-29.168deg) }
+      16.6667% { transform: rotate(-26.352deg) }
+      18.75% { transform: rotate(-21.820deg) }
+      20.8333% { transform: rotate(-16.020deg) }
+      22.9167% { transform: rotate(-9.521deg) }
+      25% { transform: rotate(-2.945deg) }
+      27.0833% { transform: rotate(3.111deg) }
+      29.1667% { transform: rotate(8.147deg) }
+      31.25% { transform: rotate(11.813deg) }
+      33.3333% { transform: rotate(13.947deg) }
+      35.4167% { transform: rotate(14.581deg) }
+      37.5% { transform: rotate(13.921deg) }
+      39.5833% { transform: rotate(12.307deg) }
+      41.6667% { transform: rotate(10.155deg) }
+      43.75% { transform: rotate(7.893deg) }
+      45.8333% { transform: rotate(5.897deg) }
+      47.9167% { transform: rotate(4.443deg) }
+      50% { transform: rotate(3.675deg) }
+      52.0833% { transform: rotate(3.596deg) }
+      54.1667% { transform: rotate(4.083deg) }
+      56.25% { transform: rotate(4.920deg) }
+      58.3333% { transform: rotate(5.845deg) }
+      60.4167% { transform: rotate(6.605deg) }
+      62.5% { transform: rotate(6.999deg) }
+      64.5833% { transform: rotate(6.921deg) }
+      66.6667% { transform: rotate(6.376deg) }
+      68.75% { transform: rotate(5.477deg) }
+      70.8333% { transform: rotate(4.422deg) }
+      72.9167% { transform: rotate(3.460deg) }
+      75% { transform: rotate(2.833deg) }
+      77.0833% { transform: rotate(2.734deg) }
+      79.1667% { transform: rotate(3.257deg) }
+      81.25% { transform: rotate(4.372deg) }
+      83.3333% { transform: rotate(5.916deg) }
+      85.4167% { transform: rotate(7.607deg) }
+      87.5% { transform: rotate(9.080deg) }
+      89.5833% { transform: rotate(9.940deg) }
+      91.6667% { transform: rotate(9.821deg) }
+      93.75% { transform: rotate(8.451deg) }
+      95.8333% { transform: rotate(5.701deg) }
+      97.9167% { transform: rotate(1.619deg) }
+      100% { transform: rotate(-3.563deg) }
+    }
+    @keyframes right-brain-wander-3 {
+      0% { transform: translate(0.0000px, 0.0000px) }
+      2.0833% { transform: translate(0.0310px, 0.4708px) }
+      4.1667% { transform: translate(0.0795px, 0.7757px) }
+      6.25% { transform: translate(0.1454px, 0.9430px) }
+      8.3333% { transform: translate(0.2272px, 1.0000px) }
+      10.4167% { transform: translate(0.3219px, 0.9732px) }
+      12.5% { transform: translate(0.4252px, 0.8877px) }
+      14.5833% { transform: translate(0.5323px, 0.7674px) }
+      16.6667% { transform: translate(0.6375px, 0.6352px) }
+      18.75% { transform: translate(0.7357px, 0.5128px) }
+      20.8333% { transform: translate(0.8220px, 0.4214px) }
+      22.9167% { transform: translate(0.8930px, 0.3818px) }
+      25% { transform: translate(0.9463px, 0.4152px) }
+      27.0833% { transform: translate(0.9812px, 0.4888px) }
+      29.1667% { transform: translate(0.9985px, 0.5535px) }
+      31.25% { transform: translate(1.0000px, 0.6080px) }
+      33.3333% { transform: translate(0.9886px, 0.6516px) }
+      35.4167% { transform: translate(0.9675px, 0.6847px) }
+      37.5% { transform: translate(0.9401px, 0.7087px) }
+      39.5833% { transform: translate(0.9093px, 0.7253px) }
+      41.6667% { transform: translate(0.8771px, 0.7363px) }
+      43.75% { transform: translate(0.8451px, 0.7435px) }
+      45.8333% { transform: translate(0.8136px, 0.7482px) }
+      47.9167% { transform: translate(0.7823px, 0.7513px) }
+      50% { transform: translate(0.7503px, 0.7530px) }
+      52.0833% { transform: translate(0.7166px, 0.7528px) }
+      54.1667% { transform: translate(0.6799px, 0.7501px) }
+      56.25% { transform: translate(0.6395px, 0.7439px) }
+      58.3333% { transform: translate(0.5954px, 0.7333px) }
+      60.4167% { transform: translate(0.5477px, 0.7177px) }
+      62.5% { transform: translate(0.4976px, 0.6968px) }
+      64.5833% { transform: translate(0.4465px, 0.6707px) }
+      66.6667% { transform: translate(0.3959px, 0.6403px) }
+      68.75% { transform: translate(0.3475px, 0.6065px) }
+      70.8333% { transform: translate(0.3026px, 0.5706px) }
+      72.9167% { transform: translate(0.2620px, 0.5338px) }
+      75% { transform: translate(0.2258px, 0.4970px) }
+      77.0833% { transform: translate(0.1936px, 0.4610px) }
+      79.1667% { transform: translate(0.1645px, 0.4257px) }
+      81.25% { transform: translate(0.1374px, 0.3907px) }
+      83.3333% { transform: translate(0.1113px, 0.3553px) }
+      85.4167% { transform: translate(0.0853px, 0.3184px) }
+      87.5% { transform: translate(0.0594px, 0.2791px) }
+      89.5833% { transform: translate(0.0344px, 0.2366px) }
+      91.6667% { transform: translate(0.0119px, 0.1909px) }
+      93.75% { transform: translate(-0.0059px, 0.1426px) }
+      95.8333% { transform: translate(-0.0158px, 0.0930px) }
+      97.9167% { transform: translate(-0.0149px, 0.0445px) }
+      100% { transform: translate(-0.0000px, 0.0000px) }
+    }
+    @keyframes right-brain-tumble-3 {
+      0% { transform: rotate(-15.140deg) }
+      2.0833% { transform: rotate(-11.889deg) }
+      4.1667% { transform: rotate(-7.474deg) }
+      6.25% { transform: rotate(-2.091deg) }
+      8.3333% { transform: rotate(3.937deg) }
+      10.4167% { transform: rotate(10.196deg) }
+      12.5% { transform: rotate(16.223deg) }
+      14.5833% { transform: rotate(21.560deg) }
+      16.6667% { transform: rotate(25.810deg) }
+      18.75% { transform: rotate(28.676deg) }
+      20.8333% { transform: rotate(30.000deg) }
+      22.9167% { transform: rotate(29.777deg) }
+      25% { transform: rotate(28.149deg) }
+      27.0833% { transform: rotate(25.385deg) }
+      29.1667% { transform: rotate(21.838deg) }
+      31.25% { transform: rotate(17.904deg) }
+      33.3333% { transform: rotate(13.968deg) }
+      35.4167% { transform: rotate(10.355deg) }
+      37.5% { transform: rotate(7.301deg) }
+      39.5833% { transform: rotate(4.926deg) }
+      41.6667% { transform: rotate(3.231deg) }
+      43.75% { transform: rotate(2.115deg) }
+      45.8333% { transform: rotate(1.400deg) }
+      47.9167% { transform: rotate(0.869deg) }
+      50% { transform: rotate(0.306deg) }
+      52.0833% { transform: rotate(-0.469deg) }
+      54.1667% { transform: rotate(-1.566deg) }
+      56.25% { transform: rotate(-3.015deg) }
+      58.3333% { transform: rotate(-4.761deg) }
+      60.4167% { transform: rotate(-6.682deg) }
+      62.5% { transform: rotate(-8.610deg) }
+      64.5833% { transform: rotate(-10.368deg) }
+      66.6667% { transform: rotate(-11.800deg) }
+      68.75% { transform: rotate(-12.803deg) }
+      70.8333% { transform: rotate(-13.347deg) }
+      72.9167% { transform: rotate(-13.478deg) }
+      75% { transform: rotate(-13.315deg) }
+      77.0833% { transform: rotate(-13.026deg) }
+      79.1667% { transform: rotate(-12.797deg) }
+      81.25% { transform: rotate(-12.798deg) }
+      83.3333% { transform: rotate(-13.143deg) }
+      85.4167% { transform: rotate(-13.869deg) }
+      87.5% { transform: rotate(-14.914deg) }
+      89.5833% { transform: rotate(-16.118deg) }
+      91.6667% { transform: rotate(-17.241deg) }
+      93.75% { transform: rotate(-17.988deg) }
+      95.8333% { transform: rotate(-18.054deg) }
+      97.9167% { transform: rotate(-17.169deg) }
+      100% { transform: rotate(-15.140deg) }
+    }
+    @keyframes right-brain-wander-4 {
+      0% { transform: translate(0.0000px, 0.0000px) }
+      2.0833% { transform: translate(0.0691px, -0.3153px) }
+      4.1667% { transform: translate(0.1260px, -0.3863px) }
+      6.25% { transform: translate(0.1658px, -0.2846px) }
+      8.3333% { transform: translate(0.1843px, -0.0747px) }
+      10.4167% { transform: translate(0.1786px, 0.1873px) }
+      12.5% { transform: translate(0.1477px, 0.4544px) }
+      14.5833% { transform: translate(0.0922px, 0.6897px) }
+      16.6667% { transform: translate(0.0147px, 0.8671px) }
+      18.75% { transform: translate(-0.0805px, 0.9716px) }
+      20.8333% { transform: translate(-0.1879px, 1.0000px) }
+      22.9167% { transform: translate(-0.3014px, 0.9601px) }
+      25% { transform: translate(-0.4150px, 0.8707px) }
+      27.0833% { transform: translate(-0.5230px, 0.7561px) }
+      29.1667% { transform: translate(-0.6209px, 0.6283px) }
+      31.25% { transform: translate(-0.7057px, 0.4954px) }
+      33.3333% { transform: translate(-0.7759px, 0.3644px) }
+      35.4167% { transform: translate(-0.8316px, 0.2407px) }
+      37.5% { transform: translate(-0.8741px, 0.1277px) }
+      39.5833% { transform: translate(-0.9057px, 0.0266px) }
+      41.6667% { transform: translate(-0.9290px, -0.0630px) }
+      43.75% { transform: translate(-0.9467px, -0.1431px) }
+      45.8333% { transform: translate(-0.9609px, -0.2164px) }
+      47.9167% { transform: translate(-0.9732px, -0.2857px) }
+      50% { transform: translate(-0.9839px, -0.3533px) }
+      52.0833% { transform: translate(-0.9927px, -0.4207px) }
+      54.1667% { transform: translate(-0.9986px, -0.4881px) }
+      56.25% { transform: translate(-1.0000px, -0.5544px) }
+      58.3333% { transform: translate(-0.9955px, -0.6176px) }
+      60.4167% { transform: translate(-0.9836px, -0.6751px) }
+      62.5% { transform: translate(-0.9638px, -0.7241px) }
+      64.5833% { transform: translate(-0.9359px, -0.7622px) }
+      66.6667% { transform: translate(-0.9007px, -0.7880px) }
+      68.75% { transform: translate(-0.8596px, -0.8007px) }
+      70.8333% { transform: translate(-0.8142px, -0.8012px) }
+      72.9167% { transform: translate(-0.7667px, -0.7909px) }
+      75% { transform: translate(-0.7184px, -0.7723px) }
+      77.0833% { transform: translate(-0.6707px, -0.7476px) }
+      79.1667% { transform: translate(-0.6238px, -0.7191px) }
+      81.25% { transform: translate(-0.5774px, -0.6879px) }
+      83.3333% { transform: translate(-0.5302px, -0.6543px) }
+      85.4167% { transform: translate(-0.4807px, -0.6168px) }
+      87.5% { transform: translate(-0.4271px, -0.5731px) }
+      89.5833% { transform: translate(-0.3679px, -0.5197px) }
+      91.6667% { transform: translate(-0.3023px, -0.4528px) }
+      93.75% { transform: translate(-0.2306px, -0.3689px) }
+      95.8333% { transform: translate(-0.1542px, -0.2657px) }
+      97.9167% { transform: translate(-0.0760px, -0.1423px) }
+      100% { transform: translate(0.0000px, -0.0000px) }
+    }
+    @keyframes right-brain-tumble-4 {
+      0% { transform: rotate(26.785deg) }
+      2.0833% { transform: rotate(29.010deg) }
+      4.1667% { transform: rotate(30.000deg) }
+      6.25% { transform: rotate(29.480deg) }
+      8.3333% { transform: rotate(27.315deg) }
+      10.4167% { transform: rotate(23.531deg) }
+      12.5% { transform: rotate(18.323deg) }
+      14.5833% { transform: rotate(12.035deg) }
+      16.6667% { transform: rotate(5.126deg) }
+      18.75% { transform: rotate(-1.888deg) }
+      20.8333% { transform: rotate(-8.488deg) }
+      22.9167% { transform: rotate(-14.215deg) }
+      25% { transform: rotate(-18.719deg) }
+      27.0833% { transform: rotate(-21.794deg) }
+      29.1667% { transform: rotate(-23.398deg) }
+      31.25% { transform: rotate(-23.644deg) }
+      33.3333% { transform: rotate(-22.773deg) }
+      35.4167% { transform: rotate(-21.118deg) }
+      37.5% { transform: rotate(-19.048deg) }
+      39.5833% { transform: rotate(-16.920deg) }
+      41.6667% { transform: rotate(-15.025deg) }
+      43.75% { transform: rotate(-13.561deg) }
+      45.8333% { transform: rotate(-12.605deg) }
+      47.9167% { transform: rotate(-12.125deg) }
+      50% { transform: rotate(-11.987deg) }
+      52.0833% { transform: rotate(-11.995deg) }
+      54.1667% { transform: rotate(-11.928deg) }
+      56.25% { transform: rotate(-11.583deg) }
+      58.3333% { transform: rotate(-10.812deg) }
+      60.4167% { transform: rotate(-9.547deg) }
+      62.5% { transform: rotate(-7.811deg) }
+      64.5833% { transform: rotate(-5.712deg) }
+      66.6667% { transform: rotate(-3.422deg) }
+      68.75% { transform: rotate(-1.143deg) }
+      70.8333% { transform: rotate(0.928deg) }
+      72.9167% { transform: rotate(2.641deg) }
+      75% { transform: rotate(3.920deg) }
+      77.0833% { transform: rotate(4.779deg) }
+      79.1667% { transform: rotate(5.326deg) }
+      81.25% { transform: rotate(5.746deg) }
+      83.3333% { transform: rotate(6.270deg) }
+      85.4167% { transform: rotate(7.133deg) }
+      87.5% { transform: rotate(8.536deg) }
+      89.5833% { transform: rotate(10.596deg) }
+      91.6667% { transform: rotate(13.321deg) }
+      93.75% { transform: rotate(16.592deg) }
+      95.8333% { transform: rotate(20.165deg) }
+      97.9167% { transform: rotate(23.698deg) }
+      100% { transform: rotate(26.785deg) }
+    }
+    @keyframes right-brain-wander-5 {
+      0% { transform: translate(0.0000px, 0.0000px) }
+      2.0833% { transform: translate(-0.1120px, 0.4639px) }
+      4.1667% { transform: translate(-0.2437px, 0.5405px) }
+      6.25% { transform: translate(-0.3883px, 0.4082px) }
+      8.3333% { transform: translate(-0.5370px, 0.1834px) }
+      10.4167% { transform: translate(-0.6793px, -0.0637px) }
+      12.5% { transform: translate(-0.8048px, -0.2948px) }
+      14.5833% { transform: translate(-0.9043px, -0.4934px) }
+      16.6667% { transform: translate(-0.9707px, -0.6555px) }
+      18.75% { transform: translate(-1.0000px, -0.7828px) }
+      20.8333% { transform: translate(-0.9919px, -0.8790px) }
+      22.9167% { transform: translate(-0.9496px, -0.9466px) }
+      25% { transform: translate(-0.8791px, -0.9867px) }
+      27.0833% { transform: translate(-0.7888px, -1.0000px) }
+      29.1667% { transform: translate(-0.6878px, -0.9889px) }
+      31.25% { transform: translate(-0.5855px, -0.9577px) }
+      33.3333% { transform: translate(-0.4894px, -0.9121px) }
+      35.4167% { transform: translate(-0.4051px, -0.8583px) }
+      37.5% { transform: translate(-0.3355px, -0.8024px) }
+      39.5833% { transform: translate(-0.2802px, -0.7494px) }
+      41.6667% { transform: translate(-0.2367px, -0.7030px) }
+      43.75% { transform: translate(-0.2004px, -0.6651px) }
+      45.8333% { transform: translate(-0.1658px, -0.6360px) }
+      47.9167% { transform: translate(-0.1276px, -0.6143px) }
+      50% { transform: translate(-0.0816px, -0.5978px) }
+      52.0833% { transform: translate(-0.0253px, -0.5836px) }
+      54.1667% { transform: translate(0.0413px, -0.5690px) }
+      56.25% { transform: translate(0.1159px, -0.5518px) }
+      58.3333% { transform: translate(0.1945px, -0.5309px) }
+      60.4167% { transform: translate(0.2713px, -0.5061px) }
+      62.5% { transform: translate(0.3405px, -0.4784px) }
+      64.5833% { transform: translate(0.3966px, -0.4493px) }
+      66.6667% { transform: translate(0.4354px, -0.4208px) }
+      68.75% { transform: translate(0.4550px, -0.3948px) }
+      70.8333% { transform: translate(0.4557px, -0.3726px) }
+      72.9167% { transform: translate(0.4399px, -0.3546px) }
+      75% { transform: translate(0.4120px, -0.3401px) }
+      77.0833% { transform: translate(0.3774px, -0.3276px) }
+      79.1667% { transform: translate(0.3415px, -0.3145px) }
+      81.25% { transform: translate(0.3092px, -0.2983px) }
+      83.3333% { transform: translate(0.2832px, -0.2765px) }
+      85.4167% { transform: translate(0.2644px, -0.2475px) }
+      87.5% { transform: translate(0.2511px, -0.2108px) }
+      89.5833% { transform: translate(0.2392px, -0.1677px) }
+      91.6667% { transform: translate(0.2232px, -0.1211px) }
+      93.75% { transform: translate(0.1966px, -0.0754px) }
+      95.8333% { transform: translate(0.1534px, -0.0360px) }
+      97.9167% { transform: translate(0.0886px, -0.0090px) }
+      100% { transform: translate(-0.0000px, -0.0000px) }
+    }
+    @keyframes right-brain-tumble-5 {
+      0% { transform: rotate(-0.392deg) }
+      2.0833% { transform: rotate(-6.222deg) }
+      4.1667% { transform: rotate(-12.460deg) }
+      6.25% { transform: rotate(-18.518deg) }
+      8.3333% { transform: rotate(-23.785deg) }
+      10.4167% { transform: rotate(-27.709deg) }
+      12.5% { transform: rotate(-29.862deg) }
+      14.5833% { transform: rotate(-30.000deg) }
+      16.6667% { transform: rotate(-28.091deg) }
+      18.75% { transform: rotate(-24.324deg) }
+      20.8333% { transform: rotate(-19.082deg) }
+      22.9167% { transform: rotate(-12.895deg) }
+      25% { transform: rotate(-6.374deg) }
+      27.0833% { transform: rotate(-0.133deg) }
+      29.1667% { transform: rotate(5.286deg) }
+      31.25% { transform: rotate(9.474deg) }
+      33.3333% { transform: rotate(12.196deg) }
+      35.4167% { transform: rotate(13.414deg) }
+      37.5% { transform: rotate(13.272deg) }
+      39.5833% { transform: rotate(12.062deg) }
+      41.6667% { transform: rotate(10.175deg) }
+      43.75% { transform: rotate(8.037deg) }
+      45.8333% { transform: rotate(6.041deg) }
+      47.9167% { transform: rotate(4.498deg) }
+      50% { transform: rotate(3.593deg) }
+      52.0833% { transform: rotate(3.375deg) }
+      54.1667% { transform: rotate(3.759deg) }
+      56.25% { transform: rotate(4.554deg) }
+      58.3333% { transform: rotate(5.512deg) }
+      60.4167% { transform: rotate(6.371deg) }
+      62.5% { transform: rotate(6.914deg) }
+      64.5833% { transform: rotate(7.005deg) }
+      66.6667% { transform: rotate(6.616deg) }
+      68.75% { transform: rotate(5.833deg) }
+      70.8333% { transform: rotate(4.835deg) }
+      72.9167% { transform: rotate(3.863deg) }
+      75% { transform: rotate(3.173deg) }
+      77.0833% { transform: rotate(2.980deg) }
+      79.1667% { transform: rotate(3.415deg) }
+      81.25% { transform: rotate(4.489deg) }
+      83.3333% { transform: rotate(6.077deg) }
+      85.4167% { transform: rotate(7.924deg) }
+      87.5% { transform: rotate(9.677deg) }
+      89.5833% { transform: rotate(10.934deg) }
+      91.6667% { transform: rotate(11.300deg) }
+      93.75% { transform: rotate(10.454deg) }
+      95.8333% { transform: rotate(8.206deg) }
+      97.9167% { transform: rotate(4.534deg) }
+      100% { transform: rotate(-0.392deg) }
+    }
+    @keyframes right-brain-wander-6 {
+      0% { transform: translate(0.0000px, 0.0000px) }
+      2.0833% { transform: translate(0.0197px, 0.2393px) }
+      4.1667% { transform: translate(0.0568px, 0.3866px) }
+      6.25% { transform: translate(0.1118px, 0.4613px) }
+      8.3333% { transform: translate(0.1840px, 0.4818px) }
+      10.4167% { transform: translate(0.2709px, 0.4656px) }
+      12.5% { transform: translate(0.3689px, 0.4284px) }
+      14.5833% { transform: translate(0.4732px, 0.3841px) }
+      16.6667% { transform: translate(0.5787px, 0.3451px) }
+      18.75% { transform: translate(0.6800px, 0.3221px) }
+      20.8333% { transform: translate(0.7720px, 0.3250px) }
+      22.9167% { transform: translate(0.8509px, 0.3628px) }
+      25% { transform: translate(0.9139px, 0.4450px) }
+      27.0833% { transform: translate(0.9594px, 0.5488px) }
+      29.1667% { transform: translate(0.9877px, 0.6429px) }
+      31.25% { transform: translate(1.0000px, 0.7244px) }
+      33.3333% { transform: translate(0.9988px, 0.7921px) }
+      35.4167% { transform: translate(0.9870px, 0.8460px) }
+      37.5% { transform: translate(0.9677px, 0.8874px) }
+      39.5833% { transform: translate(0.9439px, 0.9183px) }
+      41.6667% { transform: translate(0.9178px, 0.9410px) }
+      43.75% { transform: translate(0.8911px, 0.9581px) }
+      45.8333% { transform: translate(0.8643px, 0.9713px) }
+      47.9167% { transform: translate(0.8374px, 0.9821px) }
+      50% { transform: translate(0.8096px, 0.9907px) }
+      52.0833% { transform: translate(0.7799px, 0.9970px) }
+      54.1667% { transform: translate(0.7472px, 1.0000px) }
+      56.25% { transform: translate(0.7105px, 0.9984px) }
+      58.3333% { transform: translate(0.6697px, 0.9909px) }
+      60.4167% { transform: translate(0.6247px, 0.9764px) }
+      62.5% { transform: translate(0.5765px, 0.9544px) }
+      64.5833% { transform: translate(0.5264px, 0.9250px) }
+      66.6667% { transform: translate(0.4759px, 0.8888px) }
+      68.75% { transform: translate(0.4266px, 0.8472px) }
+      70.8333% { transform: translate(0.3800px, 0.8018px) }
+      72.9167% { transform: translate(0.3369px, 0.7541px) }
+      75% { transform: translate(0.2977px, 0.7058px) }
+      77.0833% { transform: translate(0.2622px, 0.6577px) }
+      79.1667% { transform: translate(0.2296px, 0.6101px) }
+      81.25% { transform: translate(0.1988px, 0.5627px) }
+      83.3333% { transform: translate(0.1688px, 0.5143px) }
+      85.4167% { transform: translate(0.1386px, 0.4637px) }
+      87.5% { transform: translate(0.1081px, 0.4093px) }
+      89.5833% { transform: translate(0.0777px, 0.3500px) }
+      91.6667% { transform: translate(0.0487px, 0.2854px) }
+      93.75% { transform: translate(0.0235px, 0.2158px) }
+      95.8333% { transform: translate(0.0048px, 0.1431px) }
+      97.9167% { transform: translate(-0.0041px, 0.0699px) }
+      100% { transform: translate(0.0000px, 0.0000px) }
+    }
+    @keyframes right-brain-tumble-6 {
+      0% { transform: rotate(-18.076deg) }
+      2.0833% { transform: rotate(-15.311deg) }
+      4.1667% { transform: rotate(-11.281deg) }
+      6.25% { transform: rotate(-6.134deg) }
+      8.3333% { transform: rotate(-0.154deg) }
+      10.4167% { transform: rotate(6.266deg) }
+      12.5% { transform: rotate(12.665deg) }
+      14.5833% { transform: rotate(18.566deg) }
+      16.6667% { transform: rotate(23.531deg) }
+      18.75% { transform: rotate(27.214deg) }
+      20.8333% { transform: rotate(29.393deg) }
+      22.9167% { transform: rotate(30.000deg) }
+      25% { transform: rotate(29.120deg) }
+      27.0833% { transform: rotate(26.975deg) }
+      29.1667% { transform: rotate(23.890deg) }
+      31.25% { transform: rotate(20.252deg) }
+      33.3333% { transform: rotate(16.453deg) }
+      35.4167% { transform: rotate(12.843deg) }
+      37.5% { transform: rotate(9.694deg) }
+      39.5833% { transform: rotate(7.167deg) }
+      41.6667% { transform: rotate(5.304deg) }
+      43.75% { transform: rotate(4.038deg) }
+      45.8333% { transform: rotate(3.215deg) }
+      47.9167% { transform: rotate(2.627deg) }
+      50% { transform: rotate(2.054deg) }
+      52.0833% { transform: rotate(1.304deg) }
+      54.1667% { transform: rotate(0.243deg) }
+      56.25% { transform: rotate(-1.182deg) }
+      58.3333% { transform: rotate(-2.943deg) }
+      60.4167% { transform: rotate(-4.932deg) }
+      62.5% { transform: rotate(-6.990deg) }
+      64.5833% { transform: rotate(-8.938deg) }
+      66.6667% { transform: rotate(-10.606deg) }
+      68.75% { transform: rotate(-11.872deg) }
+      70.8333% { transform: rotate(-12.680deg) }
+      72.9167% { transform: rotate(-13.055deg) }
+      75% { transform: rotate(-13.098deg) }
+      77.0833% { transform: rotate(-12.967deg) }
+      79.1667% { transform: rotate(-12.852deg) }
+      81.25% { transform: rotate(-12.936deg) }
+      83.3333% { transform: rotate(-13.356deg) }
+      85.4167% { transform: rotate(-14.178deg) }
+      87.5% { transform: rotate(-15.369deg) }
+      89.5833% { transform: rotate(-16.795deg) }
+      91.6667% { transform: rotate(-18.229deg) }
+      93.75% { transform: rotate(-19.380deg) }
+      95.8333% { transform: rotate(-19.928deg) }
+      97.9167% { transform: rotate(-19.571deg) }
+      100% { transform: rotate(-18.076deg) }
+    }
+    @keyframes right-brain-wander-7 {
+      0% { transform: translate(0.0000px, 0.0000px) }
+      2.0833% { transform: translate(0.0824px, -0.2843px) }
+      4.1667% { transform: translate(0.1545px, -0.3487px) }
+      6.25% { transform: translate(0.2109px, -0.2560px) }
+      8.3333% { transform: translate(0.2465px, -0.0630px) }
+      10.4167% { transform: translate(0.2577px, 0.1804px) }
+      12.5% { transform: translate(0.2423px, 0.4324px) }
+      14.5833% { transform: translate(0.2003px, 0.6595px) }
+      16.6667% { transform: translate(0.1336px, 0.8376px) }
+      18.75% { transform: translate(0.0457px, 0.9525px) }
+      20.8333% { transform: translate(-0.0579px, 1.0000px) }
+      22.9167% { transform: translate(-0.1713px, 0.9860px) }
+      25% { transform: translate(-0.2881px, 0.9261px) }
+      27.0833% { transform: translate(-0.4020px, 0.8412px) }
+      29.1667% { transform: translate(-0.5081px, 0.7414px) }
+      31.25% { transform: translate(-0.6025px, 0.6338px) }
+      33.3333% { transform: translate(-0.6831px, 0.5247px) }
+      35.4167% { transform: translate(-0.7493px, 0.4193px) }
+      37.5% { transform: translate(-0.8020px, 0.3210px) }
+      39.5833% { transform: translate(-0.8430px, 0.2317px) }
+      41.6667% { transform: translate(-0.8750px, 0.1514px) }
+      43.75% { transform: translate(-0.9006px, 0.0789px) }
+      45.8333% { transform: translate(-0.9223px, 0.0120px) }
+      47.9167% { transform: translate(-0.9415px, -0.0515px) }
+      50% { transform: translate(-0.9592px, -0.1138px) }
+      52.0833% { transform: translate(-0.9751px, -0.1762px) }
+      54.1667% { transform: translate(-0.9882px, -0.2393px) }
+      56.25% { transform: translate(-0.9971px, -0.3024px) }
+      58.3333% { transform: translate(-1.0000px, -0.3639px) }
+      60.4167% { transform: translate(-0.9955px, -0.4216px) }
+      62.5% { transform: translate(-0.9826px, -0.4729px) }
+      64.5833% { transform: translate(-0.9609px, -0.5157px) }
+      66.6667% { transform: translate(-0.9309px, -0.5483px) }
+      68.75% { transform: translate(-0.8939px, -0.5699px) }
+      70.8333% { transform: translate(-0.8517px, -0.5807px) }
+      72.9167% { transform: translate(-0.8060px, -0.5817px) }
+      75% { transform: translate(-0.7588px, -0.5749px) }
+      77.0833% { transform: translate(-0.7114px, -0.5623px) }
+      79.1667% { transform: translate(-0.6643px, -0.5458px) }
+      81.25% { transform: translate(-0.6173px, -0.5266px) }
+      83.3333% { transform: translate(-0.5694px, -0.5053px) }
+      85.4167% { transform: translate(-0.5189px, -0.4808px) }
+      87.5% { transform: translate(-0.4639px, -0.4512px) }
+      89.5833% { transform: translate(-0.4025px, -0.4135px) }
+      91.6667% { transform: translate(-0.3337px, -0.3644px) }
+      93.75% { transform: translate(-0.2572px, -0.3005px) }
+      95.8333% { transform: translate(-0.1742px, -0.2191px) }
+      97.9167% { transform: translate(-0.0872px, -0.1188px) }
+      100% { transform: translate(-0.0000px, -0.0000px) }
+    }
+    @keyframes right-brain-tumble-7 {
+      0% { transform: rotate(25.195deg) }
+      2.0833% { transform: rotate(27.983deg) }
+      4.1667% { transform: rotate(29.690deg) }
+      6.25% { transform: rotate(30.000deg) }
+      8.3333% { transform: rotate(28.723deg) }
+      10.4167% { transform: rotate(25.819deg) }
+      12.5% { transform: rotate(21.414deg) }
+      14.5833% { transform: rotate(15.788deg) }
+      16.6667% { transform: rotate(9.348deg) }
+      18.75% { transform: rotate(2.577deg) }
+      20.8333% { transform: rotate(-4.017deg) }
+      22.9167% { transform: rotate(-9.960deg) }
+      25% { transform: rotate(-14.871deg) }
+      27.0833% { transform: rotate(-18.493deg) }
+      29.1667% { transform: rotate(-20.725deg) }
+      31.25% { transform: rotate(-21.616deg) }
+      33.3333% { transform: rotate(-21.355deg) }
+      35.4167% { transform: rotate(-20.230deg) }
+      37.5% { transform: rotate(-18.582deg) }
+      39.5833% { transform: rotate(-16.760deg) }
+      41.6667% { transform: rotate(-15.064deg) }
+      43.75% { transform: rotate(-13.713deg) }
+      45.8333% { transform: rotate(-12.821deg) }
+      47.9167% { transform: rotate(-12.387deg) }
+      50% { transform: rotate(-12.313deg) }
+      52.0833% { transform: rotate(-12.426deg) }
+      54.1667% { transform: rotate(-12.517deg) }
+      56.25% { transform: rotate(-12.382deg) }
+      58.3333% { transform: rotate(-11.860deg) }
+      60.4167% { transform: rotate(-10.861deg) }
+      62.5% { transform: rotate(-9.380deg) }
+      64.5833% { transform: rotate(-7.499deg) }
+      66.6667% { transform: rotate(-5.367deg) }
+      68.75% { transform: rotate(-3.176deg) }
+      70.8333% { transform: rotate(-1.122deg) }
+      72.9167% { transform: rotate(0.632deg) }
+      75% { transform: rotate(1.989deg) }
+      77.0833% { transform: rotate(2.936deg) }
+      79.1667% { transform: rotate(3.552deg) }
+      81.25% { transform: rotate(3.999deg) }
+      83.3333% { transform: rotate(4.493deg) }
+      85.4167% { transform: rotate(5.272deg) }
+      87.5% { transform: rotate(6.549deg) }
+      89.5833% { transform: rotate(8.470deg) }
+      91.6667% { transform: rotate(11.083deg) }
+      93.75% { transform: rotate(14.313deg) }
+      95.8333% { transform: rotate(17.960deg) }
+      97.9167% { transform: rotate(21.716deg) }
+      100% { transform: rotate(25.195deg) }
+    }
+    @keyframes right-brain-wander-8 {
+      0% { transform: translate(0.0000px, 0.0000px) }
+      2.0833% { transform: translate(-0.0960px, 0.0002px) }
+      4.1667% { transform: translate(-0.2130px, -0.0248px) }
+      6.25% { transform: translate(-0.3458px, -0.0765px) }
+      8.3333% { transform: translate(-0.4866px, -0.1539px) }
+      10.4167% { transform: translate(-0.6260px, -0.2536px) }
+      12.5% { transform: translate(-0.7541px, -0.3696px) }
+      14.5833% { transform: translate(-0.8617px, -0.4945px) }
+      16.6667% { transform: translate(-0.9413px, -0.6196px) }
+      18.75% { transform: translate(-0.9880px, -0.7366px) }
+      20.8333% { transform: translate(-1.0000px, -0.8377px) }
+      22.9167% { transform: translate(-0.9790px, -0.9171px) }
+      25% { transform: translate(-0.9297px, -0.9709px) }
+      27.0833% { transform: translate(-0.8590px, -0.9981px) }
+      29.1667% { transform: translate(-0.7751px, -1.0000px) }
+      31.25% { transform: translate(-0.6865px, -0.9801px) }
+      33.3333% { transform: translate(-0.6009px, -0.9437px) }
+      35.4167% { transform: translate(-0.5241px, -0.8967px) }
+      37.5% { transform: translate(-0.4594px, -0.8452px) }
+      39.5833% { transform: translate(-0.4075px, -0.7947px) }
+      41.6667% { transform: translate(-0.3667px, -0.7492px) }
+      43.75% { transform: translate(-0.3332px, -0.7114px) }
+      45.8333% { transform: translate(-0.3022px, -0.6819px) }
+      47.9167% { transform: translate(-0.2685px, -0.6599px) }
+      50% { transform: translate(-0.2278px, -0.6436px) }
+      52.0833% { transform: translate(-0.1773px, -0.6301px) }
+      54.1667% { transform: translate(-0.1163px, -0.6168px) }
+      56.25% { transform: translate(-0.0463px, -0.6013px) }
+      58.3333% { transform: translate(0.0293px, -0.5821px) }
+      60.4167% { transform: translate(0.1057px, -0.5589px) }
+      62.5% { transform: translate(0.1771px, -0.5323px) }
+      64.5833% { transform: translate(0.2382px, -0.5036px) }
+      66.6667% { transform: translate(0.2847px, -0.4749px) }
+      68.75% { transform: translate(0.3139px, -0.4480px) }
+      70.8333% { transform: translate(0.3253px, -0.4246px) }
+      72.9167% { transform: translate(0.3205px, -0.4052px) }
+      75% { transform: translate(0.3032px, -0.3895px) }
+      77.0833% { transform: translate(0.2780px, -0.3760px) }
+      79.1667% { transform: translate(0.2501px, -0.3625px) }
+      81.25% { transform: translate(0.2243px, -0.3461px) }
+      83.3333% { transform: translate(0.2038px, -0.3242px) }
+      85.4167% { transform: translate(0.1900px, -0.2948px) }
+      87.5% { transform: translate(0.1820px, -0.2569px) }
+      89.5833% { transform: translate(0.1767px, -0.2112px) }
+      91.6667% { transform: translate(0.1690px, -0.1602px) }
+      93.75% { transform: translate(0.1530px, -0.1080px) }
+      95.8333% { transform: translate(0.1226px, -0.0598px) }
+      97.9167% { transform: translate(0.0727px, -0.0217px) }
+      100% { transform: translate(-0.0000px, -0.0000px) }
+    }
+    @keyframes right-brain-tumble-8 {
+      0% { transform: rotate(2.780deg) }
+      2.0833% { transform: rotate(-2.839deg) }
+      4.1667% { transform: rotate(-9.094deg) }
+      6.25% { transform: rotate(-15.420deg) }
+      8.3333% { transform: rotate(-21.204deg) }
+      10.4167% { transform: rotate(-25.858deg) }
+      12.5% { transform: rotate(-28.897deg) }
+      14.5833% { transform: rotate(-30.000deg) }
+      16.6667% { transform: rotate(-29.050deg) }
+      18.75% { transform: rotate(-26.149deg) }
+      20.8333% { transform: rotate(-21.608deg) }
+      22.9167% { transform: rotate(-15.902deg) }
+      25% { transform: rotate(-9.614deg) }
+      27.0833% { transform: rotate(-3.356deg) }
+      29.1667% { transform: rotate(2.301deg) }
+      31.25% { transform: rotate(6.898deg) }
+      33.3333% { transform: rotate(10.137deg) }
+      35.4167% { transform: rotate(11.908deg) }
+      37.5% { transform: rotate(12.289deg) }
+      39.5833% { transform: rotate(11.518deg) }
+      41.6667% { transform: rotate(9.950deg) }
+      43.75% { transform: rotate(7.994deg) }
+      45.8333% { transform: rotate(6.051deg) }
+      47.9167% { transform: rotate(4.458deg) }
+      50% { transform: rotate(3.438deg) }
+      52.0833% { transform: rotate(3.083deg) }
+      54.1667% { transform: rotate(3.348deg) }
+      56.25% { transform: rotate(4.075deg) }
+      58.3333% { transform: rotate(5.033deg) }
+      60.4167% { transform: rotate(5.963deg) }
+      62.5% { transform: rotate(6.634deg) }
+      64.5833% { transform: rotate(6.886deg) }
+      66.6667% { transform: rotate(6.660deg) }
+      68.75% { transform: rotate(6.010deg) }
+      70.8333% { transform: rotate(5.091deg) }
+      72.9167% { transform: rotate(4.134deg) }
+      75% { transform: rotate(3.395deg) }
+      77.0833% { transform: rotate(3.112deg) }
+      79.1667% { transform: rotate(3.445deg) }
+      81.25% { transform: rotate(4.447deg) }
+      83.3333% { transform: rotate(6.034deg) }
+      85.4167% { transform: rotate(7.986deg) }
+      87.5% { transform: rotate(9.974deg) }
+      89.5833% { transform: rotate(11.596deg) }
+      91.6667% { transform: rotate(12.440deg) }
+      93.75% { transform: rotate(12.145deg) }
+      95.8333% { transform: rotate(10.465deg) }
+      97.9167% { transform: rotate(7.310deg) }
+      100% { transform: rotate(2.780deg) }
+    }
+    @keyframes right-brain-wander-9 {
+      0% { transform: translate(0.0000px, 0.0000px) }
+      2.0833% { transform: translate(0.0084px, -0.0750px) }
+      4.1667% { transform: translate(0.0339px, -0.1390px) }
+      6.25% { transform: translate(0.0779px, -0.1872px) }
+      8.3333% { transform: translate(0.1400px, -0.2152px) }
+      10.4167% { transform: translate(0.2185px, -0.2198px) }
+      12.5% { transform: translate(0.3103px, -0.1994px) }
+      14.5833% { transform: translate(0.4111px, -0.1541px) }
+      16.6667% { transform: translate(0.5159px, -0.0861px) }
+      18.75% { transform: translate(0.6193px, 0.0012px) }
+      20.8333% { transform: translate(0.7162px, 0.1026px) }
+      22.9167% { transform: translate(0.8022px, 0.2126px) }
+      25% { transform: translate(0.8739px, 0.3251px) }
+      27.0833% { transform: translate(0.9295px, 0.4346px) }
+      29.1667% { transform: translate(0.9683px, 0.5365px) }
+      31.25% { transform: translate(0.9912px, 0.6272px) }
+      33.3333% { transform: translate(1.0000px, 0.7048px) }
+      35.4167% { transform: translate(0.9974px, 0.7689px) }
+      37.5% { transform: translate(0.9863px, 0.8201px) }
+      39.5833% { transform: translate(0.9697px, 0.8603px) }
+      41.6667% { transform: translate(0.9499px, 0.8918px) }
+      43.75% { transform: translate(0.9286px, 0.9168px) }
+      45.8333% { transform: translate(0.9067px, 0.9375px) }
+      47.9167% { transform: translate(0.8844px, 0.9554px) }
+      50% { transform: translate(0.8610px, 0.9710px) }
+      52.0833% { transform: translate(0.8355px, 0.9843px) }
+      54.1667% { transform: translate(0.8070px, 0.9944px) }
+      56.25% { transform: translate(0.7743px, 1.0000px) }
+      58.3333% { transform: translate(0.7370px, 0.9997px) }
+      60.4167% { transform: translate(0.6951px, 0.9922px) }
+      62.5% { transform: translate(0.6492px, 0.9767px) }
+      64.5833% { transform: translate(0.6005px, 0.9531px) }
+      66.6667% { transform: translate(0.5505px, 0.9220px) }
+      68.75% { transform: translate(0.5008px, 0.8843px) }
+      70.8333% { transform: translate(0.4529px, 0.8418px) }
+      72.9167% { transform: translate(0.4077px, 0.7960px) }
+      75% { transform: translate(0.3660px, 0.7487px) }
+      77.0833% { transform: translate(0.3275px, 0.7008px) }
+      79.1667% { transform: translate(0.2917px, 0.6530px) }
+      81.25% { transform: translate(0.2575px, 0.6049px) }
+      83.3333% { transform: translate(0.2239px, 0.5555px) }
+      85.4167% { transform: translate(0.1899px, 0.5036px) }
+      87.5% { transform: translate(0.1550px, 0.4474px) }
+      89.5833% { transform: translate(0.1196px, 0.3855px) }
+      91.6667% { transform: translate(0.0846px, 0.3172px) }
+      93.75% { transform: translate(0.0522px, 0.2426px) }
+      95.8333% { transform: translate(0.0251px, 0.1629px) }
+      97.9167% { transform: translate(0.0066px, 0.0808px) }
+      100% { transform: translate(-0.0000px, 0.0000px) }
+    }
+    @keyframes right-brain-tumble-9 {
+      0% { transform: rotate(-21.040deg) }
+      2.0833% { transform: rotate(-18.805deg) }
+      4.1667% { transform: rotate(-15.209deg) }
+      6.25% { transform: rotate(-10.346deg) }
+      8.3333% { transform: rotate(-4.460deg) }
+      10.4167% { transform: rotate(2.082deg) }
+      12.5% { transform: rotate(8.824deg) }
+      14.5833% { transform: rotate(15.272deg) }
+      16.6667% { transform: rotate(20.952deg) }
+      18.75% { transform: rotate(25.464deg) }
+      20.8333% { transform: rotate(28.525deg) }
+      22.9167% { transform: rotate(30.000deg) }
+      25% { transform: rotate(29.913deg) }
+      27.0833% { transform: rotate(28.436deg) }
+      29.1667% { transform: rotate(25.863deg) }
+      31.25% { transform: rotate(22.566deg) }
+      33.3333% { transform: rotate(18.942deg) }
+      35.4167% { transform: rotate(15.367deg) }
+      37.5% { transform: rotate(12.145deg) }
+      39.5833% { transform: rotate(9.480deg) }
+      41.6667% { transform: rotate(7.457deg) }
+      43.75% { transform: rotate(6.045deg) }
+      45.8333% { transform: rotate(5.114deg) }
+      47.9167% { transform: rotate(4.470deg) }
+      50% { transform: rotate(3.891deg) }
+      52.0833% { transform: rotate(3.171deg) }
+      54.1667% { transform: rotate(2.155deg) }
+      56.25% { transform: rotate(0.763deg) }
+      58.3333% { transform: rotate(-1.001deg) }
+      60.4167% { transform: rotate(-3.048deg) }
+      62.5% { transform: rotate(-5.229deg) }
+      64.5833% { transform: rotate(-7.361deg) }
+      66.6667% { transform: rotate(-9.265deg) }
+      68.75% { transform: rotate(-10.796deg) }
+      70.8333% { transform: rotate(-11.876deg) }
+      72.9167% { transform: rotate(-12.505deg) }
+      75% { transform: rotate(-12.764deg) }
+      77.0833% { transform: rotate(-12.802deg) }
+      79.1667% { transform: rotate(-12.810deg) }
+      81.25% { transform: rotate(-12.982deg) }
+      83.3333% { transform: rotate(-13.481deg) }
+      85.4167% { transform: rotate(-14.401deg) }
+      87.5% { transform: rotate(-15.740deg) }
+      89.5833% { transform: rotate(-17.391deg) }
+      91.6667% { transform: rotate(-19.145deg) }
+      93.75% { transform: rotate(-20.713deg) }
+      95.8333% { transform: rotate(-21.763deg) }
+      97.9167% { transform: rotate(-21.965deg) }
+      100% { transform: rotate(-21.040deg) }
+    }
+    @keyframes right-brain-wander-10 {
+      0% { transform: translate(0.0000px, 0.0000px) }
+      2.0833% { transform: translate(0.0966px, 0.1144px) }
+      4.1667% { transform: translate(0.1851px, 0.2419px) }
+      6.25% { transform: translate(0.2595px, 0.3775px) }
+      8.3333% { transform: translate(0.3139px, 0.5146px) }
+      10.4167% { transform: translate(0.3438px, 0.6462px) }
+      12.5% { transform: translate(0.3460px, 0.7648px) }
+      14.5833% { transform: translate(0.3194px, 0.8640px) }
+      16.6667% { transform: translate(0.2652px, 0.9382px) }
+      18.75% { transform: translate(0.1864px, 0.9840px) }
+      20.8333% { transform: translate(0.0878px, 1.0000px) }
+      22.9167% { transform: translate(-0.0244px, 0.9871px) }
+      25% { transform: translate(-0.1436px, 0.9483px) }
+      27.0833% { transform: translate(-0.2633px, 0.8882px) }
+      29.1667% { transform: translate(-0.3775px, 0.8122px) }
+      31.25% { transform: translate(-0.4819px, 0.7265px) }
+      33.3333% { transform: translate(-0.5733px, 0.6368px) }
+      35.4167% { transform: translate(-0.6506px, 0.5478px) }
+      37.5% { transform: translate(-0.7141px, 0.4632px) }
+      39.5833% { transform: translate(-0.7654px, 0.3849px) }
+      41.6667% { transform: translate(-0.8068px, 0.3136px) }
+      43.75% { transform: translate(-0.8411px, 0.2485px) }
+      45.8333% { transform: translate(-0.8708px, 0.1881px) }
+      47.9167% { transform: translate(-0.8978px, 0.1305px) }
+      50% { transform: translate(-0.9231px, 0.0737px) }
+      52.0833% { transform: translate(-0.9467px, 0.0164px) }
+      54.1667% { transform: translate(-0.9679px, -0.0421px) }
+      56.25% { transform: translate(-0.9850px, -0.1013px) }
+      58.3333% { transform: translate(-0.9963px, -0.1601px) }
+      60.4167% { transform: translate(-1.0000px, -0.2166px) }
+      62.5% { transform: translate(-0.9949px, -0.2687px) }
+      64.5833% { transform: translate(-0.9803px, -0.3142px) }
+      66.6667% { transform: translate(-0.9565px, -0.3513px) }
+      68.75% { transform: translate(-0.9245px, -0.3792px) }
+      70.8333% { transform: translate(-0.8860px, -0.3977px) }
+      72.9167% { transform: translate(-0.8430px, -0.4075px) }
+      75% { transform: translate(-0.7973px, -0.4099px) }
+      77.0833% { transform: translate(-0.7507px, -0.4069px) }
+      79.1667% { transform: translate(-0.7038px, -0.4000px) }
+      81.25% { transform: translate(-0.6567px, -0.3906px) }
+      83.3333% { transform: translate(-0.6083px, -0.3792px) }
+      85.4167% { transform: translate(-0.5572px, -0.3653px) }
+      87.5% { transform: translate(-0.5010px, -0.3472px) }
+      89.5833% { transform: translate(-0.4378px, -0.3226px) }
+      91.6667% { transform: translate(-0.3659px, -0.2883px) }
+      93.75% { transform: translate(-0.2848px, -0.2412px) }
+      95.8333% { transform: translate(-0.1950px, -0.1784px) }
+      97.9167% { transform: translate(-0.0989px, -0.0981px) }
+      100% { transform: translate(-0.0000px, -0.0000px) }
+    }
+    @keyframes right-brain-tumble-10 {
+      0% { transform: rotate(23.280deg) }
+      2.0833% { transform: rotate(26.556deg) }
+      4.1667% { transform: rotate(28.911deg) }
+      6.25% { transform: rotate(30.000deg) }
+      8.3333% { transform: rotate(29.582deg) }
+      10.4167% { transform: rotate(27.558deg) }
+      12.5% { transform: rotate(23.984deg) }
+      14.5833% { transform: rotate(19.076deg) }
+      16.6667% { transform: rotate(13.186deg) }
+      18.75% { transform: rotate(6.757deg) }
+      20.8333% { transform: rotate(0.280deg) }
+      22.9167% { transform: rotate(-5.770deg) }
+      25% { transform: rotate(-10.982deg) }
+      27.0833% { transform: rotate(-15.061deg) }
+      29.1667% { transform: rotate(-17.847deg) }
+      31.25% { transform: rotate(-19.335deg) }
+      33.3333% { transform: rotate(-19.655deg) }
+      35.4167% { transform: rotate(-19.049deg) }
+      37.5% { transform: rotate(-17.829deg) }
+      39.5833% { transform: rotate(-16.327deg) }
+      41.6667% { transform: rotate(-14.849deg) }
+      43.75% { transform: rotate(-13.631deg) }
+      45.8333% { transform: rotate(-12.814deg) }
+      47.9167% { transform: rotate(-12.434deg) }
+      50% { transform: rotate(-12.423deg) }
+      52.0833% { transform: rotate(-12.633deg) }
+      54.1667% { transform: rotate(-12.872deg) }
+      56.25% { transform: rotate(-12.938deg) }
+      58.3333% { transform: rotate(-12.660deg) }
+      60.4167% { transform: rotate(-11.928deg) }
+      62.5% { transform: rotate(-10.712deg) }
+      64.5833% { transform: rotate(-9.067deg) }
+      66.6667% { transform: rotate(-7.121deg) }
+      68.75% { transform: rotate(-5.050deg) }
+      70.8333% { transform: rotate(-3.047deg) }
+      72.9167% { transform: rotate(-1.283deg) }
+      75% { transform: rotate(0.125deg) }
+      77.0833% { transform: rotate(1.138deg) }
+      79.1667% { transform: rotate(1.809deg) }
+      81.25% { transform: rotate(2.273deg) }
+      83.3333% { transform: rotate(2.732deg) }
+      85.4167% { transform: rotate(3.419deg) }
+      87.5% { transform: rotate(4.557deg) }
+      89.5833% { transform: rotate(6.318deg) }
+      91.6667% { transform: rotate(8.784deg) }
+      93.75% { transform: rotate(11.923deg) }
+      95.8333% { transform: rotate(15.581deg) }
+      97.9167% { transform: rotate(19.487deg) }
+      100% { transform: rotate(23.280deg) }
+    }
+    @keyframes right-brain-wander-11 {
+      0% { transform: translate(0.0000px, 0.0000px) }
+      2.0833% { transform: translate(-0.0814px, 0.0142px) }
+      4.1667% { transform: translate(-0.1848px, 0.0036px) }
+      6.25% { transform: translate(-0.3062px, -0.0344px) }
+      8.3333% { transform: translate(-0.4391px, -0.0999px) }
+      10.4167% { transform: translate(-0.5750px, -0.1903px) }
+      12.5% { transform: translate(-0.7045px, -0.3006px) }
+      14.5833% { transform: translate(-0.8185px, -0.4237px) }
+      16.6667% { transform: translate(-0.9091px, -0.5512px) }
+      18.75% { transform: translate(-0.9705px, -0.6744px) }
+      20.8333% { transform: translate(-1.0000px, -0.7851px) }
+      22.9167% { transform: translate(-0.9978px, -0.8765px) }
+      25% { transform: translate(-0.9672px, -0.9438px) }
+      27.0833% { transform: translate(-0.9140px, -0.9849px) }
+      29.1667% { transform: translate(-0.8454px, -1.0000px) }
+      31.25% { transform: translate(-0.7694px, -0.9919px) }
+      33.3333% { transform: translate(-0.6934px, -0.9651px) }
+      35.4167% { transform: translate(-0.6235px, -0.9255px) }
+      37.5% { transform: translate(-0.5635px, -0.8790px) }
+      39.5833% { transform: translate(-0.5149px, -0.8314px) }
+      41.6667% { transform: translate(-0.4767px, -0.7873px) }
+      43.75% { transform: translate(-0.4460px, -0.7497px) }
+      45.8333% { transform: translate(-0.4182px, -0.7200px) }
+      47.9167% { transform: translate(-0.3888px, -0.6979px) }
+      50% { transform: translate(-0.3531px, -0.6817px) }
+      52.0833% { transform: translate(-0.3082px, -0.6691px) }
+      54.1667% { transform: translate(-0.2526px, -0.6571px) }
+      56.25% { transform: translate(-0.1872px, -0.6434px) }
+      58.3333% { transform: translate(-0.1146px, -0.6262px) }
+      60.4167% { transform: translate(-0.0392px, -0.6048px) }
+      62.5% { transform: translate(0.0337px, -0.5796px) }
+      64.5833% { transform: translate(0.0989px, -0.5517px) }
+      66.6667% { transform: translate(0.1518px, -0.5231px) }
+      68.75% { transform: translate(0.1892px, -0.4957px) }
+      70.8333% { transform: translate(0.2100px, -0.4714px) }
+      72.9167% { transform: translate(0.2149px, -0.4509px) }
+      75% { transform: translate(0.2069px, -0.4341px) }
+      77.0833% { transform: translate(0.1901px, -0.4200px) }
+      79.1667% { transform: translate(0.1694px, -0.4062px) }
+      81.25% { transform: translate(0.1494px, -0.3900px) }
+      83.3333% { transform: translate(0.1337px, -0.3684px) }
+      85.4167% { transform: translate(0.1242px, -0.3391px) }
+      87.5% { transform: translate(0.1208px, -0.3005px) }
+      89.5833% { transform: translate(0.1210px, -0.2529px) }
+      91.6667% { transform: translate(0.1206px, -0.1981px) }
+      93.75% { transform: translate(0.1138px, -0.1398px) }
+      95.8333% { transform: translate(0.0949px, -0.0832px) }
+      97.9167% { transform: translate(0.0582px, -0.0345px) }
+      100% { transform: translate(-0.0000px, 0.0000px) }
+    }
+    @keyframes right-brain-tumble-11 {
+      0% { transform: rotate(5.960deg) }
+      2.0833% { transform: rotate(0.562deg) }
+      4.1667% { transform: rotate(-5.705deg) }
+      6.25% { transform: rotate(-12.297deg) }
+      8.3333% { transform: rotate(-18.596deg) }
+      10.4167% { transform: rotate(-23.982deg) }
+      12.5% { transform: rotate(-27.911deg) }
+      14.5833% { transform: rotate(-29.985deg) }
+      16.6667% { transform: rotate(-30.000deg) }
+      18.75% { transform: rotate(-27.972deg) }
+      20.8333% { transform: rotate(-24.138deg) }
+      22.9167% { transform: rotate(-18.916deg) }
+      25% { transform: rotate(-12.862deg) }
+      27.0833% { transform: rotate(-6.587deg) }
+      29.1667% { transform: rotate(-0.689deg) }
+      31.25% { transform: rotate(4.323deg) }
+      33.3333% { transform: rotate(8.085deg) }
+      35.4167% { transform: rotate(10.417deg) }
+      37.5% { transform: rotate(11.327deg) }
+      39.5833% { transform: rotate(11.001deg) }
+      41.6667% { transform: rotate(9.754deg) }
+      43.75% { transform: rotate(7.983deg) }
+      45.8333% { transform: rotate(6.094deg) }
+      47.9167% { transform: rotate(4.449deg) }
+      50% { transform: rotate(3.311deg) }
+      52.0833% { transform: rotate(2.813deg) }
+      54.1667% { transform: rotate(2.954deg) }
+      56.25% { transform: rotate(3.608deg) }
+      58.3333% { transform: rotate(4.560deg) }
+      60.4167% { transform: rotate(5.556deg) }
+      62.5% { transform: rotate(6.352deg) }
+      64.5833% { transform: rotate(6.761deg) }
+      66.6667% { transform: rotate(6.693deg) }
+      68.75% { transform: rotate(6.172deg) }
+      70.8333% { transform: rotate(5.329deg) }
+      72.9167% { transform: rotate(4.381deg) }
+      75% { transform: rotate(3.591deg) }
+      77.0833% { transform: rotate(3.212deg) }
+      79.1667% { transform: rotate(3.440deg) }
+      81.25% { transform: rotate(4.367deg) }
+      83.3333% { transform: rotate(5.951deg) }
+      85.4167% { transform: rotate(8.009deg) }
+      87.5% { transform: rotate(10.232deg) }
+      89.5833% { transform: rotate(12.224deg) }
+      91.6667% { transform: rotate(13.552deg) }
+      93.75% { transform: rotate(13.818deg) }
+      95.8333% { transform: rotate(12.714deg) }
+      97.9167% { transform: rotate(10.086deg) }
+      100% { transform: rotate(5.960deg) }
+    }
+    @keyframes right-brain-throw-0 {
+      0% { transform: translate(0.00px, 0px) scale(1.0000) }
+      12.5% { transform: translate(81.00px, 0px) scale(0.9378) }
+      25% { transform: translate(162.00px, 0px) scale(0.8794) }
+      37.5% { transform: translate(243.00px, 0px) scale(0.8247) }
+      50% { transform: translate(324.00px, 0px) scale(0.7734) }
+      62.5% { transform: translate(405.00px, 0px) scale(0.7252) }
+      75% { transform: translate(486.00px, 0px) scale(0.6801) }
+      87.5% { transform: translate(567.00px, 0px) scale(0.6378) }
+      100% { transform: translate(648.00px, 0px) scale(0.5981) }
+    }
+    @keyframes right-brain-throw-1 {
+      0% { transform: translate(0.00px, 0px) scale(1.0000) }
+      12.5% { transform: translate(54.00px, 0px) scale(0.9570) }
+      25% { transform: translate(108.00px, 0px) scale(0.9158) }
+      37.5% { transform: translate(162.00px, 0px) scale(0.8763) }
+      50% { transform: translate(216.00px, 0px) scale(0.8386) }
+      62.5% { transform: translate(270.00px, 0px) scale(0.8025) }
+      75% { transform: translate(324.00px, 0px) scale(0.7680) }
+      87.5% { transform: translate(378.00px, 0px) scale(0.7349) }
+      100% { transform: translate(432.00px, 0px) scale(0.7033) }
+    }
+    @keyframes right-brain-throw-2 {
+      0% { transform: translate(0.00px, 0px) scale(1.0000) }
+      12.5% { transform: translate(162.00px, 0px) scale(0.8720) }
+      25% { transform: translate(324.00px, 0px) scale(0.7604) }
+      37.5% { transform: translate(486.00px, 0px) scale(0.6631) }
+      50% { transform: translate(648.00px, 0px) scale(0.5782) }
+      62.5% { transform: translate(810.00px, 0px) scale(0.5042) }
+      75% { transform: translate(972.00px, 0px) scale(0.4396) }
+      87.5% { transform: translate(1134.00px, 0px) scale(0.3834) }
+      100% { transform: translate(1296.00px, 0px) scale(0.3343) }
+    }
+    @keyframes right-brain-throw-3 {
+      0% { transform: translate(0.00px, 0px) scale(1.0000) }
+      12.5% { transform: translate(54.00px, 0px) scale(0.9554) }
+      25% { transform: translate(108.00px, 0px) scale(0.9127) }
+      37.5% { transform: translate(162.00px, 0px) scale(0.8720) }
+      50% { transform: translate(216.00px, 0px) scale(0.8331) }
+      62.5% { transform: translate(270.00px, 0px) scale(0.7959) }
+      75% { transform: translate(324.00px, 0px) scale(0.7604) }
+      87.5% { transform: translate(378.00px, 0px) scale(0.7265) }
+      100% { transform: translate(432.00px, 0px) scale(0.6940) }
+    }
+    @keyframes right-brain-throw-4 {
+      0% { transform: translate(0.00px, 0px) scale(1.0000) }
+      12.5% { transform: translate(81.00px, 0px) scale(0.9363) }
+      25% { transform: translate(162.00px, 0px) scale(0.8767) }
+      37.5% { transform: translate(243.00px, 0px) scale(0.8209) }
+      50% { transform: translate(324.00px, 0px) scale(0.7686) }
+      62.5% { transform: translate(405.00px, 0px) scale(0.7196) }
+      75% { transform: translate(486.00px, 0px) scale(0.6738) }
+      87.5% { transform: translate(567.00px, 0px) scale(0.6309) }
+      100% { transform: translate(648.00px, 0px) scale(0.5907) }
+    }
+    @keyframes right-brain-throw-5 {
+      0% { transform: translate(0.00px, 0px) scale(1.0000) }
+      12.5% { transform: translate(162.00px, 0px) scale(0.8794) }
+      25% { transform: translate(324.00px, 0px) scale(0.7734) }
+      37.5% { transform: translate(486.00px, 0px) scale(0.6801) }
+      50% { transform: translate(648.00px, 0px) scale(0.5981) }
+      62.5% { transform: translate(810.00px, 0px) scale(0.5260) }
+      75% { transform: translate(972.00px, 0px) scale(0.4625) }
+      87.5% { transform: translate(1134.00px, 0px) scale(0.4068) }
+      100% { transform: translate(1296.00px, 0px) scale(0.3577) }
+    }
   </style>
+  <clipPath id="right-brain-contour"><path d="M1496 0 L68 0 L68 4 L88 8 L96 12 L104 16 L108 20 L112 24 L112 28 L116 32 L136 36 L144 40 L152 44 L156 48 L160 52 L160 56 L164 60 L168 64 L168 68 L168 72 L172 76 L172 80 L172 84 L172 88 L172 92 L172 96 L172 100 L168 104 L168 108 L168 112 L164 116 L184 120 L192 124 L200 128 L204 132 L208 136 L208 140 L212 144 L216 148 L216 152 L216 156 L220 160 L220 164 L220 168 L220 172 L220 176 L220 180 L220 184 L216 188 L216 192 L216 196 L212 200 L216 204 L216 208 L216 212 L220 216 L220 220 L220 224 L220 228 L220 232 L220 236 L220 240 L216 244 L216 248 L216 252 L212 256 L208 260 L208 264 L204 268 L200 272 L192 276 L184 280 L164 284 L168 288 L168 292 L168 296 L172 300 L172 304 L172 308 L172 312 L172 316 L172 320 L172 324 L168 328 L168 332 L168 336 L164 340 L160 344 L160 348 L156 352 L152 356 L144 360 L136 364 L116 368 L112 372 L112 376 L108 380 L104 384 L96 388 L88 392 L68 396 L68 400 L1496 400 Z"/></clipPath>
+  <g clip-path="url(#right-brain-contour)"><g transform="translate(-512 44)"><g transform="scale(71.156 41.857)"><g class="throw" style="animation-name: right-brain-wander-0; animation-delay: 0.000s;"><g transform="scale(0.014054 0.023891)"><g class="throw" style="animation-name: right-brain-throw-0; animation-delay: 0.000s;"><g class="throw" style="animation-name: right-brain-tumble-0; animation-delay: 0.000s;"><g transform="scale(5.8520)"><path d="M0 -8 L7 -4 L7 4 L0 8 L-7 4 L-7 -4 L0 -8 M0 0 L0 8 M0 0 L-7 -4 M0 0 L7 -4" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></g></g></g></g></g></g><g transform="translate(-512 32)"><g transform="scale(48.681 28.636)"><g class="throw" style="animation-name: right-brain-wander-1; animation-delay: -0.600s;"><g transform="scale(0.020542 0.034921)"><g class="throw" style="animation-name: right-brain-throw-0; animation-delay: -0.600s;"><g class="throw" style="animation-name: right-brain-tumble-1; animation-delay: -0.600s;"><g transform="scale(5.8520)"><path d="M0 -8 C4 -8 6 -5 6 -2 C6 1 4 2 3 4 L-3 4 C-4 2 -6 1 -6 -2 C-6 -5 -4 -8 0 -8 M-3 6 L3 6 M-2 8 L2 8" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></g></g></g></g></g></g><g transform="translate(136 44)"><g transform="scale(73.122 43.013)"><g class="throw" style="animation-name: right-brain-wander-3; animation-delay: 0.000s;"><g transform="scale(0.013676 0.023249)"><g class="throw" style="animation-name: right-brain-throw-0; animation-delay: 0.000s;"><g class="throw" style="animation-name: right-brain-tumble-3; animation-delay: 0.000s;"><g transform="scale(3.5000)"><path d="M0 8 C-1 4.5 -2.4 2.6 -3.4 0.6 C-4.8 -1.8 -6 -3.4 -6 -4.8 C-6 -6.6 -3.6 -8 0 -8 C3.6 -8 6 -6.6 6 -4.8 C6 -3.4 4.8 -1.8 3.4 0.6 C2.4 2.6 1 4.5 0 8 M0 -3.6 m-2 0 a2 2 0 1 0 4 0 a2 2 0 1 0 -4 0 M-0.75 -1 L0.75 -1 L0.45 2.4 L0 6.2 L-0.45 2.4 L-0.75 -1" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(136 32)"><g transform="scale(71.156 41.857)"><g class="throw" style="animation-name: right-brain-wander-0; animation-delay: -0.600s;"><g transform="scale(0.014054 0.023891)"><g class="throw" style="animation-name: right-brain-throw-0; animation-delay: -0.600s;"><g class="throw" style="animation-name: right-brain-tumble-0; animation-delay: -0.600s;"><g transform="scale(3.5000)"><path d="M-8 8 L-4 7 L5 -2 L2 -5 L-7 4 L-8 8 M-4 7 L-7 4" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M-8 8 L-5 7.2 L-7.2 5 L-8 8" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(784 44)"><g transform="scale(74.215 43.656)"><g class="throw" style="animation-name: right-brain-wander-5; animation-delay: 0.000s;"><g transform="scale(0.013474 0.022906)"><g class="throw" style="animation-name: right-brain-throw-0; animation-delay: 0.000s;"><g class="throw" style="animation-name: right-brain-tumble-5; animation-delay: 0.000s;"><g transform="scale(2.0933)"><path d="M0 -8 C1 -2 2 -1 8 0 C2 1 1 2 0 8 C-1 2 -2 1 -8 0 C-2 -1 -1 -2 0 -8" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></g></g></g></g></g></g><g transform="translate(784 32)"><g transform="scale(104.098 62.508)"><g class="throw" style="animation-name: right-brain-wander-7; animation-delay: -0.600s;"><g transform="scale(0.009606 0.015998)"><g class="throw" style="animation-name: right-brain-throw-0; animation-delay: -0.600s;"><g class="throw" style="animation-name: right-brain-tumble-7; animation-delay: -0.600s;"><g transform="scale(2.0933)"><path d="M-1 -8 C4 -8 8 -5 8 -1 C8 2 5 3 3 3 C1 3 0 4 0 6 C0 7 -2 8 -4 8 C-7 8 -8 4 -8 0 C-8 -5 -5 -8 -1 -8 M-4 1 m-2 0 a2 2 0 1 0 4 0 a2 2 0 1 0 -4 0" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M-3 -4 m-1.6 0 a1.6 1.6 0 1 0 3.2 0 a1.6 1.6 0 1 0 -3.2 0 M2 -5 m-1.6 0 a1.6 1.6 0 1 0 3.2 0 a1.6 1.6 0 1 0 -3.2 0 M5 -1 m-1.6 0 a1.6 1.6 0 1 0 3.2 0 a1.6 1.6 0 1 0 -3.2 0" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(1432 44)"><g transform="scale(86.322 101.545)"><g class="throw" style="animation-name: right-brain-wander-8; animation-delay: 0.000s;"><g transform="scale(0.011585 0.009848)"><g class="throw" style="animation-name: right-brain-throw-0; animation-delay: 0.000s;"><g class="throw" style="animation-name: right-brain-tumble-8; animation-delay: 0.000s;"><g transform="scale(1.2520)"><path d="M4 4 L4 -8 C9 -7 10 -2 7 2" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M4 4 A4 3 0 1 1 -4 4 A4 3 0 1 1 4 4" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(1432 32)"><g transform="scale(115.256 67.798)"><g class="throw" style="animation-name: right-brain-wander-9; animation-delay: -0.600s;"><g transform="scale(0.008676 0.014750)"><g class="throw" style="animation-name: right-brain-throw-0; animation-delay: -0.600s;"><g class="throw" style="animation-name: right-brain-tumble-9; animation-delay: -0.600s;"><g transform="scale(1.2520)"><path d="M2 -8 L-4 1 L0 1 L-2 8 L4 -1 L0 -1 L2 -8" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></g></g></g></g></g></g><g transform="translate(2080 44)"><g transform="scale(101.553 75.706)"><g class="throw" style="animation-name: right-brain-wander-10; animation-delay: 0.000s;"><g transform="scale(0.009847 0.013209)"><g class="throw" style="animation-name: right-brain-throw-0; animation-delay: 0.000s;"><g class="throw" style="animation-name: right-brain-tumble-10; animation-delay: 0.000s;"><g transform="scale(0.7488)"><path d="M8 -8 L-2 2 M-4 0 L0 4" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M-2 2 C-6 2 -7 3 -8 8 C-3 7 -2 6 -2 2" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(2080 32)"><g transform="scale(86.322 103.680)"><g class="throw" style="animation-name: right-brain-wander-8; animation-delay: -0.600s;"><g transform="scale(0.011585 0.009645)"><g class="throw" style="animation-name: right-brain-throw-0; animation-delay: -0.600s;"><g class="throw" style="animation-name: right-brain-tumble-8; animation-delay: -0.600s;"><g transform="scale(0.7488)"><path d="M0 -3 C-2 -6 -5 -7 -8 -6 L-8 5 C-5 4 -2 5 0 7 C2 5 5 4 8 5 L8 -6 C5 -7 2 -6 0 -3 M0 -3 L0 7" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></g></g></g></g></g></g><g transform="translate(-260 116)"><g transform="scale(32.454 19.091)"><g class="throw" style="animation-name: right-brain-wander-1; animation-delay: 0.000s;"><g transform="scale(0.030813 0.052382)"><g class="throw" style="animation-name: right-brain-throw-1; animation-delay: 0.000s;"><g class="throw" style="animation-name: right-brain-tumble-1; animation-delay: 0.000s;"><g transform="scale(4.2657)"><path d="M0 8 C-1 4.5 -2.4 2.6 -3.4 0.6 C-4.8 -1.8 -6 -3.4 -6 -4.8 C-6 -6.6 -3.6 -8 0 -8 C3.6 -8 6 -6.6 6 -4.8 C6 -3.4 4.8 -1.8 3.4 0.6 C2.4 2.6 1 4.5 0 8 M0 -3.6 m-2 0 a2 2 0 1 0 4 0 a2 2 0 1 0 -4 0 M-0.75 -1 L0.75 -1 L0.45 2.4 L0 6.2 L-0.45 2.4 L-0.75 -1" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(-260 104)"><g transform="scale(27.536 16.198)"><g class="throw" style="animation-name: right-brain-wander-2; animation-delay: -0.600s;"><g transform="scale(0.036316 0.061737)"><g class="throw" style="animation-name: right-brain-throw-1; animation-delay: -0.600s;"><g class="throw" style="animation-name: right-brain-tumble-2; animation-delay: -0.600s;"><g transform="scale(4.2657)"><path d="M-4 5 L-4 -6 L8 -8 L8 3" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M-4 5 A4 3 0 1 1 -12 5 A4 3 0 1 1 -4 5 M8 3 A4 3 0 1 1 0 3 A4 3 0 1 1 8 3" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(172 116)"><g transform="scale(47.438 27.904)"><g class="throw" style="animation-name: right-brain-wander-0; animation-delay: 0.000s;"><g transform="scale(0.021080 0.035837)"><g class="throw" style="animation-name: right-brain-throw-1; animation-delay: 0.000s;"><g class="throw" style="animation-name: right-brain-tumble-0; animation-delay: 0.000s;"><g transform="scale(3.0000)"><path d="M0 -8 L7 4 L-7 4 L0 -8" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></g></g></g></g></g></g><g transform="translate(172 104)"><g transform="scale(32.454 19.091)"><g class="throw" style="animation-name: right-brain-wander-1; animation-delay: -0.600s;"><g transform="scale(0.030813 0.052382)"><g class="throw" style="animation-name: right-brain-throw-1; animation-delay: -0.600s;"><g class="throw" style="animation-name: right-brain-tumble-1; animation-delay: -0.600s;"><g transform="scale(3.0000)"><path d="M-1 -8 C4 -8 8 -5 8 -1 C8 2 5 3 3 3 C1 3 0 4 0 6 C0 7 -2 8 -4 8 C-7 8 -8 4 -8 0 C-8 -5 -5 -8 -1 -8 M-4 1 m-2 0 a2 2 0 1 0 4 0 a2 2 0 1 0 -4 0" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M-3 -4 m-1.6 0 a1.6 1.6 0 1 0 3.2 0 a1.6 1.6 0 1 0 -3.2 0 M2 -5 m-1.6 0 a1.6 1.6 0 1 0 3.2 0 a1.6 1.6 0 1 0 -3.2 0 M5 -1 m-1.6 0 a1.6 1.6 0 1 0 3.2 0 a1.6 1.6 0 1 0 -3.2 0" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(604 116)"><g transform="scale(27.536 16.198)"><g class="throw" style="animation-name: right-brain-wander-2; animation-delay: 0.000s;"><g transform="scale(0.036316 0.061737)"><g class="throw" style="animation-name: right-brain-throw-1; animation-delay: 0.000s;"><g class="throw" style="animation-name: right-brain-tumble-2; animation-delay: 0.000s;"><g transform="scale(2.1098)"><path d="M0 -8 C4 -8 6 -5 6 -2 C6 1 4 2 3 4 L-3 4 C-4 2 -6 1 -6 -2 C-6 -5 -4 -8 0 -8 M-3 6 L3 6 M-2 8 L2 8" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></g></g></g></g></g></g><g transform="translate(604 104)"><g transform="scale(47.438 27.904)"><g class="throw" style="animation-name: right-brain-wander-0; animation-delay: -0.600s;"><g transform="scale(0.021080 0.035837)"><g class="throw" style="animation-name: right-brain-throw-1; animation-delay: -0.600s;"><g class="throw" style="animation-name: right-brain-tumble-0; animation-delay: -0.600s;"><g transform="scale(2.1098)"><path d="M0 -8 C5 -2 6 2 3 5 C0 8 -4 7 -5 3 C-6 -1 -3 -4 0 -8" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(1036 116)"><g transform="scale(49.477 29.104)"><g class="throw" style="animation-name: right-brain-wander-5; animation-delay: 0.000s;"><g transform="scale(0.020212 0.034360)"><g class="throw" style="animation-name: right-brain-throw-1; animation-delay: 0.000s;"><g class="throw" style="animation-name: right-brain-tumble-5; animation-delay: 0.000s;"><g transform="scale(1.4838)"><path d="M8 -8 L-2 2 M-4 0 L0 4" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M-2 2 C-6 2 -7 3 -8 8 C-3 7 -2 6 -2 2" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(1036 104)"><g transform="scale(76.790 47.666)"><g class="throw" style="animation-name: right-brain-wander-6; animation-delay: -0.600s;"><g transform="scale(0.013023 0.020979)"><g class="throw" style="animation-name: right-brain-throw-1; animation-delay: -0.600s;"><g class="throw" style="animation-name: right-brain-tumble-6; animation-delay: -0.600s;"><g transform="scale(1.4838)"><path d="M0 -8 C1 -2 2 -1 8 0 C2 1 1 2 0 8 C-1 2 -2 1 -8 0 C-2 -1 -1 -2 0 -8" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></g></g></g></g></g></g><g transform="translate(1468 116)"><g transform="scale(57.548 68.480)"><g class="throw" style="animation-name: right-brain-wander-8; animation-delay: 0.000s;"><g transform="scale(0.017377 0.014603)"><g class="throw" style="animation-name: right-brain-throw-1; animation-delay: 0.000s;"><g class="throw" style="animation-name: right-brain-tumble-8; animation-delay: 0.000s;"><g transform="scale(1.0435)"><path d="M-8 0 C-4 -8 -4 8 0 0 C4 -8 4 8 8 0" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></g></g></g></g></g></g><g transform="translate(1468 104)"><g transform="scale(76.837 45.198)"><g class="throw" style="animation-name: right-brain-wander-9; animation-delay: -0.600s;"><g transform="scale(0.013015 0.022125)"><g class="throw" style="animation-name: right-brain-throw-1; animation-delay: -0.600s;"><g class="throw" style="animation-name: right-brain-tumble-9; animation-delay: -0.600s;"><g transform="scale(1.0435)"><path d="M4 4 L4 -8 C9 -7 10 -2 7 2" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M4 4 A4 3 0 1 1 -4 4 A4 3 0 1 1 4 4" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(1900 116)"><g transform="scale(67.702 50.470)"><g class="throw" style="animation-name: right-brain-wander-10; animation-delay: 0.000s;"><g transform="scale(0.014771 0.019814)"><g class="throw" style="animation-name: right-brain-throw-1; animation-delay: 0.000s;"><g class="throw" style="animation-name: right-brain-tumble-10; animation-delay: 0.000s;"><g transform="scale(0.7339)"><path d="M2 -8 L-4 1 L0 1 L-2 8 L4 -1 L0 -1 L2 -8" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></g></g></g></g></g></g><g transform="translate(1900 104)"><g transform="scale(59.610 69.120)"><g class="throw" style="animation-name: right-brain-wander-11; animation-delay: -0.600s;"><g transform="scale(0.016776 0.014468)"><g class="throw" style="animation-name: right-brain-throw-1; animation-delay: -0.600s;"><g class="throw" style="animation-name: right-brain-tumble-11; animation-delay: -0.600s;"><g transform="scale(0.7339)"><path d="M0 -8 L7 -4 L7 4 L0 8 L-7 4 L-7 -4 L0 -8 M0 0 L0 8 M0 0 L-7 -4 M0 0 L7 -4" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></g></g></g></g></g></g><g transform="translate(-1076 184)"><g transform="scale(97.362 57.272)"><g class="throw" style="animation-name: right-brain-wander-1; animation-delay: 0.000s;"><g transform="scale(0.010271 0.017461)"><g class="throw" style="animation-name: right-brain-throw-2; animation-delay: 0.000s;"><g class="throw" style="animation-name: right-brain-tumble-1; animation-delay: 0.000s;"><g transform="scale(10.4697)"><path d="M0 -3 C-2 -6 -5 -7 -8 -6 L-8 5 C-5 4 -2 5 0 7 C2 5 5 4 8 5 L8 -6 C5 -7 2 -6 0 -3 M0 -3 L0 7" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></g></g></g></g></g></g><g transform="translate(-1076 176)"><g transform="scale(82.608 48.593)"><g class="throw" style="animation-name: right-brain-wander-2; animation-delay: -0.400s;"><g transform="scale(0.012105 0.020579)"><g class="throw" style="animation-name: right-brain-throw-2; animation-delay: -0.400s;"><g class="throw" style="animation-name: right-brain-tumble-2; animation-delay: -0.400s;"><g transform="scale(10.4697)"><path d="M0 8 C-1 4.5 -2.4 2.6 -3.4 0.6 C-4.8 -1.8 -6 -3.4 -6 -4.8 C-6 -6.6 -3.6 -8 0 -8 C3.6 -8 6 -6.6 6 -4.8 C6 -3.4 4.8 -1.8 3.4 0.6 C2.4 2.6 1 4.5 0 8 M0 -3.6 m-2 0 a2 2 0 1 0 4 0 a2 2 0 1 0 -4 0 M-0.75 -1 L0.75 -1 L0.45 2.4 L0 6.2 L-0.45 2.4 L-0.75 -1" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(-1076 164)"><g transform="scale(146.243 86.025)"><g class="throw" style="animation-name: right-brain-wander-3; animation-delay: -0.800s;"><g transform="scale(0.006838 0.011624)"><g class="throw" style="animation-name: right-brain-throw-2; animation-delay: -0.800s;"><g class="throw" style="animation-name: right-brain-tumble-3; animation-delay: -0.800s;"><g transform="scale(10.4697)"><path d="M-8 8 L-4 7 L5 -2 L2 -5 L-7 4 L-8 8 M-4 7 L-7 4" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M-8 8 L-5 7.2 L-7.2 5 L-8 8" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(220 184)"><g transform="scale(97.362 57.272)"><g class="throw" style="animation-name: right-brain-wander-1; animation-delay: 0.000s;"><g transform="scale(0.010271 0.017461)"><g class="throw" style="animation-name: right-brain-throw-2; animation-delay: 0.000s;"><g class="throw" style="animation-name: right-brain-tumble-1; animation-delay: 0.000s;"><g transform="scale(3.5000)"><path d="M0 -8 L7 4 L-7 4 L0 -8" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></g></g></g></g></g></g><g transform="translate(220 176)"><g transform="scale(82.608 48.593)"><g class="throw" style="animation-name: right-brain-wander-2; animation-delay: -0.400s;"><g transform="scale(0.012105 0.020579)"><g class="throw" style="animation-name: right-brain-throw-2; animation-delay: -0.400s;"><g class="throw" style="animation-name: right-brain-tumble-2; animation-delay: -0.400s;"><g transform="scale(3.5000)"><path d="M-1 -8 C4 -8 8 -5 8 -1 C8 2 5 3 3 3 C1 3 0 4 0 6 C0 7 -2 8 -4 8 C-7 8 -8 4 -8 0 C-8 -5 -5 -8 -1 -8 M-4 1 m-2 0 a2 2 0 1 0 4 0 a2 2 0 1 0 -4 0" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M-3 -4 m-1.6 0 a1.6 1.6 0 1 0 3.2 0 a1.6 1.6 0 1 0 -3.2 0 M2 -5 m-1.6 0 a1.6 1.6 0 1 0 3.2 0 a1.6 1.6 0 1 0 -3.2 0 M5 -1 m-1.6 0 a1.6 1.6 0 1 0 3.2 0 a1.6 1.6 0 1 0 -3.2 0" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(220 164)"><g transform="scale(146.243 86.025)"><g class="throw" style="animation-name: right-brain-wander-3; animation-delay: -0.800s;"><g transform="scale(0.006838 0.011624)"><g class="throw" style="animation-name: right-brain-throw-2; animation-delay: -0.800s;"><g class="throw" style="animation-name: right-brain-tumble-3; animation-delay: -0.800s;"><g transform="scale(3.5000)"><path d="M4 4 L4 -8 C9 -7 10 -2 7 2" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M4 4 A4 3 0 1 1 -4 4 A4 3 0 1 1 4 4" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(1516 184)"><g transform="scale(230.512 135.595)"><g class="throw" style="animation-name: right-brain-wander-9; animation-delay: 0.000s;"><g transform="scale(0.004338 0.007375)"><g class="throw" style="animation-name: right-brain-throw-2; animation-delay: 0.000s;"><g class="throw" style="animation-name: right-brain-tumble-9; animation-delay: 0.000s;"><g transform="scale(1.1700)"><path d="M0 -8 C5 -2 6 2 3 5 C0 8 -4 7 -5 3 C-6 -1 -3 -4 0 -8" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(1516 176)"><g transform="scale(203.106 151.411)"><g class="throw" style="animation-name: right-brain-wander-10; animation-delay: -0.400s;"><g transform="scale(0.004924 0.006605)"><g class="throw" style="animation-name: right-brain-throw-2; animation-delay: -0.400s;"><g class="throw" style="animation-name: right-brain-tumble-10; animation-delay: -0.400s;"><g transform="scale(1.1700)"><path d="M8 -8 L-2 2 M-4 0 L0 4" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M-2 2 C-6 2 -7 3 -8 8 C-3 7 -2 6 -2 2" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(1516 164)"><g transform="scale(178.831 207.360)"><g class="throw" style="animation-name: right-brain-wander-11; animation-delay: -0.800s;"><g transform="scale(0.005592 0.004823)"><g class="throw" style="animation-name: right-brain-throw-2; animation-delay: -0.800s;"><g class="throw" style="animation-name: right-brain-tumble-11; animation-delay: -0.800s;"><g transform="scale(1.1700)"><path d="M0 -3 C-2 -6 -5 -7 -8 -6 L-8 5 C-5 4 -2 5 0 7 C2 5 5 4 8 5 L8 -6 C5 -7 2 -6 0 -3 M0 -3 L0 7" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></g></g></g></g></g></g><g transform="translate(2812 184)"><g transform="scale(230.512 135.595)"><g class="throw" style="animation-name: right-brain-wander-9; animation-delay: 0.000s;"><g transform="scale(0.004338 0.007375)"><g class="throw" style="animation-name: right-brain-throw-2; animation-delay: 0.000s;"><g class="throw" style="animation-name: right-brain-tumble-9; animation-delay: 0.000s;"><g transform="scale(0.3911)"><path d="M-8 0 C-4 -8 -4 8 0 0 C4 -8 4 8 8 0" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></g></g></g></g></g></g><g transform="translate(-212 256)"><g transform="scale(27.536 16.198)"><g class="throw" style="animation-name: right-brain-wander-2; animation-delay: 0.000s;"><g transform="scale(0.036316 0.061737)"><g class="throw" style="animation-name: right-brain-throw-3; animation-delay: 0.000s;"><g class="throw" style="animation-name: right-brain-tumble-2; animation-delay: 0.000s;"><g transform="scale(5.0430)"><path d="M-4 5 L-4 -6 L8 -8 L8 3" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M-4 5 A4 3 0 1 1 -12 5 A4 3 0 1 1 -4 5 M8 3 A4 3 0 1 1 0 3 A4 3 0 1 1 8 3" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(-212 244)"><g transform="scale(48.748 28.675)"><g class="throw" style="animation-name: right-brain-wander-3; animation-delay: -0.600s;"><g transform="scale(0.020514 0.034873)"><g class="throw" style="animation-name: right-brain-throw-3; animation-delay: -0.600s;"><g class="throw" style="animation-name: right-brain-tumble-3; animation-delay: -0.600s;"><g transform="scale(5.0430)"><path d="M0 -8 L7 4 L-7 4 L0 -8" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></g></g></g></g></g></g><g transform="translate(220 256)"><g transform="scale(47.438 27.904)"><g class="throw" style="animation-name: right-brain-wander-0; animation-delay: 0.000s;"><g transform="scale(0.021080 0.035837)"><g class="throw" style="animation-name: right-brain-throw-3; animation-delay: 0.000s;"><g class="throw" style="animation-name: right-brain-tumble-0; animation-delay: 0.000s;"><g transform="scale(3.5000)"><path d="M0 -8 L7 -4 L7 4 L0 8 L-7 4 L-7 -4 L0 -8 M0 0 L0 8 M0 0 L-7 -4 M0 0 L7 -4" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></g></g></g></g></g></g><g transform="translate(220 244)"><g transform="scale(27.536 16.198)"><g class="throw" style="animation-name: right-brain-wander-2; animation-delay: -0.600s;"><g transform="scale(0.036316 0.061737)"><g class="throw" style="animation-name: right-brain-throw-3; animation-delay: -0.600s;"><g class="throw" style="animation-name: right-brain-tumble-2; animation-delay: -0.600s;"><g transform="scale(3.5000)"><path d="M0 -8 C4 -8 6 -5 6 -2 C6 1 4 2 3 4 L-3 4 C-4 2 -6 1 -6 -2 C-6 -5 -4 -8 0 -8 M-3 6 L3 6 M-2 8 L2 8" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></g></g></g></g></g></g><g transform="translate(652 256)"><g transform="scale(69.398 41.672)"><g class="throw" style="animation-name: right-brain-wander-7; animation-delay: 0.000s;"><g transform="scale(0.014410 0.023997)"><g class="throw" style="animation-name: right-brain-throw-3; animation-delay: 0.000s;"><g class="throw" style="animation-name: right-brain-tumble-7; animation-delay: 0.000s;"><g transform="scale(2.4291)"><path d="M0 -8 C5 -2 6 2 3 5 C0 8 -4 7 -5 3 C-6 -1 -3 -4 0 -8" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(652 244)"><g transform="scale(59.152 34.795)"><g class="throw" style="animation-name: right-brain-wander-4; animation-delay: -0.600s;"><g transform="scale(0.016906 0.028739)"><g class="throw" style="animation-name: right-brain-throw-3; animation-delay: -0.600s;"><g class="throw" style="animation-name: right-brain-tumble-4; animation-delay: -0.600s;"><g transform="scale(2.4291)"><path d="M-8 8 L-4 7 L5 -2 L2 -5 L-7 4 L-8 8 M-4 7 L-7 4" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M-8 8 L-5 7.2 L-7.2 5 L-8 8" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(1084 256)"><g transform="scale(67.702 50.470)"><g class="throw" style="animation-name: right-brain-wander-10; animation-delay: 0.000s;"><g transform="scale(0.014771 0.019814)"><g class="throw" style="animation-name: right-brain-throw-3; animation-delay: 0.000s;"><g class="throw" style="animation-name: right-brain-tumble-10; animation-delay: 0.000s;"><g transform="scale(1.6859)"><path d="M0 -8 C1 -2 2 -1 8 0 C2 1 1 2 0 8 C-1 2 -2 1 -8 0 C-2 -1 -1 -2 0 -8" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></g></g></g></g></g></g><g transform="translate(1084 244)"><g transform="scale(59.610 59.356)"><g class="throw" style="animation-name: right-brain-wander-11; animation-delay: -0.600s;"><g transform="scale(0.016776 0.016848)"><g class="throw" style="animation-name: right-brain-throw-3; animation-delay: -0.600s;"><g class="throw" style="animation-name: right-brain-tumble-11; animation-delay: -0.600s;"><g transform="scale(1.6859)"><path d="M-8 0 C-4 -8 -4 8 0 0 C4 -8 4 8 8 0" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></g></g></g></g></g></g><g transform="translate(1516 256)"><g transform="scale(57.548 69.120)"><g class="throw" style="animation-name: right-brain-wander-8; animation-delay: 0.000s;"><g transform="scale(0.017377 0.014468)"><g class="throw" style="animation-name: right-brain-throw-3; animation-delay: 0.000s;"><g class="throw" style="animation-name: right-brain-tumble-8; animation-delay: 0.000s;"><g transform="scale(1.1700)"><path d="M4 4 L4 -8 C9 -7 10 -2 7 2" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M4 4 A4 3 0 1 1 -4 4 A4 3 0 1 1 4 4" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(1516 244)"><g transform="scale(67.702 50.470)"><g class="throw" style="animation-name: right-brain-wander-10; animation-delay: -0.600s;"><g transform="scale(0.014771 0.019814)"><g class="throw" style="animation-name: right-brain-throw-3; animation-delay: -0.600s;"><g class="throw" style="animation-name: right-brain-tumble-10; animation-delay: -0.600s;"><g transform="scale(1.1700)"><path d="M2 -8 L-4 1 L0 1 L-2 8 L4 -1 L0 -1 L2 -8" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></g></g></g></g></g></g><g transform="translate(1948 256)"><g transform="scale(59.610 69.120)"><g class="throw" style="animation-name: right-brain-wander-11; animation-delay: 0.000s;"><g transform="scale(0.016776 0.014468)"><g class="throw" style="animation-name: right-brain-throw-3; animation-delay: 0.000s;"><g class="throw" style="animation-name: right-brain-tumble-11; animation-delay: 0.000s;"><g transform="scale(0.8120)"><path d="M8 -8 L-2 2 M-4 0 L0 4" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M-2 2 C-6 2 -7 3 -8 8 C-3 7 -2 6 -2 2" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(-480 328)"><g transform="scale(71.156 41.857)"><g class="throw" style="animation-name: right-brain-wander-0; animation-delay: 0.000s;"><g transform="scale(0.014054 0.023891)"><g class="throw" style="animation-name: right-brain-throw-4; animation-delay: 0.000s;"><g class="throw" style="animation-name: right-brain-tumble-0; animation-delay: 0.000s;"><g transform="scale(5.0785)"><path d="M0 -3 C-2 -6 -5 -7 -8 -6 L-8 5 C-5 4 -2 5 0 7 C2 5 5 4 8 5 L8 -6 C5 -7 2 -6 0 -3 M0 -3 L0 7" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></g></g></g></g></g></g><g transform="translate(-480 316)"><g transform="scale(48.681 28.636)"><g class="throw" style="animation-name: right-brain-wander-1; animation-delay: -0.600s;"><g transform="scale(0.020542 0.034921)"><g class="throw" style="animation-name: right-brain-throw-4; animation-delay: -0.600s;"><g class="throw" style="animation-name: right-brain-tumble-1; animation-delay: -0.600s;"><g transform="scale(5.0785)"><path d="M0 8 C-1 4.5 -2.4 2.6 -3.4 0.6 C-4.8 -1.8 -6 -3.4 -6 -4.8 C-6 -6.6 -3.6 -8 0 -8 C3.6 -8 6 -6.6 6 -4.8 C6 -3.4 4.8 -1.8 3.4 0.6 C2.4 2.6 1 4.5 0 8 M0 -3.6 m-2 0 a2 2 0 1 0 4 0 a2 2 0 1 0 -4 0 M-0.75 -1 L0.75 -1 L0.45 2.4 L0 6.2 L-0.45 2.4 L-0.75 -1" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(168 328)"><g transform="scale(73.122 43.013)"><g class="throw" style="animation-name: right-brain-wander-3; animation-delay: 0.000s;"><g transform="scale(0.013676 0.023249)"><g class="throw" style="animation-name: right-brain-throw-4; animation-delay: 0.000s;"><g class="throw" style="animation-name: right-brain-tumble-3; animation-delay: 0.000s;"><g transform="scale(3.0000)"><path d="M-4 5 L-4 -6 L8 -8 L8 3" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M-4 5 A4 3 0 1 1 -12 5 A4 3 0 1 1 -4 5 M8 3 A4 3 0 1 1 0 3 A4 3 0 1 1 8 3" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(168 316)"><g transform="scale(71.156 41.857)"><g class="throw" style="animation-name: right-brain-wander-0; animation-delay: -0.600s;"><g transform="scale(0.014054 0.023891)"><g class="throw" style="animation-name: right-brain-throw-4; animation-delay: -0.600s;"><g class="throw" style="animation-name: right-brain-tumble-0; animation-delay: -0.600s;"><g transform="scale(3.0000)"><path d="M0 -8 L7 4 L-7 4 L0 -8" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></g></g></g></g></g></g><g transform="translate(816 328)"><g transform="scale(74.215 43.656)"><g class="throw" style="animation-name: right-brain-wander-5; animation-delay: 0.000s;"><g transform="scale(0.013474 0.022906)"><g class="throw" style="animation-name: right-brain-throw-4; animation-delay: 0.000s;"><g class="throw" style="animation-name: right-brain-tumble-5; animation-delay: 0.000s;"><g transform="scale(1.7722)"><path d="M-1 -8 C4 -8 8 -5 8 -1 C8 2 5 3 3 3 C1 3 0 4 0 6 C0 7 -2 8 -4 8 C-7 8 -8 4 -8 0 C-8 -5 -5 -8 -1 -8 M-4 1 m-2 0 a2 2 0 1 0 4 0 a2 2 0 1 0 -4 0" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M-3 -4 m-1.6 0 a1.6 1.6 0 1 0 3.2 0 a1.6 1.6 0 1 0 -3.2 0 M2 -5 m-1.6 0 a1.6 1.6 0 1 0 3.2 0 a1.6 1.6 0 1 0 -3.2 0 M5 -1 m-1.6 0 a1.6 1.6 0 1 0 3.2 0 a1.6 1.6 0 1 0 -3.2 0" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(816 316)"><g transform="scale(104.098 62.508)"><g class="throw" style="animation-name: right-brain-wander-7; animation-delay: -0.600s;"><g transform="scale(0.009606 0.015998)"><g class="throw" style="animation-name: right-brain-throw-4; animation-delay: -0.600s;"><g class="throw" style="animation-name: right-brain-tumble-7; animation-delay: -0.600s;"><g transform="scale(1.7722)"><path d="M0 -8 C4 -8 6 -5 6 -2 C6 1 4 2 3 4 L-3 4 C-4 2 -6 1 -6 -2 C-6 -5 -4 -8 0 -8 M-3 6 L3 6 M-2 8 L2 8" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></g></g></g></g></g></g><g transform="translate(1464 328)"><g transform="scale(86.322 102.587)"><g class="throw" style="animation-name: right-brain-wander-8; animation-delay: 0.000s;"><g transform="scale(0.011585 0.009748)"><g class="throw" style="animation-name: right-brain-throw-4; animation-delay: 0.000s;"><g class="throw" style="animation-name: right-brain-tumble-8; animation-delay: 0.000s;"><g transform="scale(1.0469)"><path d="M0 -8 C5 -2 6 2 3 5 C0 8 -4 7 -5 3 C-6 -1 -3 -4 0 -8" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(1464 316)"><g transform="scale(115.256 67.798)"><g class="throw" style="animation-name: right-brain-wander-9; animation-delay: -0.600s;"><g transform="scale(0.008676 0.014750)"><g class="throw" style="animation-name: right-brain-throw-4; animation-delay: -0.600s;"><g class="throw" style="animation-name: right-brain-tumble-9; animation-delay: -0.600s;"><g transform="scale(1.0469)"><path d="M8 -8 L-2 2 M-4 0 L0 4" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M-2 2 C-6 2 -7 3 -8 8 C-3 7 -2 6 -2 2" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(2112 328)"><g transform="scale(89.416 103.680)"><g class="throw" style="animation-name: right-brain-wander-11; animation-delay: 0.000s;"><g transform="scale(0.011184 0.009645)"><g class="throw" style="animation-name: right-brain-throw-4; animation-delay: 0.000s;"><g class="throw" style="animation-name: right-brain-tumble-11; animation-delay: 0.000s;"><g transform="scale(0.6184)"><path d="M0 -8 C1 -2 2 -1 8 0 C2 1 1 2 0 8 C-1 2 -2 1 -8 0 C-2 -1 -1 -2 0 -8" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></g></g></g></g></g></g><g transform="translate(2112 316)"><g transform="scale(86.322 103.680)"><g class="throw" style="animation-name: right-brain-wander-8; animation-delay: -0.600s;"><g transform="scale(0.011585 0.009645)"><g class="throw" style="animation-name: right-brain-throw-4; animation-delay: -0.600s;"><g class="throw" style="animation-name: right-brain-tumble-8; animation-delay: -0.600s;"><g transform="scale(0.6184)"><path d="M-8 0 C-4 -8 -4 8 0 0 C4 -8 4 8 8 0" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></g></g></g></g></g></g><g transform="translate(-1160 332)"><g transform="scale(97.362 57.272)"><g class="throw" style="animation-name: right-brain-wander-1; animation-delay: 0.000s;"><g transform="scale(0.010271 0.017461)"><g class="throw" style="animation-name: right-brain-throw-5; animation-delay: 0.000s;"><g class="throw" style="animation-name: right-brain-tumble-1; animation-delay: 0.000s;"><g transform="scale(9.7846)"><path d="M-4 5 L-4 -6 L8 -8 L8 3" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M-4 5 A4 3 0 1 1 -12 5 A4 3 0 1 1 -4 5 M8 3 A4 3 0 1 1 0 3 A4 3 0 1 1 8 3" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(-1160 396)"><g transform="scale(146.243 86.025)"><g class="throw" style="animation-name: right-brain-wander-3; animation-delay: -0.400s;"><g transform="scale(0.006838 0.011624)"><g class="throw" style="animation-name: right-brain-throw-5; animation-delay: -0.400s;"><g class="throw" style="animation-name: right-brain-tumble-3; animation-delay: -0.400s;"><g transform="scale(9.7846)"><path d="M2 -8 L-4 1 L0 1 L-2 8 L4 -1 L0 -1 L2 -8" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></g></g></g></g></g></g><g transform="translate(-1160 384)"><g transform="scale(142.313 83.713)"><g class="throw" style="animation-name: right-brain-wander-0; animation-delay: -0.800s;"><g transform="scale(0.007027 0.011946)"><g class="throw" style="animation-name: right-brain-throw-5; animation-delay: -0.800s;"><g class="throw" style="animation-name: right-brain-tumble-0; animation-delay: -0.800s;"><g transform="scale(9.7846)"><path d="M0 -8 L7 -4 L7 4 L0 8 L-7 4 L-7 -4 L0 -8 M0 0 L0 8 M0 0 L-7 -4 M0 0 L7 -4" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></g></g></g></g></g></g><g transform="translate(136 332)"><g transform="scale(97.362 57.272)"><g class="throw" style="animation-name: right-brain-wander-1; animation-delay: 0.000s;"><g transform="scale(0.010271 0.017461)"><g class="throw" style="animation-name: right-brain-throw-5; animation-delay: 0.000s;"><g class="throw" style="animation-name: right-brain-tumble-1; animation-delay: 0.000s;"><g transform="scale(3.5000)"><path d="M0 -8 C4 -8 6 -5 6 -2 C6 1 4 2 3 4 L-3 4 C-4 2 -6 1 -6 -2 C-6 -5 -4 -8 0 -8 M-3 6 L3 6 M-2 8 L2 8" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></g></g></g></g></g></g><g transform="translate(136 396)"><g transform="scale(82.608 48.593)"><g class="throw" style="animation-name: right-brain-wander-2; animation-delay: -0.400s;"><g transform="scale(0.012105 0.020579)"><g class="throw" style="animation-name: right-brain-throw-5; animation-delay: -0.400s;"><g class="throw" style="animation-name: right-brain-tumble-2; animation-delay: -0.400s;"><g transform="scale(3.5000)"><path d="M0 8 C-1 4.5 -2.4 2.6 -3.4 0.6 C-4.8 -1.8 -6 -3.4 -6 -4.8 C-6 -6.6 -3.6 -8 0 -8 C3.6 -8 6 -6.6 6 -4.8 C6 -3.4 4.8 -1.8 3.4 0.6 C2.4 2.6 1 4.5 0 8 M0 -3.6 m-2 0 a2 2 0 1 0 4 0 a2 2 0 1 0 -4 0 M-0.75 -1 L0.75 -1 L0.45 2.4 L0 6.2 L-0.45 2.4 L-0.75 -1" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(136 384)"><g transform="scale(142.313 83.713)"><g class="throw" style="animation-name: right-brain-wander-0; animation-delay: -0.800s;"><g transform="scale(0.007027 0.011946)"><g class="throw" style="animation-name: right-brain-throw-5; animation-delay: -0.800s;"><g class="throw" style="animation-name: right-brain-tumble-0; animation-delay: -0.800s;"><g transform="scale(3.5000)"><path d="M-8 8 L-4 7 L5 -2 L2 -5 L-7 4 L-8 8 M-4 7 L-7 4" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M-8 8 L-5 7.2 L-7.2 5 L-8 8" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(1432 332)"><g transform="scale(230.512 135.595)"><g class="throw" style="animation-name: right-brain-wander-9; animation-delay: 0.000s;"><g transform="scale(0.004338 0.007375)"><g class="throw" style="animation-name: right-brain-throw-5; animation-delay: 0.000s;"><g class="throw" style="animation-name: right-brain-tumble-9; animation-delay: 0.000s;"><g transform="scale(1.2520)"><path d="M0 -8 C1 -2 2 -1 8 0 C2 1 1 2 0 8 C-1 2 -2 1 -8 0 C-2 -1 -1 -2 0 -8" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></g></g></g></g></g></g><g transform="translate(1432 396)"><g transform="scale(203.106 151.411)"><g class="throw" style="animation-name: right-brain-wander-10; animation-delay: -0.400s;"><g transform="scale(0.004924 0.006605)"><g class="throw" style="animation-name: right-brain-throw-5; animation-delay: -0.400s;"><g class="throw" style="animation-name: right-brain-tumble-10; animation-delay: -0.400s;"><g transform="scale(1.2520)"><path d="M-1 -8 C4 -8 8 -5 8 -1 C8 2 5 3 3 3 C1 3 0 4 0 6 C0 7 -2 8 -4 8 C-7 8 -8 4 -8 0 C-8 -5 -5 -8 -1 -8 M-4 1 m-2 0 a2 2 0 1 0 4 0 a2 2 0 1 0 -4 0" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M-3 -4 m-1.6 0 a1.6 1.6 0 1 0 3.2 0 a1.6 1.6 0 1 0 -3.2 0 M2 -5 m-1.6 0 a1.6 1.6 0 1 0 3.2 0 a1.6 1.6 0 1 0 -3.2 0 M5 -1 m-1.6 0 a1.6 1.6 0 1 0 3.2 0 a1.6 1.6 0 1 0 -3.2 0" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(1432 384)"><g transform="scale(172.644 203.091)"><g class="throw" style="animation-name: right-brain-wander-8; animation-delay: -0.800s;"><g transform="scale(0.005792 0.004924)"><g class="throw" style="animation-name: right-brain-throw-5; animation-delay: -0.800s;"><g class="throw" style="animation-name: right-brain-tumble-8; animation-delay: -0.800s;"><g transform="scale(1.2520)"><path d="M4 4 L4 -8 C9 -7 10 -2 7 2" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M4 4 A4 3 0 1 1 -4 4 A4 3 0 1 1 4 4" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g><g transform="translate(2728 332)"><g transform="scale(230.512 135.595)"><g class="throw" style="animation-name: right-brain-wander-9; animation-delay: 0.000s;"><g transform="scale(0.004338 0.007375)"><g class="throw" style="animation-name: right-brain-throw-5; animation-delay: 0.000s;"><g class="throw" style="animation-name: right-brain-tumble-9; animation-delay: 0.000s;"><g transform="scale(0.4478)"><path d="M2 -8 L-4 1 L0 1 L-2 8 L4 -1 L0 -1 L2 -8" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></g></g></g></g></g></g><g transform="translate(2728 396)"><g transform="scale(203.106 151.411)"><g class="throw" style="animation-name: right-brain-wander-10; animation-delay: -0.400s;"><g transform="scale(0.004924 0.006605)"><g class="throw" style="animation-name: right-brain-throw-5; animation-delay: -0.400s;"><g class="throw" style="animation-name: right-brain-tumble-10; animation-delay: -0.400s;"><g transform="scale(0.4478)"><path d="M8 -8 L-2 2 M-4 0 L0 4" stroke="#ac4704" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M-2 2 C-6 2 -7 3 -8 8 C-3 7 -2 6 -2 2" fill="#ac4704" fill-rule="evenodd"/></g></g></g></g></g></g></g></g>
   <path d="M108 88 A56 56 0 0 1 60 116" stroke-width="4" stroke="#ac4704" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   <path class="signal" d="M108 88 A56 56 0 0 1 60 116" stroke-width="5" stroke="#ba4d05" stroke-dasharray="5.8 52.3" style="--cycle: 58.1; animation-delay: 0.00s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   <path class="signal" d="M108 88 A56 56 0 0 1 60 116" stroke-width="6" stroke="#c65205" stroke-dasharray="5.8 52.3" style="--cycle: 58.1; animation-delay: -0.11s;" stroke-linecap="round" stroke-linejoin="round" fill="none"/>

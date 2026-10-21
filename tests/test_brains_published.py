@@ -50,11 +50,10 @@ def test_the_published_card_runs_at_the_schedule_the_build_declares(published):
 
 
 def test_the_published_card_fits_the_budget(published):
-    """Terkel's reference is 117 KB for 48 frames at this size. Camo is not in
-    the path for a gist file, so there is no hard cap — but a card that costs
-    more than the page around it is a card drawn wrong."""
+    """A card that costs more than the page around it is a card drawn wrong.
+    `build.BUDGET` carries the number and the reasoning."""
     size = published[1].stat().st_size
-    assert size < 200_000, f"{size} bytes"
+    assert size < build.BUDGET, f"{size} bytes"
 
 
 def test_both_hemispheres_are_published():

@@ -30,6 +30,15 @@ DURATION = 1.2
 DELAY_CS = 4
 FRAMES = 30
 
+# What a pinned card may cost. Camo is not in the path for a gist file, so
+# nothing enforces this but the number itself; Terkel's reference is 117 KB for
+# 48 frames at this size, and the thrown field is what put these past it — 64
+# marks move every tick and none of them repeats a previous frame, so there is
+# almost no compression to find and size tracks the frame count. 243 KB and
+# 270 KB measured. The ceiling leaves room for a mark or two and none for
+# another lane.
+BUDGET = 300_000
+
 
 def title(name):
     """`left-brain` -> `Left Brain`, which is the card heading GitHub paints."""

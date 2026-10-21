@@ -42,10 +42,26 @@ def test_the_art_is_at_least_as_wide_as_the_card_box():
     assert figures.W / figures.H >= 374 / 100
 
 
-def test_the_art_sets_no_type(name):
-    """The accent may not set type in either theme, and a transparent
-    two-colour image has no ink to set it in. The gist description is the label."""
-    assert "<text" not in figures.load(name)
+def typeset(svg):
+    """The content of every `<text>` node."""
+    return re.findall(r"<text[^>]*>([^<]*)</text>", svg)
+
+
+def test_the_only_type_is_the_left_halfs_thrown_digits(name):
+    """The gist description is the label, so nothing in the art may read as
+    one. The left half throws binary digits, which are marks rather than
+    labelling — drawn as `<text>` because a bar and a ring drawn as paths would
+    satisfy a no-type rule and still be read as numbers.
+
+    What keeps that from becoming a hole in the rule is the shape of what is
+    permitted: ones and zeros, a handful at a time. A caption cannot be spelled
+    in them. The right half's vocabulary has no numbers and it sets no type."""
+    words = typeset(figures.load(name))
+    if name == "right-brain":
+        assert words == []
+    else:
+        assert words
+        assert all(re.fullmatch(r"[01]{1,5}", w) for w in words), sorted(set(words))
 
 
 def luminance(hex_colour):
@@ -133,9 +149,31 @@ def keyframe_declarations(svg):
 # dash is exempt from the travel budget below, and why the test after it has to
 # hold — without the unlit copy, a marching dash is a draw-on.
 ANIMATABLE = {"stroke-dashoffset", "transform"}
-TRANSFORMS = {"translate", "translateX", "translateY"}
+TRANSFORMS = {"translate", "translateX", "translateY", "scale", "rotate"}
 # How a value reaches a transform, not a transform applied to the element.
 VALUE_FNS = {"calc", "var"}
+
+
+def keyframe_blocks(svg):
+    """`{name: [(stop, declaration), ...]}` for every `@keyframes` in the file."""
+    out = {}
+    for name, body in re.findall(r"@keyframes\s+([\w-]+)\s*\{(.*?\})\s*\}", svg, re.S):
+        out[name] = re.findall(r"([\d.]+%|from|to)\s*\{([^}]*)\}", body)
+    return out
+
+
+def channels(decl):
+    """The `translate`, `scale` and `rotate` a stop names, as `(x, y, s, deg)`."""
+    move = re.search(r"translate\(([^)]*)\)", decl)
+    pair = (move.group(1).split(",") + ["0"]) if move else ["0", "0"]
+    scale = re.search(r"scale\(([\d.]+)\)", decl)
+    turn = re.search(r"rotate\((-?[\d.]+)deg\)", decl)
+    return (
+        float(re.sub(r"[a-z%]", "", pair[0]) or 0),
+        float(re.sub(r"[a-z%]", "", pair[1]) or 0),
+        float(scale.group(1)) if scale else 1.0,
+        float(turn.group(1)) if turn else 0.0,
+    )
 
 
 def test_motion_touches_only_properties_that_cannot_hide_the_drawing(name):
@@ -144,12 +182,80 @@ def test_motion_touches_only_properties_that_cannot_hide_the_drawing(name):
     assert {p for p, _ in declared} <= ANIMATABLE
 
 
-def test_any_transform_is_a_translate_inside_the_stated_budget(name):
+def test_every_transform_is_one_of_the_three_the_field_is_built_from(name):
     svg = figures.load(name)
     transforms = "".join(v for p, v in keyframe_declarations(svg) if p == "transform")
     assert {f for f in re.findall(r"([A-Za-z]+)\(", transforms)} - VALUE_FNS <= TRANSFORMS
-    moves = re.findall(r"translate[XY]?\(([^)]*)\)", transforms)
-    assert all(abs(float(v)) <= 24 for a in moves for v in re.findall(r"-?\d+(?:\.\d+)?", a))
+
+
+def lane_periods(svg):
+    """`{lane keyframe: slot spacing}` for every lane in the thrown field.
+
+    The spacing is read off the slots themselves rather than any constant, so
+    it is the figure's own answer to what one period of the lane is.
+    """
+    lanes = {}
+    for chunk in svg.split('<g transform="translate(')[1:]:
+        head = chunk[:400]
+        lane = re.search(r"animation-name: ([\w-]+-throw-\d+);", head)
+        if not lane:
+            continue
+        x = float(re.match(r"(-?[\d.]+) (-?[\d.]+)\)", chunk).group(1))
+        lanes.setdefault(lane.group(1), []).append(x)
+    out = {}
+    for lane, xs in lanes.items():
+        # A lane carries more than one stream, shifted against each other down
+        # the card but not along it, so a column can hold two marks.
+        xs = sorted(set(xs))
+        gaps = {round(b - a, 3) for a, b in zip(xs, xs[1:])}
+        assert len(gaps) == 1, f"{lane}: slots are not evenly spaced ({sorted(gaps)})"
+        out[lane] = gaps.pop()
+    return out
+
+
+def test_the_only_travel_in_the_figure_is_one_period_of_a_lane(name):
+    """What replaced the 24px travel cap, and why one was needed at all: the
+    drawing may not walk off the card over a loop, because the GIF repeats and
+    a figure that ended somewhere else would jump back.
+
+    A periodic field is the one thing that can travel and still return. The
+    slots in a lane repeat every `p`, so translating the lane by exactly `p`
+    puts a different mark in every place a mark already was and the frame is
+    indistinguishable from the first. Off by any amount and the whole field
+    jumps once per loop — which is visible, and is what the arithmetic here
+    catches. Every other channel closes outright: the wind returns, the tumble
+    returns to its own angle, and the size is a function of position rather
+    than of time.
+
+    The sign is the other half of it. Each hemisphere throws away from the
+    gutter they share, so the pair opens outward instead of one half firing
+    across the other.
+    """
+    svg = figures.load(name)
+    away = -1 if name == "left-brain" else 1
+    periods = lane_periods(svg)
+    assert periods, "the figure throws no field"
+    for lane, stops in keyframe_blocks(svg).items():
+        if not any("transform" in d for _, d in stops):
+            continue
+        first, last = channels(stops[0][1]), channels(stops[-1][1])
+        travel = away * periods.get(lane, 0)
+        assert abs((last[0] - first[0]) - travel) < 1e-6, f"{lane}: travels {last[0] - first[0]}, not {travel}"
+        assert abs(last[1] - first[1]) < 1e-6, f"{lane}: drifts {last[1] - first[1]} down"
+        assert abs(last[3] - first[3]) < 1e-3, f"{lane}: turns {last[3] - first[3]}deg"
+
+
+def test_nothing_is_scaled_away(name):
+    """`scale(0)` hides an element as completely as `opacity: 0`, and the first
+    frame is what a static renderer and a reduced-motion viewer paint. The
+    field's falloff is a function of where a mark is, so it never reaches zero
+    and it starts at the size the mark was drawn."""
+    for stops in keyframe_blocks(figures.load(name)).values():
+        sizes = [channels(d)[2] for _, d in stops if "scale" in d]
+        if not sizes:
+            continue
+        assert min(sizes) > 0.1, f"{min(sizes)} is gone"
+        assert sizes[0] == 1.0, f"the first frame is already at {sizes[0]}"
 
 
 def test_nothing_stands_behind_the_drawing(name):
@@ -176,8 +282,14 @@ def test_neither_half_closes_a_shape(name):
     """No hemisphere is outlined. The left is a honeycomb and the right a
     cluster of open arcs, and in both the mass is what implies the shape — a
     closed path is an outline drawn around a construction, which is the badge
-    the reference was taken without."""
-    assert not re.search(r'<path[^>]*\sd="[^"]*[Zz]"', figures.load(name))
+    the reference was taken without.
+
+    The contour inside `<clipPath>` is exempt. It is a region rather than a
+    drawing — it states where the field is hidden behind the hemisphere — and a
+    region has to close to bound anything.
+    """
+    painted = re.sub(r"<clipPath[\s\S]*?</clipPath>", "", figures.load(name))
+    assert not re.search(r'<path[^>]*\sd="[^"]*[Zz]"', painted)
 
 
 def test_a_dashed_edge_carries_no_signal():

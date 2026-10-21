@@ -125,9 +125,34 @@ taking every vertex off the construction. It refuses to emit a chord, an
 off-grid endpoint or a closed circle rather than publishing one as if it were a
 drawing decision.
 
-Nothing stands behind either half — no grid, no field, nothing drifting. The
-card's own surface is the ground, and the only thing that moves is the dash
-marching along the lines already drawn.
+Nothing stands behind either half — no grid, nothing drifting. The card's own
+surface is the ground.
+
+## The thrown field
+
+Each half throws marks out of its own contour, away from the gutter the two
+share, shrinking as they go. The left throws mathematics, programming and logic;
+the right throws music, drawing and making.
+
+Two things about it are worth knowing before changing anything.
+
+**It travels, and the 24px cap does not apply.** Everything else in the figure
+returns to where it started, because the GIF repeats and a drawing that ended
+elsewhere would jump. The field is the one exception: the slots in a lane repeat
+every `p`, so translating the lane by exactly `p` puts a different mark wherever
+a mark already was and the frame is indistinguishable from the first. Off by any
+amount and the whole field jumps once per loop. Every other channel still closes
+outright — the wind returns, the tumble returns to its own angle, and size is a
+function of position rather than of time, which is what lets one keyframe serve
+every slot in a lane.
+
+**The left half sets type, against the rule that nothing in the art does.** Its
+marks include binary digits, and they are drawn as `<text>`: a bar and a ring
+drawn as paths would satisfy the rule's wording and still be read as numbers. Ones
+and zeros a handful at a time cannot spell a caption, which is the rule's reason.
+The right half's vocabulary has no numbers and it sets no type at all.
+
+The field is what put the files past the old 200 KB budget — see `build.BUDGET`.
 
 ## Why the trail decays downward
 

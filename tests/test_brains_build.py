@@ -119,12 +119,11 @@ def test_the_built_card_is_the_drawings_own_shades_on_transparency(tmp_path, nam
 @needs_browser
 @pytest.mark.parametrize("name", figures.NAMES)
 def test_the_built_card_fits_the_budget(tmp_path, name):
-    """Terkel's reference is 117 KB for 48 frames at this size. Camo is not in
-    the path for a gist file, so there is no hard cap — but a card that costs
-    more than the page around it is a card drawn wrong."""
+    """A card that costs more than the page around it is a card drawn wrong.
+    `build.BUDGET` carries the number and the reasoning."""
     out = tmp_path / f"{build.title(name)}.gif"
     build.render(name, out)
-    assert out.stat().st_size < 200_000, f"{out.stat().st_size} bytes"
+    assert out.stat().st_size < build.BUDGET, f"{out.stat().st_size} bytes"
 
 
 def test_build_reports_parity_drift_without_blocking_on_it(monkeypatch, tmp_path, capsys):
