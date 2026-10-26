@@ -12,13 +12,13 @@ is vanilla JS with no build step and no deps, so the loop is seconds long. Only
 reverse this for something that exists solely in the README — the slice
 pairing, the `<picture>` tags, the font subset.
 
-Preview tree: `~/Documents/personal/design-preview` (not a git repo — no commit
+Preview tree: `~/personal/design-preview` (not a git repo — no commit
 step, and no history to recover a mistake from; read before you overwrite).
 
 ## 1. Change the preview and prove it
 
 ```bash
-cd ~/Documents/personal/design-preview
+cd ~/personal/design-preview
 python3 build.py            # systems/*.md -> site/data.js. Stock python3, no deps.
 node test/panels.mjs        # geometry, contrast and accent invariants
 node test/smoke.mjs         # every tab of every system renders
@@ -30,7 +30,7 @@ open site/index.html        # file:// works; data.js is a <script>, not a fetch
 `window.DESIGN_SYSTEMS`. If you touched a `systems/DESIGN-*.md` front matter,
 re-run it or the site still shows the old tokens.
 
-`unused_tokens.py` matches declared tokens at the 2-space level. `mine-final`
+`unused_tokens.py` matches declared tokens at the 2-space level. `fabric`
 should report **0 unspent**: a token nothing references is either dead or a
 component that forgot to use it.
 
@@ -47,7 +47,7 @@ asset scripts in page order. Import it and you have `DESIGN_SYSTEMS`,
 
 ```js
 import "/Users/.../design-preview/test/dom-stub.mjs";
-const s = window.DESIGN_SYSTEMS.find((x) => x.slug === "mine-final");
+const s = window.DESIGN_SYSTEMS.find((x) => x.slug === "fabric");
 for (const name of themeNames(s)) {
   applyTheme(s, name);                       // NOT prepare(s, name)
   for (const p of panelSlices(s)) writeFileSync(`/tmp/preview-slices/${name}-${p.file}`, p.svg);
@@ -157,7 +157,7 @@ panel; rule 6 (what the accent may touch) and rule 11 (above) are the two that
 catch people.
 
 ```bash
-R=~/Documents/personal/ozzycodes2
+R=~/personal/ozzycodes2
 $R/.venv/bin/python -m pytest $R/tests -q --cov=tools.profile --cov-report=term-missing
 ```
 

@@ -1,6 +1,6 @@
 <!-- source: site/assets/brains.js
-     generated: 2026-10-21
-     Vendored from design-preview, system mine-final. Never hand-edit:
+     generated: 2026-10-26
+     Vendored from design-preview, system fabric. Never hand-edit:
      change the preview, look at it, then run
      `python -m tools.brains.parity --write left-brain`. -->
 <svg xmlns="http://www.w3.org/2000/svg" id="left-brain" viewBox="0 0 1496 400" width="1496" height="400" role="img" aria-labelledby="left-brain-t left-brain-d">

@@ -21,7 +21,7 @@ import sys
 
 from . import figures
 
-PREVIEW = pathlib.Path.home() / "Documents" / "personal" / "design-preview"
+PREVIEW = pathlib.Path.home() / "personal" / "design-preview"
 
 # `dom-stub.mjs` installs the globals and loads every asset script in page
 # order, which is the only way `brains.js` gets `panelTheme` and `piso`.
@@ -35,7 +35,7 @@ import("file://{stub}").then(() => {{
 
 # The system the drawings are authored under. Every other system renders the
 # Brains tab from its own tokens, but only this one is published.
-SYSTEM = "mine-final"
+SYSTEM = "fabric"
 
 SOURCE = "site/assets/brains.js"
 

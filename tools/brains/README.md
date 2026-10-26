@@ -186,7 +186,7 @@ time the editor saves.
 ## The drawing lives somewhere else
 
 `left-brain.svg` and `right-brain.svg` are generated. The drawing is authored in
-`~/Documents/personal/design-preview` at `site/assets/brains.js`, on the Brains
+`~/personal/design-preview` at `site/assets/brains.js`, on the Brains
 tab, and vendored here so a capture is reproducible on a machine that has only
 this repository. Each file states its provenance in a leading comment.
 

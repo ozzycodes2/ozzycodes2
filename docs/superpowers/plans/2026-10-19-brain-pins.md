@@ -20,7 +20,7 @@
 - GIF frame delays: **2cs floor**; exact framerates only at 1, 2, 4, 5, 10, 20, 25, 50, 100 fps. Dither `atkinson`. Reserve the transparent palette entry.
 - Nothing this plan produces may be written under `assets/` — the workflow's `git add assets` would commit it on every scheduled run.
 - `tools/profile/**` and `README.md` are not modified by any task.
-- Preview edits land in `~/Documents/personal/design-preview`, which is not a git repository. `mine-final` must still report **0 unspent tokens**.
+- Preview edits land in `~/personal/design-preview`, which is not a git repository. `fabric` must still report **0 unspent tokens**.
 
 ## Review Focus
 
@@ -37,13 +37,13 @@ Five conditions the spec implies that no task's happy path exercises. Each has a
 ### Task 1: The left hemisphere, in the preview
 
 **Files:**
-- Create: `~/Documents/personal/design-preview/site/assets/brains.js`
-- Create: `~/Documents/personal/design-preview/test/brains.mjs`
-- Modify: `~/Documents/personal/design-preview/site/index.html` (script tags, after line 32)
-- Modify: `~/Documents/personal/design-preview/site/assets/app.js` (`TABS` line 9, dispatch map line 432)
-- Modify: `~/Documents/personal/design-preview/test/dom-stub.mjs` (asset load list)
-- Modify: `~/Documents/personal/design-preview/test/smoke.mjs` (`TAB_IDS` line 6)
-- Modify: `~/Documents/personal/design-preview/systems/DESIGN-mine-final.md` (Motion section prose)
+- Create: `~/personal/design-preview/site/assets/brains.js`
+- Create: `~/personal/design-preview/test/brains.mjs`
+- Modify: `~/personal/design-preview/site/index.html` (script tags, after line 32)
+- Modify: `~/personal/design-preview/site/assets/app.js` (`TABS` line 9, dispatch map line 432)
+- Modify: `~/personal/design-preview/test/dom-stub.mjs` (asset load list)
+- Modify: `~/personal/design-preview/test/smoke.mjs` (`TAB_IDS` line 6)
+- Modify: `~/personal/design-preview/systems/DESIGN-fabric.md` (Motion section prose)
 
 **Interfaces:**
 - Consumes: `panelTheme(s)`, `solid()`, `piso(ox, oy)`, `r2()` from `panels.js`, already global under `vm.runInThisContext`.
@@ -83,12 +83,12 @@ Left hemisphere geometry: 2:1 dimetric via `piso`, orthogonal in world space, ev
 
 - [ ] **Step 5: Amend the motion prose**
 
-In `systems/DESIGN-mine-final.md`, the Motion section records that figures captured for publication outside the page run under the diagram layer's `loop` mode and its clock. Prose only — no new tokens, or the 0-unspent census breaks.
+In `systems/DESIGN-fabric.md`, the Motion section records that figures captured for publication outside the page run under the diagram layer's `loop` mode and its clock. Prose only — no new tokens, or the 0-unspent census breaks.
 
 - [ ] **Step 6: Run the preview suite**
 
 Run, from the preview root: `python3 build.py && node test/brains.mjs && node test/panels.mjs && node test/smoke.mjs && python3 test/unused_tokens.py`
-Expected: all pass; `mine-final` reports `0 unspent`.
+Expected: all pass; `fabric` reports `0 unspent`.
 
 - [ ] **Step 7: Mutation-test the new assertions**
 
@@ -407,8 +407,8 @@ Expected: the drawing reads at 100px, the card surface shows through on both the
 Same path as Tasks 1, 2 and 6, for the half that argues with the first.
 
 **Files:**
-- Modify: `~/Documents/personal/design-preview/site/assets/brains.js`
-- Modify: `~/Documents/personal/design-preview/test/brains.mjs`
+- Modify: `~/personal/design-preview/site/assets/brains.js`
+- Modify: `~/personal/design-preview/test/brains.mjs`
 - Create: `tools/brains/right-brain.svg`
 
 - [ ] **Step 1: Extend the preview invariants to `"right"`**
@@ -428,7 +428,7 @@ Expected: FAIL — `brainFigure(s, "right")` not implemented.
 
 - [ ] **Step 3: Draw the right hemisphere**
 
-Round, organic, floating off the grid, per the spec's accepted decision that the halves disagree. Mine Final has no vocabulary for this, so it is invention: curves rather than orthogonal elbows, and no obligation to the 4px grid. It keeps one accent colour, no type, and frame-zero completeness.
+Round, organic, floating off the grid, per the spec's accepted decision that the halves disagree. Fabric has no vocabulary for this, so it is invention: curves rather than orthogonal elbows, and no obligation to the 4px grid. It keeps one accent colour, no type, and frame-zero completeness.
 
 - [ ] **Step 4: Run the preview suite**
 

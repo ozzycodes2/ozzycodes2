@@ -90,7 +90,7 @@ only the last closes the frame.
 
 ## Why there are two of everything
 
-Both themes are the Mine Final token set — `dark` and `light`. Panels name
+Both themes are the Fabric token set — `dark` and `light`. Panels name
 roles, never colours, so one renderer produces both: `render.py` runs every
 panel once per theme and `readme.py` pairs the output in a `<picture>` with a
 `prefers-color-scheme: dark` source, which GitHub honours. Light is the `<img>`

@@ -323,7 +323,7 @@ def test_a_tool_with_no_vendored_mark_falls_back_to_type():
 
 # --- paint -----------------------------------------------------------------
 
-# Read out of the preview's slabFaces()/focalTint()/brand() against mine-final.
+# Read out of the preview's slabFaces()/focalTint()/brand() against fabric.
 # Solved values, not declared ones — see this module's docstring.
 PREVIEW_FACES = {
     "light": {"slab": "#ffffff", "cell": "#e8e8e8", "focal": "#f7e3d6", "focal_cell": "#f5c8ab"},

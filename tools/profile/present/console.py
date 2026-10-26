@@ -5,7 +5,7 @@ consecutive <img> tags. Each slice is W wide, a multiple of ROW px tall, and
 redraws the same side rails. Only the first slice caps the top and draws the
 title bar; only the last closes the frame.
 
-Both themes are the Mine Final token set: DARK is its `dark` theme, LIGHT its
+Both themes are the Fabric token set: DARK is its `dark` theme, LIGHT its
 `light` one. Panels never name a colour, they ask the theme for a role.
 render.py runs each panel once per theme and readme.py pairs the output with
 <picture>, so the console follows the reader's system setting.
@@ -18,7 +18,7 @@ tests/test_console.py pins all sixteen against the preview's own output; that
 test is the only thing keeping the two renderers in agreement, so a change here
 that does not also change the preview is a bug in one of them.
 
-`accent` is the same value in both themes. Mine Final shares all four of its
+`accent` is the same value in both themes. Fabric shares all four of its
 accent roles across the two polarities, on the grounds that a brand hue which
 changes with the reader's system setting is two brands. It clears 3:1 on both
 canvases and 4.5:1 on neither, which is the whole reason it never sets type.

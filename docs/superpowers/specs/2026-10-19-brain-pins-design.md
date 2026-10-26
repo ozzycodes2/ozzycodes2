@@ -13,14 +13,14 @@ is "line charts, isometric shapes, like a printed circuit" and whose right half
 is rounder and organic, deliberately floating off the grid. The grid background
 of that shot is not wanted.
 
-The drawing language is Mine Final, as the rest of the profile already is.
+The drawing language is Fabric, as the rest of the profile already is.
 
 ## Goals
 
 - Two animated pins acting as column headers, one per hemisphere.
 - Four pinned repositories beneath them, falling into the correct column.
 - Legible and correct on both GitHub themes, with no second artifact per theme.
-- The halves visibly disagree: left obeys Mine Final's grid, right breaks it.
+- The halves visibly disagree: left obeys Fabric's grid, right breaks it.
 
 ## Non-goals
 
@@ -101,12 +101,12 @@ Terkel's GIF carries a two-entry global palette with index 0 flagged
 transparent. There is no white background; the card surface shows through.
 One visible colour, no theming.
 
-Mine Final makes this free. Its accent, `#ef6306`, is deliberately identical in
+Fabric makes this free. Its accent, `#ef6306`, is deliberately identical in
 both themes, on the stated grounds that a brand hue which follows the reader's
 OS setting is not one brand. An accent-on-transparent drawing is therefore
 theme-invariant by construction.
 
-The consequence is that **the art carries no type**. Mine Final forbids the
+The consequence is that **the art carries no type**. Fabric forbids the
 accent from setting type at any size in either theme, and a transparent
 two-colour image has no ink to set it in. The gist description is the label. This
 is a constraint, not a limitation to work around.
@@ -122,7 +122,7 @@ to ship.
 
 ### Motion budget
 
-Mine Final's system document bans animating transform and opacity outright. The
+Fabric's system document bans animating transform and opacity outright. The
 diagram motion layer is a gated exception to it, and these pins live under that
 exception, in its `loop` mode: one decorative token repeats and the meaning does
 not change. Its clock is `--motion-fast: 160ms`, `--motion-step: 480ms`,
@@ -195,11 +195,11 @@ Taken by the author:
 
 - Two hemispheres, engineering left and creative right, matching Terkel's split.
 - The pins sit beneath an unchanged README console.
-- Mine Final is the drawing language.
+- Fabric is the drawing language.
 - The Dribbble shot is the compositional reference, without its grid background.
-- **The halves disagree.** The left obeys Mine Final — 2:1 dimetric, orthogonal,
+- **The halves disagree.** The left obeys Fabric — 2:1 dimetric, orthogonal,
   on the 4px grid, which is the kit `panels.js` already has. The right breaks
-  that grid deliberately: round, organic, floating. Mine Final has no vocabulary
+  that grid deliberately: round, organic, floating. Fabric has no vocabulary
   for this, so the right half is invention rather than port, and the two halves
   are meant to look like they are arguing.
 - Which repositories go in which column is deferred.
@@ -232,7 +232,7 @@ Taken by the designer, open to reversal:
   not survive contact: `test/smoke.mjs` hardcodes `TAB_IDS` and asserts every
   system × tab yields at least 400 characters, so a gate would mean shipping a
   filler panel for eight systems to satisfy a test.
-- **The motion exception is recorded as prose** in the mine-final system
+- **The motion exception is recorded as prose** in the fabric system
   document, not as tokens. That system reports `0 unspent` and nothing in a GIF
   pipeline would ever reference a motion token, so adding them breaks the census
   to document something a sentence already covers.
@@ -277,9 +277,9 @@ regenerate the vendored copy. Never hand-edit `tools/brains/*.svg`.
 A tracer bullet first: one hemisphere, few frames, all the way through to a
 pinned card, looked at in both themes before the second is started.
 
-1. Draw in `~/Documents/personal/design-preview` first. `BACKPORT.md` makes this
+1. Draw in `~/personal/design-preview` first. `BACKPORT.md` makes this
    the default path for anything that changes how a drawing looks, and the
-   preview is vanilla JS with no build step. `mine-final` must report 0 unspent
+   preview is vanilla JS with no build step. `fabric` must report 0 unspent
    tokens. Add the assertion before porting, then break the renderer on purpose
    and confirm the assertion fails.
 2. Vendor the generated SVG to `tools/brains/`, with its provenance comment.
