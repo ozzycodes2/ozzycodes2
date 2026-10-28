@@ -1,17 +1,17 @@
 [
   {
     "file": "header.svg",
-    "desc": "Osniel Quintana (@ozzycodes2), platform engineer. 3 tagline lines. Current streak 2 days.",
+    "desc": "Osniel Quintana (@ozzycodes2), platform engineer. 3 tagline lines. Current streak 3 days.",
     "width": "100%"
   },
   {
     "file": "stats.svg",
-    "desc": "1,851 contributions in 2026, 507 of 574 pull requests merged, 8 repositories touched, longest streak 6 days.",
+    "desc": "1,927 contributions in 2026, 525 of 593 pull requests merged, 8 repositories touched, longest streak 6 days.",
     "width": "100%"
   },
   {
     "file": "contribution-city.svg",
-    "desc": "Isometric plan of 26 weeks: 182 tiles, 76 built on, 1,848 contributions. Tallest block is 116 on 2026-10-13.",
+    "desc": "Isometric plan of 26 weeks: 182 tiles, 77 built on, 1,924 contributions. Tallest block is 116 on 2026-10-13.",
     "width": "100%"
   },
   {
@@ -43,7 +43,7 @@
   },
   {
     "file": "projects-3.svg",
-    "desc": "email-signatures, updated 3mo ago. Tagged HTML, Email. Hand-written HTML email signatures that survive Outlook, Gmail and the dark-mode inversion every client applies differently.",
+    "desc": "email-signatures, updated 4mo ago. Tagged HTML, Email. Hand-written HTML email signatures that survive Outlook, Gmail and the dark-mode inversion every client applies differently.",
     "width": "50%",
     "href": "https://github.com/ozzycodes2/email-signatures"
   },
