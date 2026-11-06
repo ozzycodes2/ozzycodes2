@@ -1,17 +1,17 @@
 [
   {
     "file": "header.svg",
-    "desc": "Osniel Quintana (@ozzycodes2), platform engineer. 3 tagline lines. Current streak 4 days.",
+    "desc": "Osniel Quintana (@ozzycodes2), platform engineer. 3 tagline lines. Current streak 5 days.",
     "width": "100%"
   },
   {
     "file": "stats.svg",
-    "desc": "2,157 contributions in 2026, 591 of 685 pull requests merged, 8 repositories touched, longest streak 6 days.",
+    "desc": "2,197 contributions in 2026, 604 of 702 pull requests merged, 8 repositories touched, longest streak 6 days.",
     "width": "100%"
   },
   {
     "file": "contribution-city.svg",
-    "desc": "Isometric plan of 26 weeks: 182 tiles, 83 built on, 2,154 contributions. Tallest block is 116 on 2026-10-13.",
+    "desc": "Isometric plan of 26 weeks: 182 tiles, 84 built on, 2,194 contributions. Tallest block is 116 on 2026-10-13.",
     "width": "100%"
   },
   {
@@ -31,7 +31,7 @@
   },
   {
     "file": "projects-1.svg",
-    "desc": "cc-powerline, updated 2d ago. Tagged TypeScript, CLI. A Claude Code status line for Powerline users: segments for model, context burn, git state and cost, rendered in the glyphs your prompt already uses.",
+    "desc": "cc-powerline, updated 3d ago. Tagged TypeScript, CLI. A Claude Code status line for Powerline users: segments for model, context burn, git state and cost, rendered in the glyphs your prompt already uses.",
     "width": "50%",
     "href": "https://github.com/ozzycodes2/cc-powerline"
   },
