@@ -12,13 +12,13 @@ is vanilla JS with no build step and no deps, so the loop is seconds long. Only
 reverse this for something that exists solely in the README — the slice
 pairing, the `<picture>` tags, the font subset.
 
-Preview tree: `~/Documents/personal/design-preview` (not a git repo — no commit
+Preview tree: `~/personal/design-preview` (not a git repo — no commit
 step, and no history to recover a mistake from; read before you overwrite).
 
 ## 1. Change the preview and prove it
 
 ```bash
-cd ~/Documents/personal/design-preview
+cd ~/personal/design-preview
 python3 build.py            # systems/*.md -> site/data.js. Stock python3, no deps.
 node test/panels.mjs        # geometry, contrast and accent invariants
 node test/smoke.mjs         # every tab of every system renders
@@ -30,7 +30,7 @@ open site/index.html        # file:// works; data.js is a <script>, not a fetch
 `window.DESIGN_SYSTEMS`. If you touched a `systems/DESIGN-*.md` front matter,
 re-run it or the site still shows the old tokens.
 
-`unused_tokens.py` matches declared tokens at the 2-space level. `mine-final`
+`unused_tokens.py` matches declared tokens at the 2-space level. `fabric`
 should report **0 unspent**: a token nothing references is either dead or a
 component that forgot to use it.
 
@@ -47,7 +47,7 @@ asset scripts in page order. Import it and you have `DESIGN_SYSTEMS`,
 
 ```js
 import "/Users/.../design-preview/test/dom-stub.mjs";
-const s = window.DESIGN_SYSTEMS.find((x) => x.slug === "mine-final");
+const s = window.DESIGN_SYSTEMS.find((x) => x.slug === "fabric");
 for (const name of themeNames(s)) {
   applyTheme(s, name);                       // NOT prepare(s, name)
   for (const p of panelSlices(s)) writeFileSync(`/tmp/preview-slices/${name}-${p.file}`, p.svg);
@@ -118,10 +118,8 @@ match:
    source, the token counts — none of which exists here. This one ends the
    session: `$ exit`, then what the shell printed back. The closing band goes
    with it. `panelFooter` sets a second metadata row inside that band and this
-   footer has none to put there, so the same band renders as an empty strip;
-   worse in the dark theme, where `surface` is 1.01:1 from GitHub's own dark
-   page background, so it reads as a hole the last 44px of the window falls
-   through rather than as chrome. Only the top of this window has a band.
+   footer has none to put there, so the same band renders as an empty strip.
+   Only the top of this window has a band.
 7. **Four embedded font faces.** GitHub strips `<link>` and off-origin `url()`,
    so Inter 400/600 and JBM 400/700 are subset and inlined. SF Mono is asked for
    first and is not redistributable, hence the fallback stack.
@@ -157,7 +155,7 @@ panel; rule 6 (what the accent may touch) and rule 11 (above) are the two that
 catch people.
 
 ```bash
-R=~/Documents/personal/ozzycodes2
+R=~/personal/ozzycodes2
 $R/.venv/bin/python -m pytest $R/tests -q --cov=tools.profile --cov-report=term-missing
 ```
 
@@ -193,7 +191,7 @@ A per-slice colour census is the fastest whole-window check — it catches both 
 missed port and an accent that leaked somewhere it does not belong:
 
 ```bash
-for f in assets/dark/*.svg; do printf "%-26s %s\n" "$(basename $f)" "$(grep -o '#ef6306' $f | wc -l)"; done
+for f in assets/dark/*.svg; do printf "%-26s %s\n" "$(basename $f)" "$(grep -o '#ff6a13' $f | wc -l)"; done
 ```
 
 Expected, and worth re-deriving rather than trusting this table if the doctrine

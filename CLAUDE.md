@@ -5,7 +5,7 @@ SVGs. `tools/profile/README.md` is the pipeline;
 `tools/profile/present/panels/CONTRACT.md` is the panel API — read it before
 touching a panel.
 
-The panels are a **port**. The drawing lives in `~/Documents/personal/design-preview`
+The panels are a **port**. The drawing lives in `~/personal/design-preview`
 at `site/assets/panels.js`, and that file is the reference. Any change to how a
 panel looks starts there and is ported here — `tools/profile/BACKPORT.md` is the
 procedure, including the deviations from the preview that are deliberate and

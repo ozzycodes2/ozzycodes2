@@ -13,10 +13,10 @@
 <defs>
 
 </defs>
-<path d="M16 0H440V200H16V0Z" fill="#010102"/>
-<rect x="52" y="18" width="378" height="164" rx="18" fill="#0f1011" stroke="#23252a" stroke-width="1"/>
+<path d="M16 0H440V200H16V0Z" fill="#101214"/>
+<rect x="52" y="18" width="378" height="164" rx="18" fill="#1a1c1d" stroke="#2b2d33" stroke-width="1"/>
 <text x="66" y="48" fill="#f7f8f8" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="15" font-weight="700">email-signatures</text>
-<text x="416" y="48" fill="#909091" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="11" text-anchor="end">4mo ago</text>
+<text x="416" y="48" fill="#969798" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="11" text-anchor="end">4mo ago</text>
 <text x="66" y="74" fill="#d0d6e0" font-family="Inter, &#x27;Helvetica Neue&#x27;, Helvetica, Arial, system-ui, sans-serif" font-size="13">Hand-written HTML email signatures that survive</text>
 <text x="66" y="93" fill="#d0d6e0" font-family="Inter, &#x27;Helvetica Neue&#x27;, Helvetica, Arial, system-ui, sans-serif" font-size="13">Outlook, Gmail and the dark-mode inversion every</text>
 <text x="66" y="112" fill="#d0d6e0" font-family="Inter, &#x27;Helvetica Neue&#x27;, Helvetica, Arial, system-ui, sans-serif" font-size="13">client applies differently.</text>
@@ -24,5 +24,5 @@
 <text x="75" y="162" fill="#d0d6e0" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="11">HTML</text>
 <rect x="116" y="146" width="51" height="22" rx="5" fill="#f7f8f8" opacity="0.06"/>
 <text x="125" y="162" fill="#d0d6e0" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="11">Email</text>
-<path d="M16 200V0" fill="none" stroke="#23252a" stroke-width="2" shape-rendering="crispEdges"/>
+<path d="M16 200V0" fill="none" stroke="#2b2d33" stroke-width="2" shape-rendering="crispEdges"/>
 </svg>

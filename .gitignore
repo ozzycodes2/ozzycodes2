@@ -6,3 +6,6 @@ __pycache__/
 # Local side-by-side theme preview. The workflow's `git add assets` would
 # otherwise commit it on every run.
 assets/preview.html
+
+# Per-plan execution scratch: ledgers, task briefs, review packages.
+.superpowers/

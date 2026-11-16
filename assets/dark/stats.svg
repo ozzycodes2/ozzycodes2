@@ -13,30 +13,30 @@
 <defs>
 
 </defs>
-<path d="M16 0H864V280H16V0Z" fill="#010102"/>
-<text x="52" y="36" fill="#909091" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="20" font-weight="700">~/</text>
+<path d="M16 0H864V280H16V0Z" fill="#101214"/>
+<text x="52" y="36" fill="#969798" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="20" font-weight="700">~/</text>
 <text x="76" y="36" fill="#f7f8f8" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="20" font-weight="700">stats</text>
-<text x="828" y="36" fill="#909091" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="12" letter-spacing="1" text-anchor="end">captured 2026-11-15</text>
-<line x1="52" y1="50" x2="828" y2="50" stroke="#23252a" stroke-width="1" shape-rendering="crispEdges"/><line x1="52" y1="50" x2="172" y2="50" stroke="#ef6306" stroke-width="2" shape-rendering="crispEdges"/>
-<text x="52" y="66" fill="#909091" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="12">$</text>
+<text x="828" y="36" fill="#969798" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="12" letter-spacing="1" text-anchor="end">captured 2026-11-15</text>
+<line x1="52" y1="50" x2="828" y2="50" stroke="#2b2d33" stroke-width="1" shape-rendering="crispEdges"/><line x1="52" y1="50" x2="172" y2="50" stroke="#ff6a13" stroke-width="2" shape-rendering="crispEdges"/>
+<text x="52" y="66" fill="#969798" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="12">$</text>
 <text x="66" y="66" fill="#d0d6e0" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="12">gh api graphql -f login=ozzycodes2</text>
-<text x="52" y="98" fill="#909091" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="11" letter-spacing="0.5">contributions 2026</text>
+<text x="52" y="98" fill="#969798" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="11" letter-spacing="0.5">contributions 2026</text>
 <text x="52" y="136" fill="#f7f8f8" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="32" font-weight="700" letter-spacing="-0.5">2,531</text>
-<line x1="52" y1="156" x2="286" y2="156" stroke="#23252a" stroke-width="1" shape-rendering="crispEdges"/>
-<text x="310" y="98" fill="#909091" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="11" letter-spacing="0.5">pull requests merged</text>
+<line x1="52" y1="156" x2="286" y2="156" stroke="#2b2d33" stroke-width="1" shape-rendering="crispEdges"/>
+<text x="310" y="98" fill="#969798" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="11" letter-spacing="0.5">pull requests merged</text>
 <text x="310" y="136" fill="#f7f8f8" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="32" font-weight="700" letter-spacing="-0.5">662</text>
-<line x1="310" y1="156" x2="544" y2="156" stroke="#23252a" stroke-width="1" shape-rendering="crispEdges"/>
-<text x="568" y="98" fill="#909091" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="11" letter-spacing="0.5">repositories touched</text>
+<line x1="310" y1="156" x2="544" y2="156" stroke="#2b2d33" stroke-width="1" shape-rendering="crispEdges"/>
+<text x="568" y="98" fill="#969798" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="11" letter-spacing="0.5">repositories touched</text>
 <text x="568" y="136" fill="#f7f8f8" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="32" font-weight="700" letter-spacing="-0.5">11</text>
-<line x1="568" y1="156" x2="802" y2="156" stroke="#23252a" stroke-width="1" shape-rendering="crispEdges"/>
-<text x="52" y="178" fill="#909091" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="11" letter-spacing="0.5">private share</text>
+<line x1="568" y1="156" x2="802" y2="156" stroke="#2b2d33" stroke-width="1" shape-rendering="crispEdges"/>
+<text x="52" y="178" fill="#969798" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="11" letter-spacing="0.5">private share</text>
 <text x="52" y="216" fill="#f7f8f8" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="32" font-weight="700" letter-spacing="-0.5">86%</text>
-<line x1="52" y1="236" x2="286" y2="236" stroke="#23252a" stroke-width="1" shape-rendering="crispEdges"/>
-<text x="310" y="178" fill="#909091" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="11" letter-spacing="0.5">longest streak</text>
+<line x1="52" y1="236" x2="286" y2="236" stroke="#2b2d33" stroke-width="1" shape-rendering="crispEdges"/>
+<text x="310" y="178" fill="#969798" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="11" letter-spacing="0.5">longest streak</text>
 <text x="310" y="216" fill="#f7f8f8" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="32" font-weight="700" letter-spacing="-0.5">6d</text>
-<line x1="310" y1="236" x2="544" y2="236" stroke="#23252a" stroke-width="1" shape-rendering="crispEdges"/>
-<text x="568" y="178" fill="#909091" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="11" letter-spacing="0.5">account opened</text>
+<line x1="310" y1="236" x2="544" y2="236" stroke="#2b2d33" stroke-width="1" shape-rendering="crispEdges"/>
+<text x="568" y="178" fill="#969798" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="11" letter-spacing="0.5">account opened</text>
 <text x="568" y="216" fill="#f7f8f8" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="32" font-weight="700" letter-spacing="-0.5">2016</text>
-<line x1="568" y1="236" x2="802" y2="236" stroke="#23252a" stroke-width="1" shape-rendering="crispEdges"/>
-<path d="M16 280V0M864 0V280" fill="none" stroke="#23252a" stroke-width="2" shape-rendering="crispEdges"/>
+<line x1="568" y1="236" x2="802" y2="236" stroke="#2b2d33" stroke-width="1" shape-rendering="crispEdges"/>
+<path d="M16 280V0M864 0V280" fill="none" stroke="#2b2d33" stroke-width="2" shape-rendering="crispEdges"/>
 </svg>

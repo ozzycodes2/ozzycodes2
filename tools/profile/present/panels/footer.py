@@ -2,11 +2,9 @@
 from .. import console as c
 
 # The frame closes directly under the sign-off. A band mirroring the title bar's
-# depth is the obvious symmetry and it was wrong twice over: the preview sets a
-# second line of metadata inside that band and this footer has none to put
-# there, so it drew an empty row under `exit`; and the dark theme's surface is
-# 1.01:1 from GitHub's own dark page, so those 44px did not read as a closing
-# band at all but as a hole the bottom of the window fell through.
+# depth is the obvious symmetry and it was wrong: the preview sets a second line
+# of metadata inside that band and this footer has none to put there, so it
+# drew an empty row under `exit`.
 HEIGHT = 120
 PROMPT_Y = 44     # `$ exit`
 CLOSE_Y = 66      # what the shell printed back

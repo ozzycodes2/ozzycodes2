@@ -5,23 +5,25 @@ consecutive <img> tags. Each slice is W wide, a multiple of ROW px tall, and
 redraws the same side rails. Only the first slice caps the top and draws the
 title bar; only the last closes the frame.
 
-Both themes are the Mine Final token set: DARK is its `dark` theme, LIGHT its
+Both themes are the Fabric token set: DARK is its `dark` theme, LIGHT its
 `light` one. Panels never name a colour, they ask the theme for a role.
 render.py runs each panel once per theme and readme.py pairs the output with
 <picture>, so the console follows the reader's system setting.
 
-The eight role values below are not the raw tokens. They are what the preview's
+The role values below are not the raw tokens. They are what the preview's
 `panelTheme()` derives from them — `dim` and `faint` are pulled toward the ink
-until they clear 4.5:1 on the canvas at the 11-13px these labels run at, and
-`accent` is held to 3:1, the threshold for an object rather than a word.
-tests/test_console.py pins all sixteen against the preview's own output; that
+until they clear 4.5:1 on the canvas at the 11-13px these labels run at.
+tests/test_console.py pins every role against the preview's own output; that
 test is the only thing keeping the two renderers in agreement, so a change here
 that does not also change the preview is a bug in one of them.
 
-`accent` is the same value in both themes. Mine Final shares all four of its
-accent roles across the two polarities, on the grounds that a brand hue which
-changes with the reader's system setting is two brands. It clears 3:1 on both
-canvases and 4.5:1 on neither, which is the whole reason it never sets type.
+`accent` is the raw primary, the same value in both themes. Fabric shares all
+four of its accent roles across the two polarities, on the grounds that a brand
+hue which changes with the reader's system setting is two brands. It clears
+6.55:1 on the dark canvas and 2.47:1 on the light one, where Fabric's design
+doc treats an accent edge as emphasis rather than identity: allowed under 3:1,
+provided no type wears it. `mark` is what the tagline's one marked noun is set
+in — the accent where it clears 4.5:1, the ink where it does not.
 
 Type is not the token scale. A terminal has its own, and these panels set it per
 element in presentation attributes: mono at 11/12/13/15/20/32 for everything
@@ -55,7 +57,7 @@ class Theme(NamedTuple):
     every section rule, identical down the window, so the eye finds the
     sections without a second type weight. As data it marks the single highest
     value in a set, at most once per panel. It paints objects only — a dot, a
-    bar, a tower — never a word.
+    bar, a tower — never a word. `mark` is the one exception's colour.
     """
     name: str
     canvas: str
@@ -65,18 +67,21 @@ class Theme(NamedTuple):
     faint: str
     hairline: str
     accent: str
+    mark: str
 
 
 LIGHT = Theme(
     name="light",
-    canvas="#f8f8f8", ink="#171717", surface="#ffffff",
-    dim="#4d4d4d", faint="#727272", hairline="#d9d9d9", accent="#ef6306",
+    canvas="#eceef0", ink="#171717", surface="#f7f8f8",
+    dim="#2c2c2c", faint="#6b6c6d", hairline="#cbcdd4", accent="#ff6a13",
+    mark="#171717",
 )
 
 DARK = Theme(
     name="dark",
-    canvas="#010102", ink="#f7f8f8", surface="#0f1011",
-    dim="#d0d6e0", faint="#909091", hairline="#23252a", accent="#ef6306",
+    canvas="#101214", ink="#f7f8f8", surface="#1a1c1d",
+    dim="#d0d6e0", faint="#969798", hairline="#2b2d33", accent="#ff6a13",
+    mark="#ff6a13",
 )
 
 THEMES = (LIGHT, DARK)

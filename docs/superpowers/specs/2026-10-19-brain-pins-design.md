@@ -13,14 +13,14 @@ is "line charts, isometric shapes, like a printed circuit" and whose right half
 is rounder and organic, deliberately floating off the grid. The grid background
 of that shot is not wanted.
 
-The drawing language is Mine Final, as the rest of the profile already is.
+The drawing language is Fabric, as the rest of the profile already is.
 
 ## Goals
 
 - Two animated pins acting as column headers, one per hemisphere.
 - Four pinned repositories beneath them, falling into the correct column.
 - Legible and correct on both GitHub themes, with no second artifact per theme.
-- The halves visibly disagree: left obeys Mine Final's grid, right breaks it.
+- The halves visibly disagree: left obeys Fabric's grid, right breaks it.
 
 ## Non-goals
 
@@ -58,13 +58,26 @@ bare div:
             background-position-y: top; overflow: hidden;"></div>
 ```
 
-Height is pinned at 100px. Displayed width follows from the aspect ratio.
-Terkel's 1340×400 therefore paints at 335×100.
+Height is pinned at 100px, and the box's width is the column's: 374px wherever
+the viewport is wide enough, narrower below about 1280. `contain` fits whichever
+axis is tighter and leaves the slack on the other, and `background-position`
+puts that slack at the right and the bottom.
+
+Which of the two it is decides where the drawing can be anchored. Terkel's
+1340×400 is 3.35:1 against the box's 3.74:1, so it fits by height, paints at
+335×100, and leaves 39px of bare card down the right — fatal for a half anchored
+to the inner edge, because that slack is the gutter. **The art is therefore
+1496×400**, the box's own ratio: no slack in either axis at full width, and at
+narrower widths it fits by width and the slack falls harmlessly underneath. The
+fit factor is 0.25 either way, so the drawing paints the same size regardless.
 
 There is no `<img>`, so no `alt`, no `width`, no link on the image itself, and
-no hover. The only link is the card title, which is **the gist's filename** —
-`Left Brain.gif` renders as the card heading, extension included, in GitHub's
-own theme-aware colour.
+no hover. The only link is the card title, which is **the gist's description**,
+truncated to about 40 characters with an ellipsis and repeated in full in a
+`tool-tip`, in GitHub's own theme-aware colour. The filename appears nowhere on
+the card; it only has to keep a raster extension so the card renders an image at
+all. So the description is the label, and it should be exactly the label —
+anything appended to it is thrown away mid-word.
 
 ### SVG cannot be used here
 
@@ -88,14 +101,14 @@ Terkel's GIF carries a two-entry global palette with index 0 flagged
 transparent. There is no white background; the card surface shows through.
 One visible colour, no theming.
 
-Mine Final makes this free. Its accent, `#ef6306`, is deliberately identical in
+Fabric makes this free. Its accent, `#ef6306`, is deliberately identical in
 both themes, on the stated grounds that a brand hue which follows the reader's
 OS setting is not one brand. An accent-on-transparent drawing is therefore
 theme-invariant by construction.
 
-The consequence is that **the art carries no type**. Mine Final forbids the
+The consequence is that **the art carries no type**. Fabric forbids the
 accent from setting type at any size in either theme, and a transparent
-two-colour image has no ink to set it in. The gist filename is the label. This
+two-colour image has no ink to set it in. The gist description is the label. This
 is a constraint, not a limitation to work around.
 
 ### 1-bit alpha, resolved by supersampling
@@ -109,12 +122,19 @@ to ship.
 
 ### Motion budget
 
-Mine Final's system document bans animating transform and opacity outright. The
+Fabric's system document bans animating transform and opacity outright. The
 diagram motion layer is a gated exception to it, and these pins live under that
 exception, in its `loop` mode: one decorative token repeats and the meaning does
 not change. Its clock is `--motion-fast: 160ms`, `--motion-step: 480ms`,
 `--motion-hold: 720ms`, with a loop of at least 3s and travel capped at 24px.
 Terkel's loop is 5.54s across 48 frames.
+
+The cap buys a loop that reads the same joined at any point. A field of marks
+repeating every *p* and translated by exactly *p* buys that outright — every
+mark lands where its neighbour stood, so the last frame is the first — and so
+travels its own period instead of 24px. It may travel no other distance: capped
+it wobbles, mistuned it shunts once per loop. What replaces the cap is an
+assertion on the tiling, laid a period past both edges.
 
 Nothing may animate in. A GIF's first frame is what a static renderer, a
 reduced-motion viewer, and GitHub's mobile apps will show, so frame zero must
@@ -131,9 +151,13 @@ Measured numbers, to save the builder rediscovering them:
 - Dither cost over 24 frames: none 54,944 B · atkinson 56,037 · floyd_steinberg
   61,981 · bayer 68,510. `atkinson` is the right default for flat vector art and
   needs ffmpeg ≥ 6.0.
-- Do not let `palettegen` pick a generous palette. Re-encoding Terkel's
-  two-colour GIF with `max_colors=32` grew it from 117 KB to 291 KB.
-- Reserve the transparent entry explicitly (`reserve_transparent=1`).
+- Do not let `palettegen` pick the palette at all. A generous one is expensive —
+  re-encoding Terkel's two-colour GIF with `max_colors=32` grew it from 117 KB
+  to 291 KB — and the smallest one ffmpeg permits alongside a reserved
+  transparent slot still resolves its painted entry to a histogram average,
+  which the browser's antialiased edge pulls off the accent: `#ed6206` against
+  `#ef6306`, measured. Supply the 256 entries `paletteuse` demands instead, with
+  the fully transparent one last.
 
 Camo is not in the path — gist files serve from `gist.githubusercontent.com`
 directly — so the 5 MiB camo cap does not apply. Keep files small anyway; 48
@@ -171,11 +195,11 @@ Taken by the author:
 
 - Two hemispheres, engineering left and creative right, matching Terkel's split.
 - The pins sit beneath an unchanged README console.
-- Mine Final is the drawing language.
+- Fabric is the drawing language.
 - The Dribbble shot is the compositional reference, without its grid background.
-- **The halves disagree.** The left obeys Mine Final — 2:1 dimetric, orthogonal,
+- **The halves disagree.** The left obeys Fabric — 2:1 dimetric, orthogonal,
   on the 4px grid, which is the kit `panels.js` already has. The right breaks
-  that grid deliberately: round, organic, floating. Mine Final has no vocabulary
+  that grid deliberately: round, organic, floating. Fabric has no vocabulary
   for this, so the right half is invention rather than port, and the two halves
   are meant to look like they are arguing.
 - Which repositories go in which column is deferred.
@@ -191,8 +215,10 @@ Taken by the designer, open to reversal:
 
 - Transparent background with the accent as the only visible colour, rather than
   a themed pair of files.
-- No type inside the art; the gist filename does the labelling.
-- 1340×400 source art, matching Terkel's 4× ratio.
+- No type inside the art; the gist description does the labelling.
+- 1496×400 source art, matching the card box's 3.74:1 rather than Terkel's 4:1.
+  A half anchored to the inner edge needs the image to reach that edge, and
+  under `contain` only an exact ratio match guarantees it.
 - **Capture tool is Python with Playwright**, run by hand, absent from CI. The
   repo is Python, the coverage bar is pytest, and the workflow's `paths:` filter
   and `git add` list already exclude a new tool directory. Browser-dependent code
@@ -206,7 +232,7 @@ Taken by the designer, open to reversal:
   not survive contact: `test/smoke.mjs` hardcodes `TAB_IDS` and asserts every
   system × tab yields at least 400 characters, so a gate would mean shipping a
   filler panel for eight systems to satisfy a test.
-- **The motion exception is recorded as prose** in the mine-final system
+- **The motion exception is recorded as prose** in the fabric system
   document, not as tokens. That system reports `0 unspent` and nothing in a GIF
   pipeline would ever reference a motion token, so adding them breaks the census
   to document something a sentence already covers.
@@ -251,9 +277,9 @@ regenerate the vendored copy. Never hand-edit `tools/brains/*.svg`.
 A tracer bullet first: one hemisphere, few frames, all the way through to a
 pinned card, looked at in both themes before the second is started.
 
-1. Draw in `~/Documents/personal/design-preview` first. `BACKPORT.md` makes this
+1. Draw in `~/personal/design-preview` first. `BACKPORT.md` makes this
    the default path for anything that changes how a drawing looks, and the
-   preview is vanilla JS with no build step. `mine-final` must report 0 unspent
+   preview is vanilla JS with no build step. `fabric` must report 0 unspent
    tokens. Add the assertion before porting, then break the renderer on purpose
    and confirm the assertion fails.
 2. Vendor the generated SVG to `tools/brains/`, with its provenance comment.

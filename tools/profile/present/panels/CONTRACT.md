@@ -67,11 +67,13 @@ the same device columns from one slice to the next is the `preserveAspectRatio`
 `slice_svg` sets — without it they step at the seams. Panels do not draw rails —
 `slice_svg` does — so `EDGE_W` is the only one you need.
 
-Theme roles: `canvas` `surface` `ink` `dim` `faint` `hairline` `accent`. Three
+Theme roles: `canvas` `surface` `ink` `dim` `faint` `hairline` `accent` `mark`. Three
 text tiers, not two — `ink` carries meaning, `dim` is supporting prose, `faint`
 is the label above a value and the counter beside a heading. `surface` is the one
 step above the canvas and the whole of this system's depth; there are no shadows.
 `accent` is the same hex in both themes — see rule 6 for what it may touch.
+`mark` is the colour of rule 6's one accented word: the accent where it clears
+4.5:1, the ink where it does not.
 `LIGHT` and `DARK` are the two instances, `THEMES` is both.
 
 Type is set per element, as a presentation attribute through `tx`, not as a
@@ -127,9 +129,11 @@ families and the two radii.
    than a second datum. A set of equals gets nothing: `~/projects`
    carries only the rule. Where the accent paints a surface rather than a mark
    it goes in as a mix over the canvas, not as the literal: six logos on a field
-   of chroma are six logos nobody can read. The accent sets type in exactly one
-   place — the employer's name in `~/header`'s tagline, in caps at weight 700 —
-   since the accent is corrected to 3:1. It is there by instruction. Nothing
+   of chroma are six logos nobody can read. The accent sets type in at most one
+   place — the employer's name in `~/header`'s tagline, in caps at weight 700,
+   in `mark` — and only on the dark canvas, where it clears 4.5:1. On the light
+   one the accent is 2.47:1, an edge Fabric allows as emphasis, and the name is
+   ink at the same weight. It is there by instruction. Nothing
    else joins it: a second accented word and the first stops reading as the
    exception. The three tiers corrected for type are `ink`, `dim` and `faint`.
 

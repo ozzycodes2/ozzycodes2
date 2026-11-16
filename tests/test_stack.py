@@ -323,16 +323,16 @@ def test_a_tool_with_no_vendored_mark_falls_back_to_type():
 
 # --- paint -----------------------------------------------------------------
 
-# Read out of the preview's slabFaces()/focalTint()/brand() against mine-final.
+# Read out of the preview's slabFaces()/focalTint()/brand() against fabric.
 # Solved values, not declared ones — see this module's docstring.
 PREVIEW_FACES = {
-    "light": {"slab": "#ffffff", "cell": "#e8e8e8", "focal": "#f7e3d6", "focal_cell": "#f5c8ab"},
-    "dark": {"slab": "#0f1011", "cell": "#262728", "focal": "#2c1303", "focal_cell": "#502103"},
+    "light": {"slab": "#f7f8f8", "cell": "#e1e2e2", "focal": "#efdcd1", "focal_cell": "#f2c1a5"},
+    "dark": {"slab": "#1a1c1d", "cell": "#303233", "focal": "#3b2214", "focal_cell": "#5f2f14"},
 }
 PREVIEW_BRAND = {
     # Black marks on a near-black canvas are holes, not brands.
-    "light": {"Rust": "#000000", "Swift": "#e74f37", "Datadog": "#632ca6"},
-    "dark": {"Rust": "#727272", "Swift": "#f05138", "Datadog": "#875dba"},
+    "light": {"Rust": "#000000", "Swift": "#df4c35", "Datadog": "#632ca6"},
+    "dark": {"Rust": "#7c7c7c", "Swift": "#f05138", "Datadog": "#8f69bf"},
 }
 
 

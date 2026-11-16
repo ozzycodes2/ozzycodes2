@@ -103,18 +103,18 @@ def test_mix_returns_a_literal_hex_with_no_opacity(theme):
 
 # --- the themes ------------------------------------------------------------
 
-# What the preview's panelTheme() derives from DESIGN-mine-final.md. These are
+# What the preview's panelTheme() derives from DESIGN-fabric.md. These are
 # the numbers that make the two renderers agree, so they are pinned literally
 # rather than recomputed — a test that derived them the same way console.py does
 # would pass whatever console.py said. Regenerate by running panelTheme() in
-# design-preview against mine-final and reading off both themes.
+# design-preview against fabric and reading off both themes.
 PREVIEW = {
-    "dark": dict(canvas="#010102", ink="#f7f8f8", surface="#0f1011",
-                 dim="#d0d6e0", faint="#909091", hairline="#23252a",
-                 accent="#ef6306"),
-    "light": dict(canvas="#f8f8f8", ink="#171717", surface="#ffffff",
-                  dim="#4d4d4d", faint="#727272", hairline="#d9d9d9",
-                  accent="#ef6306"),
+    "dark": dict(canvas="#101214", ink="#f7f8f8", surface="#1a1c1d",
+                 dim="#d0d6e0", faint="#969798", hairline="#2b2d33",
+                 accent="#ff6a13", mark="#ff6a13"),
+    "light": dict(canvas="#eceef0", ink="#171717", surface="#f7f8f8",
+                  dim="#2c2c2c", faint="#6b6c6d", hairline="#cbcdd4",
+                  accent="#ff6a13", mark="#171717"),
 }
 
 
@@ -127,7 +127,7 @@ def test_each_theme_matches_the_preview_role_for_role(theme):
 
 def test_the_accent_is_one_value_across_both_themes():
     """A brand hue that changes with the reader's system setting is two brands,
-    so Mine Final shares the accent where it splits every other role."""
+    so Fabric shares the accent where it splits every other role."""
     assert len({t.accent for t in c.THEMES}) == 1
 
 
