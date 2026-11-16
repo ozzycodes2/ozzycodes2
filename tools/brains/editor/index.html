@@ -15,37 +15,37 @@
     align-items: center; padding: .6rem 1rem; background: #0d1117;
     border-bottom: 1px solid #21262d;
   }
-  header b { color: #ef6306; font-weight: 600; }
+  header b { color: #de5100; font-weight: 600; }
   button, select {
     font: inherit; color: inherit; background: #161b22;
     border: 1px solid #30363d; border-radius: 4px; padding: .2rem .6rem;
   }
-  button:hover { border-color: #ef6306; }
+  button:hover { border-color: #de5100; }
   #saved { color: #3fb950; }
   #saved[data-dirty] { color: #d29922; }
   main { padding: 1rem; overflow: auto; }
   svg { display: block; }
   /* The grid is construction: thin, dim, and never the thing being drawn. */
-  .grid line { stroke: #ef6306; stroke-opacity: .22; stroke-width: 1; }
+  .grid line { stroke: #de5100; stroke-opacity: .22; stroke-width: 1; }
   .hit { fill: none; stroke: transparent; stroke-width: 16; cursor: pointer; }
-  .hit:hover { stroke: #ef630633; }
+  .hit:hover { stroke: #de510033; }
   /* Narrower than a side's: an arc now ends exactly on a tip, whose own hit
      area sits on top of it. */
   .hit.arc { stroke-width: 10; }
   /* A disc, not a ring — `fill: none` would leave only its edge clickable. */
-  .hit.tip { fill: #ef630600; stroke-width: 0; }
-  .hit.tip:hover { fill: #ef630655; }
-  .on { stroke: #ef6306; stroke-width: 4; stroke-linecap: round; pointer-events: none; }
+  .hit.tip { fill: #de510000; stroke-width: 0; }
+  .hit.tip:hover { fill: #de510055; }
+  .on { stroke: #de5100; stroke-width: 4; stroke-linecap: round; pointer-events: none; }
   .on.dash { stroke-dasharray: 8 12; }
   .on.arc { fill: none; }
-  .node { fill: #ef6306; pointer-events: none; }
+  .node { fill: #de5100; pointer-events: none; }
   /* A terminal is smaller than a junction and hollow: a line that stops is a
      lighter mark than one that meets another. The stroke is half the radius, so
      the hole is half the ring whatever size the mark is. */
-  .node.ring { fill: none; stroke: #ef6306; stroke-width: 2; }
+  .node.ring { fill: none; stroke: #de5100; stroke-width: 2; }
   /* Which tip a circle hangs off. Construction, like the grid — the figure has
      no mark at the centre. */
-  .anchor { fill: #ef6306; fill-opacity: .4; pointer-events: none; }
+  .anchor { fill: #de5100; fill-opacity: .4; pointer-events: none; }
   /* The published extent, so a shape can be held to the size the other half
      is tuned to. Not drawn in the figure. */
   .extent { fill: none; stroke: #58a6ff; stroke-opacity: .5; stroke-width: 1; stroke-dasharray: 4 4; }

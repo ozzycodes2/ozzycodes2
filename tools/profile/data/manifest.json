@@ -21,7 +21,7 @@
   },
   {
     "file": "route.svg",
-    "desc": "4 roles from 2016 to 2026, spaced by date on one axis: first commit, 2016-08; JP Morgan, 2019-07 .. 2020-12 (1y 6mo); Apple, 2020-12 .. 2022-01 (1y 2mo); Twilio, 2022-01 .. 2026-07 (4y 7mo); Machinify, 2026-07 .. now (3mo).",
+    "desc": "4 roles from 2016 to 2026, spaced by date on one axis: first commit, 2016-08; JP Morgan, 2019-07 .. 2020-12 (1y 6mo); Apple, 2020-12 .. 2022-01 (1y 2mo); Twilio, 2022-01 .. 2026-07 (4y 7mo); Machinify, 2026-07 .. now (4mo).",
     "width": "100%"
   },
   {
@@ -31,7 +31,7 @@
   },
   {
     "file": "projects-1.svg",
-    "desc": "cc-powerline, updated 2mo ago. Tagged TypeScript, CLI. A Claude Code status line for Powerline users: segments for model, context burn, git state and cost, rendered in the glyphs your prompt already uses.",
+    "desc": "cc-powerline, updated 3mo ago. Tagged TypeScript, CLI. A Claude Code status line for Powerline users: segments for model, context burn, git state and cost, rendered in the glyphs your prompt already uses.",
     "width": "50%",
     "href": "https://github.com/ozzycodes2/cc-powerline"
   },
@@ -43,7 +43,7 @@
   },
   {
     "file": "projects-3.svg",
-    "desc": "email-signatures, updated 3mo ago. Tagged HTML, Email. Hand-written HTML email signatures that survive Outlook, Gmail and the dark-mode inversion every client applies differently.",
+    "desc": "email-signatures, updated 4mo ago. Tagged HTML, Email. Hand-written HTML email signatures that survive Outlook, Gmail and the dark-mode inversion every client applies differently.",
     "width": "50%",
     "href": "https://github.com/ozzycodes2/email-signatures"
   },

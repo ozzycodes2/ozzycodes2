@@ -13,25 +13,25 @@
 <defs>
 
 </defs>
-<path d="M34 16H846a18 18 0 0 1 18 18V320H16V34a18 18 0 0 1 18 -18Z" fill="#f8f8f8"/>
-<path d="M34 16H846a18 18 0 0 1 18 18V60H16V34a18 18 0 0 1 18 -18Z" fill="#ffffff"/>
-<circle cx="40" cy="38" r="5" fill="none" stroke="#727272" stroke-width="1"/><circle cx="58" cy="38" r="5" fill="none" stroke="#727272" stroke-width="1"/><circle cx="76" cy="38" r="5" fill="none" stroke="#727272" stroke-width="1"/>
-<text x="440" y="43" fill="#727272" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="12" letter-spacing="1" text-anchor="middle">ozzycodes2 — zsh</text>
-<line x1="16" y1="60" x2="864" y2="60" stroke="#d9d9d9" stroke-width="1" shape-rendering="crispEdges"/>
-<text x="52" y="84" fill="#727272" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="12">$</text>
-<text x="66" y="84" fill="#4d4d4d" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="12">whoami</text>
+<path d="M34 16H846a18 18 0 0 1 18 18V320H16V34a18 18 0 0 1 18 -18Z" fill="#eceef0"/>
+<path d="M34 16H846a18 18 0 0 1 18 18V60H16V34a18 18 0 0 1 18 -18Z" fill="#f7f8f8"/>
+<circle cx="40" cy="38" r="5" fill="none" stroke="#6b6c6d" stroke-width="1"/><circle cx="58" cy="38" r="5" fill="none" stroke="#6b6c6d" stroke-width="1"/><circle cx="76" cy="38" r="5" fill="none" stroke="#6b6c6d" stroke-width="1"/>
+<text x="440" y="43" fill="#6b6c6d" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="12" letter-spacing="1" text-anchor="middle">ozzycodes2 — zsh</text>
+<line x1="16" y1="60" x2="864" y2="60" stroke="#cbcdd4" stroke-width="1" shape-rendering="crispEdges"/>
+<text x="52" y="84" fill="#6b6c6d" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="12">$</text>
+<text x="66" y="84" fill="#2c2c2c" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="12">whoami</text>
 <text x="52" y="126" fill="#171717" font-family="Inter, &#x27;Helvetica Neue&#x27;, Helvetica, Arial, system-ui, sans-serif" font-size="40" font-weight="600" letter-spacing="-0.8">Osniel Quintana</text>
-<text x="52" y="154" fill="#4d4d4d" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="13">@ozzycodes2 · platform engineer</text>
-<circle class="live" cx="722" cy="149" r="4" fill="#ef6306"/>
+<text x="52" y="154" fill="#2c2c2c" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="13">@ozzycodes2 · platform engineer</text>
+<circle class="live" cx="722" cy="149" r="4" fill="#ff6a13"/>
 <text x="828" y="154" fill="#171717" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="13" text-anchor="end">1-day streak</text>
-<text x="52" y="188" fill="#727272" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="13">»</text>
-<text x="70" y="188" fill="#4d4d4d" font-family="Inter, &#x27;Helvetica Neue&#x27;, Helvetica, Arial, system-ui, sans-serif" font-size="15">Backend by trade, platform by habit.</text>
-<text x="52" y="210" fill="#727272" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="13">»</text>
-<text x="70" y="210" fill="#4d4d4d" font-family="Inter, &#x27;Helvetica Neue&#x27;, Helvetica, Arial, system-ui, sans-serif" font-size="15">I build the developer tooling other engineers ship on.</text>
-<text x="52" y="232" fill="#727272" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="13">»</text>
-<text x="70" y="232" fill="#4d4d4d" font-family="Inter, &#x27;Helvetica Neue&#x27;, Helvetica, Arial, system-ui, sans-serif" font-size="15">Wiring coding agents into <tspan fill="#ef6306" font-weight="700">MACHINIFY</tspan>&#x27;s toolchain</text>
-<text x="52" y="264" fill="#727272" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="12">$</text>
-<rect class="caret" x="66" y="253" width="7" height="14" fill="#ef6306"/>
-<path d="M16 320V34M864 34V320" fill="none" stroke="#d9d9d9" stroke-width="2" shape-rendering="crispEdges"/>
-<path d="M16 34a18 18 0 0 1 18 -18H846a18 18 0 0 1 18 18" fill="none" stroke="#d9d9d9" stroke-width="2"/>
+<text x="52" y="188" fill="#6b6c6d" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="13">»</text>
+<text x="70" y="188" fill="#2c2c2c" font-family="Inter, &#x27;Helvetica Neue&#x27;, Helvetica, Arial, system-ui, sans-serif" font-size="15">Backend by trade, platform by habit.</text>
+<text x="52" y="210" fill="#6b6c6d" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="13">»</text>
+<text x="70" y="210" fill="#2c2c2c" font-family="Inter, &#x27;Helvetica Neue&#x27;, Helvetica, Arial, system-ui, sans-serif" font-size="15">I build the developer tooling other engineers ship on.</text>
+<text x="52" y="232" fill="#6b6c6d" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="13">»</text>
+<text x="70" y="232" fill="#2c2c2c" font-family="Inter, &#x27;Helvetica Neue&#x27;, Helvetica, Arial, system-ui, sans-serif" font-size="15">Wiring coding agents into <tspan fill="#171717" font-weight="700">MACHINIFY</tspan>&#x27;s toolchain</text>
+<text x="52" y="264" fill="#6b6c6d" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="12">$</text>
+<rect class="caret" x="66" y="253" width="7" height="14" fill="#ff6a13"/>
+<path d="M16 320V34M864 34V320" fill="none" stroke="#cbcdd4" stroke-width="2" shape-rendering="crispEdges"/>
+<path d="M16 34a18 18 0 0 1 18 -18H846a18 18 0 0 1 18 18" fill="none" stroke="#cbcdd4" stroke-width="2"/>
 </svg>

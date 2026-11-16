@@ -217,15 +217,22 @@ def tspans(svg):
             for attrs, body in re.findall(r"<tspan\s([^>]*)>(.*?)</tspan>", svg)]
 
 
-def test_a_marked_run_is_the_one_type_the_accent_sets():
-    """Rule 6's single exception, and the only run in the window under 4.5:1 on
-    the canvas — the accent is corrected to 3:1, the threshold for an object."""
-    runs = tspans(marked())
+@pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
+def test_a_marked_run_is_bold_in_the_mark_and_clears_text_contrast(theme):
+    """Rule 6's single exception. The accent sets it only where it clears 4.5:1;
+    on the light canvas it is 2.47:1, so the run falls back to the ink."""
+    runs = tspans(marked(theme=theme))
     assert [b for _, b in runs] == ["MACHINIFY"]
     attrs = runs[0][0]
-    assert attrs["fill"] == c.LIGHT.accent
+    assert attrs["fill"] == theme.mark
     assert attrs["font-weight"] == "700"
+    assert c.contrast(theme.mark, theme.canvas) >= 4.5
+
+
+def test_the_mark_is_the_accent_only_where_the_accent_clears_text_contrast():
+    assert c.DARK.mark == c.DARK.accent
     assert c.contrast(c.LIGHT.accent, c.LIGHT.canvas) < 4.5
+    assert c.LIGHT.mark == c.LIGHT.ink
 
 
 def test_the_marked_run_sits_in_the_line_it_belongs_to():
@@ -235,7 +242,7 @@ def test_the_marked_run_sits_in_the_line_it_belongs_to():
     attrs, body = next((a, b) for a, b in texts(marked())
                        if "Wiring coding agents" in b)
     assert body == ("Wiring coding agents into "
-                    f'<tspan fill="{c.LIGHT.accent}" font-weight="700">MACHINIFY'
+                    f'<tspan fill="{c.LIGHT.mark}" font-weight="700">MACHINIFY'
                     "</tspan>&#x27;s toolchain")
     assert attrs["x"] == str(header.BULLET_X)
     assert attrs["y"] == str(header.TAGLINE_Y)
@@ -269,13 +276,14 @@ def test_markup_inside_a_marked_run_is_escaped():
 
 
 @pytest.mark.parametrize("theme", c.THEMES, ids=lambda t: t.name)
-def test_the_accent_pays_for_a_noun_a_datum_and_the_caret(theme):
-    """Three paints, and the slice has room for no fourth: the employer's name,
-    the one live fact, and the caret — which is chrome rather than a datum, in
-    the same way the rule under every section heading is."""
+def test_the_accent_pays_for_at_most_a_noun_a_datum_and_the_caret(theme):
+    """Three paints at most, and the slice has room for no fourth: the
+    employer's name where the accent may set type, the one live fact, and the
+    caret — which is chrome rather than a datum, in the same way the rule under
+    every section heading is."""
     svg = marked(theme=theme)
-    assert svg.count(theme.accent) == 3
-    assert f'<tspan fill="{theme.accent}" font-weight="700">MACHINIFY' in svg
+    assert svg.count(theme.accent) == (3 if theme.mark == theme.accent else 2)
+    assert f'<tspan fill="{theme.mark}" font-weight="700">MACHINIFY' in svg
     assert f'r="4" fill="{theme.accent}"' in svg
     assert f'<rect class="caret" ' in svg and f'fill="{theme.accent}"/>' in svg
 

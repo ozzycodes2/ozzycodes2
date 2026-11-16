@@ -89,17 +89,6 @@ def test_nothing_is_drawn_under_the_sign_off(out):
     assert c.LIGHT.surface not in out.split("</style>", 1)[-1]
 
 
-def test_the_dark_closing_band_would_dissolve_into_githubs_own_page():
-    """The other half of the reason, and the one a reader cannot see locally.
-    GitHub's dark canvas is #0d1117; `surface` sits 1.01:1 from it, so a band of
-    it at the foot is not a quiet strip but a hole — the window's bottom 44px
-    disappear and the side edges appear to stop above their own corners. The
-    canvas the rest of the window is painted in clears that by an order more."""
-    page = "#0d1117"
-    assert c.contrast(c.DARK.surface, page) < 1.02
-    assert c.contrast(c.DARK.canvas, page) > 1.09
-
-
 def test_the_sign_off_keeps_its_clearance_above_the_edge_the_frame_closes_on(out):
     """It is the last thing in the window, so it needs clearance beneath it as
     well as the gutter the frame already leaves outside itself."""

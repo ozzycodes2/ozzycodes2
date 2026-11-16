@@ -13,10 +13,10 @@
 <defs>
 
 </defs>
-<path d="M0 0H424V200H0V0Z" fill="#010102"/>
-<rect x="10" y="18" width="378" height="164" rx="18" fill="#0f1011" stroke="#23252a" stroke-width="1"/>
+<path d="M0 0H424V200H0V0Z" fill="#101214"/>
+<rect x="10" y="18" width="378" height="164" rx="18" fill="#1a1c1d" stroke="#2b2d33" stroke-width="1"/>
 <text x="24" y="48" fill="#f7f8f8" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="15" font-weight="700">visualizer</text>
-<text x="374" y="48" fill="#909091" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="11" text-anchor="end">6y ago</text>
+<text x="374" y="48" fill="#969798" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="11" text-anchor="end">6y ago</text>
 <text x="24" y="74" fill="#d0d6e0" font-family="Inter, &#x27;Helvetica Neue&#x27;, Helvetica, Arial, system-ui, sans-serif" font-size="13">Step-through visualisation of pathfinding algorithms</text>
 <text x="24" y="93" fill="#d0d6e0" font-family="Inter, &#x27;Helvetica Neue&#x27;, Helvetica, Arial, system-ui, sans-serif" font-size="13">— A*, Dijkstra, BFS, DFS — on a grid you draw walls</text>
 <text x="24" y="112" fill="#d0d6e0" font-family="Inter, &#x27;Helvetica Neue&#x27;, Helvetica, Arial, system-ui, sans-serif" font-size="13">into.</text>
@@ -24,5 +24,5 @@
 <text x="33" y="162" fill="#d0d6e0" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="11">JavaScript</text>
 <rect x="114" y="146" width="84" height="22" rx="5" fill="#f7f8f8" opacity="0.06"/>
 <text x="123" y="162" fill="#d0d6e0" font-family="&#x27;SF Mono&#x27;, ui-monospace, SFMono-Regular, JBM, Menlo, monospace" font-size="11">Algorithms</text>
-<path d="M424 0V200" fill="none" stroke="#23252a" stroke-width="2" shape-rendering="crispEdges"/>
+<path d="M424 0V200" fill="none" stroke="#2b2d33" stroke-width="2" shape-rendering="crispEdges"/>
 </svg>

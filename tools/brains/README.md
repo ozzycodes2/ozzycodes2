@@ -164,11 +164,11 @@ One bit of alpha: a half-opaque pixel is simply absent, so a trail that
 dissolved into the ground would blink out instead of fading. Every step of the
 decay is therefore fully opaque, and what changes along it is shade and weight.
 
-One image for both themes: the accent is already the brightest a pinned figure
-can be. `#ef6306` is 3.25:1 on a white card against a 3:1 floor, and the next
-step lighter is 2.70:1. So the drawing rests below the accent — `#ac4704`, which
-is 3.30:1 on the dark card, the other end of the same band — and the signal is
-the accent itself. Brightness is a step up from rest, not a step past it.
+One image for both themes: the figure takes Fabric's `primary-focus`, `#de5100`,
+because the primary `#ff6a13` is 2.87:1 on a white card against a 3:1 floor.
+`#de5100` is 3.98:1 there. The drawing rests below it — `#ad3f00`, 22% darker,
+which is 3.14:1 on the dark card, the other end of the same band — and the
+signal is the accent itself. Brightness is a step up from rest, not a step past it.
 
 Those shades are the GIF palette. `figures.paints` reads them off the vendored
 SVG and `encode.palette_pixels` shares the 255 opaque slots between them; a

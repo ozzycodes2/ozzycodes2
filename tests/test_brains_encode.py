@@ -18,9 +18,9 @@ import pytest
 from tools.brains import encode, figures
 
 FIXTURE = pathlib.Path(__file__).parent / "fixtures" / "two-colour-transparent.gif"
-ACCENT = (0xEF, 0x63, 0x06)
+ACCENT = (0xDE, 0x51, 0x00)
 # Two more steps off the drawing's decay ramp, for the multi-ink cases.
-TRAIL, REST = (0xC6, 0x52, 0x05), (0xAC, 0x47, 0x04)
+TRAIL, REST = (0xC1, 0x46, 0x00), (0xAD, 0x3F, 0x00)
 needs_ffmpeg = pytest.mark.skipif(shutil.which("ffmpeg") is None, reason="no ffmpeg")
 
 

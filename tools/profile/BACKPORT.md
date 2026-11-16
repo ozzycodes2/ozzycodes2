@@ -118,10 +118,8 @@ match:
    source, the token counts — none of which exists here. This one ends the
    session: `$ exit`, then what the shell printed back. The closing band goes
    with it. `panelFooter` sets a second metadata row inside that band and this
-   footer has none to put there, so the same band renders as an empty strip;
-   worse in the dark theme, where `surface` is 1.01:1 from GitHub's own dark
-   page background, so it reads as a hole the last 44px of the window falls
-   through rather than as chrome. Only the top of this window has a band.
+   footer has none to put there, so the same band renders as an empty strip.
+   Only the top of this window has a band.
 7. **Four embedded font faces.** GitHub strips `<link>` and off-origin `url()`,
    so Inter 400/600 and JBM 400/700 are subset and inlined. SF Mono is asked for
    first and is not redistributable, hence the fallback stack.
@@ -193,7 +191,7 @@ A per-slice colour census is the fastest whole-window check — it catches both 
 missed port and an accent that leaked somewhere it does not belong:
 
 ```bash
-for f in assets/dark/*.svg; do printf "%-26s %s\n" "$(basename $f)" "$(grep -o '#ef6306' $f | wc -l)"; done
+for f in assets/dark/*.svg; do printf "%-26s %s\n" "$(basename $f)" "$(grep -o '#ff6a13' $f | wc -l)"; done
 ```
 
 Expected, and worth re-deriving rather than trusting this table if the doctrine

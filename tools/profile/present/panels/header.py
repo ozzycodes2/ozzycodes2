@@ -30,19 +30,18 @@ MARK = re.compile(r"\*([^*]+)\*")
 
 
 def _tagline(theme, y, line):
-    """One tagline line, with any `*marked*` run set in the accent.
+    """One tagline line, with any `*marked*` run set bold in `theme.mark`.
 
-    This is the one run of type in the window painted in the accent, and so the
-    only one that does not clear 4.5:1 on the canvas — the accent is corrected
-    to 3:1, which is the threshold for an object. It is a proper noun in caps,
-    not prose the line depends on, and it is there by instruction. CONTRACT.md
-    rule 6 records it as the exception it is.
+    This is the one run of type the accent may set, and only where it clears
+    4.5:1: on the light canvas `mark` is the ink and the weight alone marks it.
+    It is a proper noun in caps, not prose the line depends on, and it is there
+    by instruction. CONTRACT.md rule 6 records it as the exception it is.
 
     One <text> with tspans rather than three positioned runs: Inter cannot be
     measured before it is drawn, so the renderer has to do the advancing.
     """
     runs = "".join(
-        f'<tspan fill="{theme.accent}" font-weight="700">{c.e(part)}</tspan>'
+        f'<tspan fill="{theme.mark}" font-weight="700">{c.e(part)}</tspan>'
         if i % 2 else c.e(part)
         for i, part in enumerate(MARK.split(line))
     )

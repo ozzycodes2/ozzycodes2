@@ -24,11 +24,12 @@ NAMES = ("left-brain", "right-brain")
 W, H = 1496, 400
 
 # Theme-invariant by design, so an accent-on-transparent drawing needs no themed
-# pair. 3.25:1 on GitHub light, 5.82:1 on dark — both clear the 3:1 floor for a
-# graphical object, and nothing lighter clears it on light. The drawing paints
+# pair. Fabric's `primary-focus`, not its primary: #ff6a13 is 2.87:1 on GitHub
+# light, under the 3:1 floor for a graphical object. This is 3.98:1 on light and
+# 4.76:1 on dark. The drawing paints
 # this hue at several shades of it, every one of which has to clear the same
 # floor; `test_brains_figures.py` is where that is checked.
-ACCENT = "#ef6306"
+ACCENT = "#de5100"
 
 _FIELD = re.compile(r"^(?:\s|<!--)*(source|generated):\s*(\S+)\s*$", re.M)
 _PAINT = re.compile(r'(?:fill|stroke)="(#[0-9a-f]{6})"')
