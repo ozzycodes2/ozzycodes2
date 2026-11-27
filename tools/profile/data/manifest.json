@@ -1,7 +1,7 @@
 [
   {
     "file": "header.svg",
-    "desc": "Osniel Quintana (@ozzycodes2), platform engineer. 3 tagline lines. Current streak 3 days.",
+    "desc": "Osniel Quintana (@ozzycodes2), platform engineer. 3 tagline lines. Current streak 0 days.",
     "width": "100%"
   },
   {
@@ -31,7 +31,7 @@
   },
   {
     "file": "projects-1.svg",
-    "desc": "cc-powerline, updated 13d ago. Tagged TypeScript, CLI. A Claude Code status line for Powerline users: segments for model, context burn, git state and cost, rendered in the glyphs your prompt already uses.",
+    "desc": "cc-powerline, updated 14d ago. Tagged TypeScript, CLI. A Claude Code status line for Powerline users: segments for model, context burn, git state and cost, rendered in the glyphs your prompt already uses.",
     "width": "50%",
     "href": "https://github.com/ozzycodes2/cc-powerline"
   },
@@ -43,7 +43,7 @@
   },
   {
     "file": "projects-3.svg",
-    "desc": "email-signatures, updated 4mo ago. Tagged HTML, Email. Hand-written HTML email signatures that survive Outlook, Gmail and the dark-mode inversion every client applies differently.",
+    "desc": "email-signatures, updated 5mo ago. Tagged HTML, Email. Hand-written HTML email signatures that survive Outlook, Gmail and the dark-mode inversion every client applies differently.",
     "width": "50%",
     "href": "https://github.com/ozzycodes2/email-signatures"
   },
